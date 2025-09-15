@@ -1,0 +1,38 @@
+.DS_Store
+*.log
+
+# Node / Next
+node_modules/
+.next/
+dist/
+build/
+coverage/
+npm-debug.log*
+yarn-*.log
+pnpm-debug.log*
+
+# Env (secrets)
+.env
+.env.*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+env/
+venv/
+*.egg-info/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+
+# DB locale
+backend/app/db.sqlite3
+
+# IDE
+.idea/
+.vscode/
+Thumbs.db
