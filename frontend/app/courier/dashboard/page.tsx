@@ -12,6 +12,7 @@ import {
   setInvoiceDetailedAndPending,
 } from "@/lib/api";
 import type { Mission, Beneficiary } from "@/lib/types";
+import MissionsCalendar from "@/components/MissionsCalendar"; // ✅ AJOUT
 
 // Libellés FR
 const CAT_FR: Record<string, string> = {
@@ -222,7 +223,8 @@ export default function CourierDashboardPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      {/* --- Header / actions --- */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Tableau de bord Livreur</h1>
         <div className="flex items-center gap-2">
@@ -230,7 +232,7 @@ export default function CourierDashboardPage() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* --- Tabs --- */}
       <div className="flex gap-2">
         {([
           ["pending", "En attente"],
@@ -249,12 +251,14 @@ export default function CourierDashboardPage() {
         ))}
       </div>
 
+      {/* --- Erreurs --- */}
       {err && (
         <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-red-700">
           {err}
         </div>
       )}
 
+      {/* --- Vos widgets existants (listes par statut, actions, etc.) --- */}
       <div className="space-y-3">
         {loading ? (
           <div className="card"><div className="card-body">Chargement…</div></div>
@@ -392,6 +396,15 @@ export default function CourierDashboardPage() {
           })
         )}
       </div>
+
+      {/* --- Calendrier des missions (AJOUT, en dessous des widgets) --- */}
+      {!loading && !err && (
+        <MissionsCalendar
+          missions={missions}
+          beneficiaries={beneficiaries}
+          role="deliverer"
+        />
+      )}
 
       {/* --- Modale facture détaillée --- */}
       {modalOpen && modalMission && (

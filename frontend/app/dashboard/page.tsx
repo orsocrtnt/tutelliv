@@ -1,85 +1,135 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { health, getStats } from "@/lib/api";
-import type { Stats } from "@/lib/types";
+import { listMissions, listBeneficiaries, getStats } from "@/lib/api";
+import type { Mission, Beneficiary, Stats } from "@/lib/types";
+import MissionsCalendar from "@/components/MissionsCalendar";
 
-export default function DashboardPage() {
-  const [apiOk, setApiOk] = useState<null | boolean>(null);
+export default function DashboardMjpmPage() {
+  const [missions, setMissions] = useState<Mission[]>([]);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  async function refresh() {
-    setErr(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+  const [errStats, setErrStats] = useState<string | null>(null);
+
+  async function loadData() {
     setLoading(true);
+    setErr(null);
     try {
-      await health();
-      setApiOk(true);
-    } catch {
-      setApiOk(false);
-    }
-    try {
-      const s = await getStats();
-      setStats(s);
+      const [ms, bs] = await Promise.all([listMissions(), listBeneficiaries()]);
+      setMissions(ms);
+      setBeneficiaries(bs);
     } catch (e: any) {
-      setErr(e?.message ?? "Erreur de chargement des statistiques");
+      setErr(e?.message ?? "Erreur lors du chargement");
     } finally {
       setLoading(false);
     }
   }
 
+  async function loadStats() {
+    setLoadingStats(true);
+    setErrStats(null);
+    try {
+      const s = await getStats();
+      setStats(s);
+    } catch (e: any) {
+      setErrStats(e?.message ?? "Erreur lors du chargement des statistiques");
+    } finally {
+      setLoadingStats(false);
+    }
+  }
+
+  async function loadAll() {
+    await Promise.allSettled([loadData(), loadStats()]);
+  }
+
   useEffect(() => {
-    let t: ReturnType<typeof setInterval> | null = null;
-    (async () => {
-      await refresh();
-      t = setInterval(refresh, 10000);
-    })();
-    return () => {
-      if (t) clearInterval(t);
-    };
+    loadAll();
   }, []);
+
+  const onRefresh = () => loadAll();
 
   return (
     <div className="space-y-6">
+      {/* --- Header --- */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Tableau de bord</h1>
-        <button onClick={refresh} className="btn btn-secondary">Rafraîchir</button>
+        <h1 className="text-2xl font-semibold">Tableau de bord – MJPM</h1>
+        <button className="btn btn-secondary" onClick={onRefresh}>
+          Rafraîchir
+        </button>
       </div>
 
-      {err && (
-        <div className="rounded-lg border p-3 text-red-600">{err}</div>
+      {/* --- Widgets (conservés) --- */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Missions en cours */}
+        <div className="rounded-xl border bg-white p-4">
+          <div className="text-sm text-gray-500">Missions en cours</div>
+          {loadingStats ? (
+            <div className="h-8 w-16 animate-pulse bg-gray-200 rounded mt-1" />
+          ) : errStats ? (
+            <div className="text-red-600 text-sm mt-1">{errStats}</div>
+          ) : (
+            <div className="text-3xl font-semibold mt-1">
+              {stats?.missions_in_progress ?? 0}
+            </div>
+          )}
+        </div>
+
+        {/* Protégés actifs (30j) */}
+        <div className="rounded-xl border bg-white p-4">
+          <div className="text-sm text-gray-500">Protégés actifs (30j)</div>
+          {loadingStats ? (
+            <div className="h-8 w-16 animate-pulse bg-gray-2 00 rounded mt-1" />
+          ) : errStats ? (
+            <div className="text-red-600 text-sm mt-1">{errStats}</div>
+          ) : (
+            <div className="text-3xl font-semibold mt-1">
+              {stats?.beneficiaries_active ?? 0}
+            </div>
+          )}
+        </div>
+
+        {/* Factures en attente */}
+        <div className="rounded-xl border bg-white p-4">
+          <div className="text-sm text-gray-500">Factures en attente</div>
+          {loadingStats ? (
+            <div className="h-8 w-16 animate-pulse bg-gray-200 rounded mt-1" />
+          ) : errStats ? (
+            <div className="text-red-600 text-sm mt-1">{errStats}</div>
+          ) : (
+            <div className="text-3xl font-semibold mt-1">
+              {stats?.invoices_pending ?? 0}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Petites meta stats */}
+      {!loadingStats && !errStats && stats?.generated_at && (
+        <div className="text-xs text-gray-500">
+          Données générées le{" "}
+          {new Date(stats.generated_at).toLocaleString("fr-FR")}
+        </div>
       )}
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <Card title="Missions en cours" value={stats?.missions_in_progress ?? 0} loading={loading} />
-        <Card title="Bénéficiaires actifs (30j)" value={stats?.beneficiaries_active ?? 0} loading={loading} />
-        <Card title="Factures en attente" value={stats?.invoices_pending ?? 0} loading={loading} />
-      </div>
+      {/* --- Erreur données (missions/bénéficiaires) --- */}
+      {err && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
+          {err}
+        </div>
+      )}
 
-      <div className="flex gap-3">
-        <Link href="/missions/new" className="btn btn-primary">Créer une nouvelle livraison</Link>
-        <Link href="/beneficiaires/new" className="btn btn-secondary">Nouveau protégé</Link>
-      </div>
-
-      <div className="text-sm text-gray-500">
-        API: {apiOk === null ? "..." : apiOk ? "OK ✅" : "Erreur ❌"}
-        {stats?.generated_at && (
-          <> · Actualisé: {new Date(stats.generated_at).toLocaleString("fr-FR")}</>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Card({ title, value, loading }: { title: string; value: number; loading?: boolean }) {
-  return (
-    <div className="rounded-lg border bg-white">
-      <div className="p-4">
-        <div className="text-sm text-gray-500">{title}</div>
-        <div className="text-3xl font-bold mt-1">{loading ? "…" : value}</div>
-      </div>
+      {/* --- Calendrier des missions (ajouté en dessous) --- */}
+      {!loading && !err && (
+        <MissionsCalendar
+          missions={missions}
+          beneficiaries={beneficiaries}
+          role="mjpm"
+        />
+      )}
     </div>
   );
 }

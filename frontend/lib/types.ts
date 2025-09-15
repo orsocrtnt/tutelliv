@@ -9,10 +9,10 @@ export interface Beneficiary {
   postal_code?: string;
   country?: string | null;
   measure_type?: string | null;
-  archived?: boolean;           // ancien modèle front (on le garde)
+  archived?: boolean;
   phone?: string | null;
   photo_url?: string | null;
-  is_active?: boolean;          // ✅ ajouté pour coller au backend
+  is_active?: boolean;
 }
 
 export interface Mission {
@@ -30,6 +30,10 @@ export interface Mission {
 
   status: "pending" | "in_progress" | "delivered" | string;
   created_at?: string; // ISO
+
+  // ✅ créneau calendrier
+  calendar_start?: string; // ISO
+  calendar_end?: string;   // ISO
 }
 
 export interface Invoice {
@@ -38,9 +42,7 @@ export interface Invoice {
   amount: number;
   status: "editing" | "pending" | "paid" | "draft" | "unpaid" | string;
   created_at?: string;
-  note?: string | null; // commentaire global MJPM / livreur
-
-  // champs optionnels pour le détail par catégorie (aligné avec le backend)
+  note?: string | null;
   lines_by_category?: Record<string, { amount: number; note?: string | null }>;
   delivery_fee?: number;
 }
