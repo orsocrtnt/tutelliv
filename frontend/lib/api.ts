@@ -1,6 +1,15 @@
 // frontend/lib/api.ts
-const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8001";
 
+// --- Base via proxy Next: même origine, pas de CORS ni 127.0.0.1 ---
+export const API_BASE_URL = "/api";
+
+// Concatène proprement base + path
+function joinUrl(base: string, path: string) {
+  if (!path) return base;
+  return `${base}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
+// --- Token helpers ---
 function getToken(): string | null {
   const m =
     typeof document !== "undefined"
@@ -12,6 +21,7 @@ function getToken(): string | null {
   return null;
 }
 
+// --- Fetch helper générique ---
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -20,11 +30,13 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${API}${path}`, {
+  const res = await fetch(joinUrl(API_BASE_URL, path), {
     ...init,
     headers,
     cache: "no-store",
+    credentials: "include", // OK si tu utilises des cookies côté back
   });
+
   if (!res.ok) {
     let msg = `${res.status} ${res.statusText}`;
     try {
@@ -32,14 +44,17 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
       if (j?.detail)
         msg =
           typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail);
-    } catch {}
+    } catch {
+      /* body non JSON */
+    }
     throw new Error(msg);
   }
+
   // @ts-expect-error - back peut renvoyer vide (logout)
   return res.status === 204 ? null : res.json();
 }
 
-// --- Auth ---
+// --- Types ---
 export type User = {
   id: number;
   email: string;
@@ -47,11 +62,13 @@ export type User = {
   name: string;
 };
 
+// --- Auth ---
 export const login = async (email: string, password: string) => {
   const out = await api<{ token: string; user: User }>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
+
   if (typeof document !== "undefined") {
     document.cookie = `tutelliv_token=${encodeURIComponent(
       out.token
@@ -92,7 +109,6 @@ export const getStats = () => api<import("@/lib/types").Stats>("/stats");
 export const listBeneficiaries = () =>
   api<import("@/lib/types").Beneficiary[]>("/beneficiaries");
 
-// ✅ Nouveau : récupérer 1 protégé par son id (évite les 404/NaN et le filtrage client)
 export const getBeneficiary = (id: string | number) =>
   api<import("@/lib/types").Beneficiary>(`/beneficiaries/${id}`);
 
@@ -140,10 +156,8 @@ export const updateMission = (
 
 // Helpers actions livreur
 import type { Mission as TMission } from "@/lib/types";
-
 const getCats = (m: TMission) =>
   m.categories?.length ? m.categories : m.category ? [m.category] : [];
-
 const getGeneral = (m: TMission) => m.general_comment ?? m.comment ?? null;
 
 export const acceptMission = (m: TMission) =>
@@ -220,12 +234,10 @@ export const setInvoiceDetailedAndPending = async (
 export const getInvoicePdfUrl = (invoiceId: string) => {
   const token = getToken();
   const qs = token ? `?token=${encodeURIComponent(token)}` : "";
-  return `${API}/invoices/${invoiceId}/pdf${qs}`;
+  return joinUrl(API_BASE_URL, `/invoices/${invoiceId}/pdf${qs}`);
 };
 
 export const openInvoicePdf = (invoiceId: string) => {
   const url = getInvoicePdfUrl(invoiceId);
   if (typeof window !== "undefined") window.open(url, "_blank");
 };
-
-

@@ -30,8 +30,7 @@ export default function Sidebar() {
   };
 
   const LinkItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
-    const active =
-      pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
+    const active = pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
     return (
       <Link
         className={`block px-3 py-2 rounded hover:bg-gray-100 ${
@@ -45,6 +44,7 @@ export default function Sidebar() {
   };
 
   return (
+    // ✅ Sidebar visible seulement ≥ md (sur mobile, on utilise le menu burger du Header)
     <aside className="w-64 bg-white border-r p-5 hidden md:block">
       <div className="text-xl font-bold mb-6">
         <Link href={role === "deliverer" ? "/courier/dashboard" : "/dashboard"}>TutelLiv</Link>

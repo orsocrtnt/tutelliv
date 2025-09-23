@@ -3,6 +3,7 @@ import React from "react";
 type Column<T> = {
   header: string;
   accessor: keyof T;
+  className?: string; // optionnel
 };
 
 type TableProps<T> = {
@@ -16,13 +17,13 @@ export default function Table<T extends { id: string | number }>({
 }: TableProps<T>) {
   return (
     <div className="overflow-x-auto rounded-lg shadow">
-      <table className="min-w-full bg-white">
+      <table className="min-w-full bg-white text-sm">
         <thead>
           <tr>
             {columns.map((col) => (
               <th
                 key={col.header}
-                className="px-4 py-2 text-left text-sm font-semibold text-gray-700 border-b"
+                className={`px-3 sm:px-4 py-2 text-left font-semibold text-gray-700 border-b ${col.className || ""}`}
               >
                 {col.header}
               </th>
@@ -35,7 +36,7 @@ export default function Table<T extends { id: string | number }>({
               {columns.map((col) => (
                 <td
                   key={String(col.accessor)}
-                  className="px-4 py-2 text-sm text-gray-600 border-b"
+                  className={`px-3 sm:px-4 py-2 text-gray-700 border-b align-top ${col.className || ""}`}
                 >
                   {String(row[col.accessor])}
                 </td>

@@ -8,6 +8,7 @@ import re
 
 from .auth import get_current_user
 from .beneficiaries import fake_beneficiaries_db  # pour afficher le protégé
+from ..events import publish_event  # ✅ NEW
 
 router = APIRouter(prefix="/invoices", tags=["invoices"])
 
@@ -161,6 +162,7 @@ def _make_pdf_bytes(draw_ops: str, pagesize=(595, 842)) -> bytes:
     ).encode("ascii")
     objs.append(page_obj)
 
+    # WinAnsiEncoding -> accents OK (é, è, à, ç...)
     stream_bytes = draw_ops.encode("cp1252", errors="strict")
     objs.append(b"4 0 obj << /Length %d >> stream\n" % len(stream_bytes) + stream_bytes + b"\nendstream endobj\n")
 
@@ -259,21 +261,17 @@ def _pdf_bytes_for_invoice(inv: InvoiceOut) -> bytes:
 
     # ======= MÉTA =======
     ops += _text(24, h-112, f"N° de facture : {disp_no}", size=11)
-    ops += _text(300, h-112, f"Date d'operation : {emit_str}", size=11)
+    ops += _text(300, h-112, f"Date d'opération : {emit_str}", size=11)
     ops += _text(300, h-128, f"Date de livraison : {livraison_str}", size=11)
 
-    # ======= ENCADRÉ PROTÉGÉ — centrage & proportions corrigés =======
-    # Centré horizontalement avec marges fixes, un poil plus bas pour équilibrer.
-    margin = 48               # marge gauche/droite fixe (meilleur centrage visuel)
-    cw = w - 2 * margin       # largeur du cadre
-    cx = margin               # position X centrée
-    ch = 78                   # hauteur légèrement augmentée
-    cy = h - 218              # position Y abaissée pour “tomber” bien sous les méta
-
-    # cadre + bordure
+    # ======= ENCADRÉ PROTÉGÉ — centré proprement =======
+    margin = 48
+    cw = w - 2 * margin
+    cx = margin
+    ch = 78
+    cy = h - 218
     ops += _rect(cx, cy, cw, ch, fill_rgb=ACCENT_BG, stroke_rgb=BORDER, fill=True, stroke=True)
 
-    # padding & lignes
     pad = 14
     line = 16
     title_y = cy + ch - pad
@@ -406,6 +404,7 @@ def create_invoice(invoice: InvoiceCreate, user=Depends(get_current_user)):
         mission=invoice.mission,
     )
     INVOICES.append(new_invoice)
+    publish_event("invoice.updated", new_invoice.model_dump())  # ✅ push
     return new_invoice
 
 @router.get("", response_model=List[InvoiceOut])
@@ -421,6 +420,7 @@ def get_invoice(invoice_id: str, user=Depends(get_current_user)):
 
 @router.put("/{invoice_id}", response_model=InvoiceOut)
 def update_invoice(invoice_id: str, data: InvoiceUpdate, user=Depends(get_current_user)):
+    # Seuls les livreurs peuvent modifier une facture
     if user.get("role") != "deliverer":
         raise HTTPException(status_code=403, detail="Seuls les livreurs peuvent modifier une facture")
 
@@ -428,7 +428,7 @@ def update_invoice(invoice_id: str, data: InvoiceUpdate, user=Depends(get_curren
         if inv.id == invoice_id:
             updated = InvoiceOut(
                 id=inv.id,
-                mission_id=inv.mission_id,
+                mission_id=inv.mission_id,  # mission_id figé
                 amount = data.amount if data.amount is not None else inv.amount,
                 status = data.status if data.status is not None else inv.status,
                 created_at = inv.created_at,
@@ -438,6 +438,7 @@ def update_invoice(invoice_id: str, data: InvoiceUpdate, user=Depends(get_curren
                 mission = data.mission if data.mission is not None else inv.mission,
             )
             INVOICES[i] = updated
+            publish_event("invoice.updated", updated.model_dump())  # ✅ push
             return updated
 
     raise HTTPException(status_code=404, detail="Invoice not found")
@@ -447,9 +448,11 @@ def delete_invoice(invoice_id: str, user=Depends(get_current_user)):
     for i, inv in enumerate(INVOICES):
         if inv.id == invoice_id:
             INVOICES.pop(i)
+            publish_event("invoice.updated", {"id": invoice_id, "deleted": True})  # ✅ info simple
             return {"ok": True}
     raise HTTPException(status_code=404, detail="Invoice not found")
 
+# ✅ PDF (MJPM & Livreur — auth par token/cookie)
 @router.get("/{invoice_id}/pdf")
 def invoice_pdf(invoice_id: str, user=Depends(get_current_user)):
     inv = next((x for x in INVOICES if x.id == invoice_id), None)
@@ -460,5 +463,5 @@ def invoice_pdf(invoice_id: str, user=Depends(get_current_user)):
     return Response(
         content=pdf,
         media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        headers={"Content-Disposition": f'attachment; filename=\"{filename}\"'}
     )

@@ -5,9 +5,9 @@ from typing import List, Optional, Dict
 from datetime import datetime, timedelta, timezone
 import uuid
 
-# ✅ n'importe plus MISSIONS depuis invoices.py (pour éviter les cycles)
+# ✅ évite les imports circulaires avec invoices.py (on importe seulement les structures nécessaires)
+from ..events import publish_event  # ✅ NEW
 from .invoices import INVOICES, InvoiceOut, get_invoice_by_mission_id, MissionSnapshot
-# import auth
 from .auth import get_current_user
 
 router = APIRouter(prefix="/missions", tags=["missions"])
@@ -125,8 +125,7 @@ def create_mission(mission: MissionCreate, user=Depends(get_current_user)):
     )
     MISSIONS.append(item)
 
-    # ✅ Auto-crée une facture liée en "editing"
-    #    👉 on stocke un snapshot de la mission pour le PDF, évitant tout import de missions.py depuis invoices.py
+    # ✅ Auto-crée une facture liée en "editing" avec snapshot mission
     snapshot = MissionSnapshot(
         id=item.id,
         beneficiary_id=item.beneficiary_id,
@@ -150,6 +149,8 @@ def create_mission(mission: MissionCreate, user=Depends(get_current_user)):
         )
     )
 
+    # ✅ push event
+    publish_event("mission.created", item.model_dump())
     return item
 
 def _with_dynamic_end(ms: MissionOut) -> MissionOut:
@@ -265,7 +266,7 @@ def update_mission(mission_id: str, data: MissionCreate, user=Depends(get_curren
             )
             MISSIONS[i] = updated
 
-            # ✅ Si la mission passe à "delivered", passer la facture liée à "pending"
+            # ✅ Met à jour la facture liée et passe à "pending" si livré
             inv = get_invoice_by_mission_id(ms.id)
             if inv:
                 # rafraîchir également le snapshot de mission dans la facture
@@ -291,6 +292,8 @@ def update_mission(mission_id: str, data: MissionCreate, user=Depends(get_curren
                     mission=snap,
                 )
 
+            # ✅ push event
+            publish_event("mission.updated", updated.model_dump())
             return updated
     raise HTTPException(status_code=404, detail="Mission not found")
 
@@ -303,5 +306,7 @@ def delete_mission(mission_id: str, user=Depends(get_current_user)):
             if inv:
                 INVOICES.remove(inv)
             MISSIONS.pop(i)
+            # ✅ push event
+            publish_event("mission.deleted", {"id": mission_id})
             return {"ok": True}
     raise HTTPException(status_code=404, detail="Mission not found")

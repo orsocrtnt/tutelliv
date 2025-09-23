@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8001";
+// ✅ On passe par le proxy Next.js : /api → (rewrites) → http://192.168.1.58:8001
+const API = "/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +23,8 @@ export default function LoginPage() {
       const res = await fetch(`${API}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // Si ton back lit des cookies à la connexion, garde credentials:
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -29,7 +32,7 @@ export default function LoginPage() {
         let msg = "Identifiants invalides";
         try {
           const j = await res.json();
-          if (j?.detail) msg = j.detail;
+          if (j?.detail) msg = typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail);
         } catch {}
         throw new Error(msg);
       }
@@ -39,12 +42,14 @@ export default function LoginPage() {
         user: { role: "mjpm" | "deliverer"; [k: string]: any };
       };
 
+      // Cookies côté front (HTTP local → pas de Secure)
       document.cookie = `tutelliv_token=${encodeURIComponent(
         data.token
       )}; path=/; max-age=${60 * 60 * 24}`;
       document.cookie = `tutelliv_role=${encodeURIComponent(
         data.user.role
       )}; path=/; max-age=${60 * 60 * 24}`;
+
       localStorage.setItem("tutelliv_token", data.token);
 
       if (data.user?.role === "deliverer") {

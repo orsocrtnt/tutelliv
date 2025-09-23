@@ -1,25 +1,26 @@
+// frontend/components/MissionsCalendar.tsx
 "use client";
 
-import React, { useMemo } from "react";
-import FullCalendar from "@fullcalendar/react";
+import { useMemo, useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+import type { Mission, Beneficiary } from "@/lib/types";
+
+// 🔹 On charge uniquement le composant React de FullCalendar en dynamic
+const FullCalendar = dynamic(
+  () => import("@fullcalendar/react").then((m) => m.default),
+  { ssr: false }
+);
+
+// 🔹 Les plugins ne sont pas des composants → imports normaux
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import frLocale from "@fullcalendar/core/locales/fr";
-import { useRouter } from "next/navigation";
-import type { Mission, Beneficiary } from "@/lib/types";
+import listPlugin from "@fullcalendar/list";
 
 type Props = {
   missions: Mission[];
   beneficiaries: Beneficiary[];
   role: "mjpm" | "deliverer";
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: "#F59E0B",     // amber-500
-  in_progress: "#3B82F6", // blue-500
-  delivered: "#10B981",   // emerald-500
-  default: "#6B7280",     // gray-500
 };
 
 const CAT_FR: Record<string, string> = {
@@ -30,137 +31,159 @@ const CAT_FR: Record<string, string> = {
   OTHER: "Autre",
 };
 
-function getCats(m: Mission): string[] {
-  if (m.categories?.length) return m.categories;
-  if (m.category) return [m.category];
-  return [];
-}
+const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
+  pending:     { bg: "#FDE68A", border: "#F59E0B", text: "#7C2D12" },
+  in_progress: { bg: "#93C5FD", border: "#3B82F6", text: "#1E3A8A" },
+  delivered:   { bg: "#86EFAC", border: "#22C55E", text: "#14532D" },
+};
 
-export default function MissionsCalendar({ missions, beneficiaries, role }: Props) {
-  const router = useRouter();
+export default function MissionsCalendar({ missions, beneficiaries }: Props) {
+  // On évite tout décalage SSR/CSR
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // ✅ Détection responsive (même breakpoint que Tailwind: sm = 640px)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const beneMap = useMemo(() => {
     const m = new Map<number, Beneficiary>();
-    for (const b of beneficiaries) m.set(Number(b.id), b);
+    (beneficiaries ?? []).forEach((b) => m.set(Number(b.id), b));
     return m;
   }, [beneficiaries]);
 
   const events = useMemo(() => {
-    return missions.map((m) => {
-      const b = beneMap.get(Number(m.beneficiary_id));
-      const fullname = b
-        ? `${(b.last_name || "").toUpperCase()} ${b.first_name || ""}`.trim()
-        : `ID ${m.beneficiary_id}`;
+    return (missions ?? []).map((m) => {
+      const bene = beneMap.get(Number(m.beneficiary_id));
+      const who = bene
+        ? `${(bene.last_name ?? "").toUpperCase()} ${bene.first_name ?? ""}`.trim()
+        : `#${m.beneficiary_id}`;
+      const cats = m.categories?.length ? m.categories : m.category ? [m.category] : [];
+      const catsLabel = cats.map((c) => CAT_FR[c] ?? c).join(", ");
+      const start = m.calendar_start ?? m.created_at;
+      const end = m.calendar_end ?? m.created_at;
+      const c = STATUS_COLORS[m.status] ?? STATUS_COLORS.pending;
 
-      const cats = getCats(m);
-      const catsLabel =
-        cats.length > 0
-          ? cats.map((c) => CAT_FR[c] ?? c).join(", ")
-          : "Sans catégorie";
-
-      const startISO = m.calendar_start ?? m.created_at ?? new Date().toISOString();
-      const endISO =
-        m.calendar_end ??
-        new Date(new Date(startISO).setDate(new Date(startISO).getDate() + 1)).toISOString(); // fallback 1j
-
-      const color = STATUS_COLORS[m.status] ?? STATUS_COLORS.default;
-
-      // Un SEUL événement all-day CONTINU par mission (relie les jours et traverse visuellement le weekend)
       return {
         id: m.id,
-        title: `${fullname} — ${catsLabel}`,
-        start: startISO,
-        end: endISO,    // exclusif
+        title: `${who} — ${catsLabel || "Mission"}`,
+        start,
+        end,
         allDay: true,
-        color,
-        extendedProps: {
-          status: m.status,
-          beneficiary: fullname,
-          categories: catsLabel,
-        },
+        backgroundColor: c.bg,
+        borderColor: c.border,
+        textColor: c.text,
+        extendedProps: { status: m.status, beneId: m.beneficiary_id, cats },
       };
     });
   }, [missions, beneMap]);
 
-  function handleEventClick(info: any) {
-    const id: string = String(info?.event?.id || "");
-    if (!id) return;
-    const status = info?.event?.extendedProps?.status;
-    if (status === "pending") router.push(`/missions/${id}/edit`);
-    else router.push(`/missions`);
-  }
-
-  function renderEventContent(arg: any) {
+  const eventContent = useCallback((arg: any) => {
+    const title = String(arg.event.title ?? "");
     return {
-      html: `
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${arg.backgroundColor || arg.borderColor || "#999"}"></span>
-          <span>${arg.event.title}</span>
-        </div>
-      `,
+      html: `<div style="padding:2px 4px; font-size:12px; line-height:1.2; overflow:hidden; text-overflow:ellipsis;">
+               ${title.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+             </div>`,
     };
-  }
+  }, []);
+
+  // 🔹 Header compact sur mobile, complet sur desktop
+  const headerToolbar = useMemo(
+    () =>
+      isMobile
+        ? { left: "prev,next", center: "title", right: "dayGridMonth,listWeek" }
+        : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek" },
+    [isMobile]
+  );
+
+  // 🔹 Boutons plus courts + formats de titre adaptés
+  const buttonText = useMemo(
+    () =>
+      isMobile
+        ? { today: "Auj.", month: "Mois", week: "Liste", day: "Jour", list: "Liste" }
+        : { today: "Aujourd'hui", month: "Mois", week: "Semaine", day: "Jour", list: "Liste" },
+    [isMobile]
+  );
+
+  // 🔹 Options d’affichage différentes selon la taille
+  const height = "auto";
+  const dayMaxEventRows = isMobile ? 2 : false;
+  const titleFormat = isMobile
+    ? { month: "long", year: "numeric" }
+    : { month: "long", year: "numeric" };
 
   return (
-    <div className="rounded-xl border bg-white p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold">
-          Calendrier des missions {role === "deliverer" ? "– Livreur" : "– MJPM"}
-        </h2>
+    <div className="rounded-xl border bg-white p-3">
+      <div className="flex items-center justify-between pb-2">
+        <h2 className="text-lg font-semibold">Calendrier des missions</h2>
         <div className="flex items-center gap-3 text-xs">
           <span className="inline-flex items-center gap-1">
-            <i className="inline-block h-3 w-3 rounded-sm" style={{ background: STATUS_COLORS.pending }}></i> En attente
+            <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_COLORS.pending.bg, border: `1px solid ${STATUS_COLORS.pending.border}` }} />
+            En attente
           </span>
           <span className="inline-flex items-center gap-1">
-            <i className="inline-block h-3 w-3 rounded-sm" style={{ background: STATUS_COLORS.in_progress }}></i> En cours
+            <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_COLORS.in_progress.bg, border: `1px solid ${STATUS_COLORS.in_progress.border}` }} />
+            En cours
           </span>
           <span className="inline-flex items-center gap-1">
-            <i className="inline-block h-3 w-3 rounded-sm" style={{ background: STATUS_COLORS.delivered }}></i> Livrée
+            <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_COLORS.delivered.bg, border: `1px solid ${STATUS_COLORS.delivered.border}` }} />
+            Livrée
           </span>
         </div>
       </div>
 
-      <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
+      {/* On attend le montage client pour éviter les warnings/hydration */}
+      {mounted && (
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+          initialView={isMobile ? "dayGridMonth" : "dayGridMonth"}
+          headerToolbar={headerToolbar}
+          buttonText={buttonText}
+          titleFormat={titleFormat as any}
+          firstDay={1}
+          weekends={true}
+          events={events}
+          eventContent={eventContent}
+          height={height}
+          contentHeight="auto"
+          expandRows={true}
+          dayMaxEventRows={dayMaxEventRows as any}
+          stickyHeaderDates={!isMobile}
+          handleWindowResize={true}
+          moreLinkClick="popover"
+        />
+      )}
 
-        /* —— VISIBILITÉ COMPLETE DES ALL-DAY —— */
-        height="auto"
-        expandRows={true}
-        allDaySlot={true}
-        dayMaxEvents={false}     // pas de +N en mois/sem/jour
-        eventMaxStack={999}      // empile autant que nécessaire
-
-        /* tu peux garder un petit cap en vue mois si tu veux :
-        views={{
-          dayGridMonth: { dayMaxEvents: 4 },       // 4 max en mois (sinon false pour illimité)
-          timeGridWeek: { dayMaxEvents: false, eventMaxStack: 999 },
-          timeGridDay:  { dayMaxEvents: false, eventMaxStack: 999 },
-        }}
-        */
-
-        locale={frLocale}
-        events={events}
-        eventClick={handleEventClick}
-        eventContent={renderEventContent}
-
-        // Laisse les week-ends visibles pour voir la continuité.
-        // hiddenDays={[0, 6]}
-
-        eventDidMount={(info) => {
-          if (info.el) {
-            info.el.style.whiteSpace = "normal";
-            info.el.style.lineHeight = "1.2";
-            info.el.style.padding = "2px 6px";
-            info.el.style.borderRadius = "6px";
+      {/* 🎯 Mini CSS global pour compacter le header sur mobile */}
+      <style jsx global>{`
+        @media (max-width: 639px) {
+          .fc .fc-toolbar {
+            flex-wrap: wrap;
+            gap: 6px;
           }
-        }}
-      />
+          .fc .fc-toolbar-title {
+            font-size: 1rem; /* 16px */
+          }
+          .fc .fc-button {
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 6px;
+          }
+          .fc .fc-col-header-cell-cushion {
+            padding: 4px 0;
+            font-size: 12px;
+          }
+          .fc .fc-daygrid-day-number {
+            padding: 4px;
+            font-size: 12px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

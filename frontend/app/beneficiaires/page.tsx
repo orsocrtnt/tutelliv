@@ -19,9 +19,9 @@ export default function BeneficiairesPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Protégés</h1>
-        <Link href="/beneficiaires/new" className="btn btn-primary">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl sm:text-2xl font-semibold">Protégés</h1>
+        <Link href="/beneficiaires/new" className="btn-primary">
           Nouveau protégé
         </Link>
       </div>
@@ -49,10 +49,10 @@ export default function BeneficiairesPage() {
                     <th className="py-2">Photo</th>
                     <th className="py-2">Nom</th>
                     <th className="py-2">Téléphone</th>
-                    <th className="py-2">Adresse</th>
-                    <th className="py-2">Ville</th>
-                    <th className="py-2">CP</th>
-                    <th className="py-2">ID</th>
+                    <th className="py-2 hidden sm:table-cell">Adresse</th>
+                    <th className="py-2 hidden md:table-cell">Ville</th>
+                    <th className="py-2 hidden md:table-cell">CP</th>
+                    <th className="py-2 hidden lg:table-cell">ID</th>
                     <th className="py-2 text-right">Profil</th>
                   </tr>
                 </thead>
@@ -109,24 +109,26 @@ export default function BeneficiairesPage() {
                       </td>
 
                       {/* Adresse */}
-                      <td className="py-2">
+                      <td className="py-2 hidden sm:table-cell">
                         {b.address || <span className="text-gray-400">—</span>}
                       </td>
 
                       {/* Ville */}
-                      <td className="py-2">
+                      <td className="py-2 hidden md:table-cell">
                         {b.city || <span className="text-gray-400">—</span>}
                       </td>
 
                       {/* CP */}
-                      <td className="py-2">
+                      <td className="py-2 hidden md:table-cell">
                         {b.postal_code || <span className="text-gray-400">—</span>}
                       </td>
 
                       {/* ID */}
-                      <td className="py-2 font-mono">{String(b.id)}</td>
+                      <td className="py-2 hidden lg:table-cell font-mono">
+                        {String(b.id)}
+                      </td>
 
-                      {/* CTA Profil explicite (en plus du clic sur le nom) */}
+                      {/* CTA Profil explicite */}
                       <td className="py-2 text-right">
                         <Link
                           href={`/beneficiaires/${b.id}`}

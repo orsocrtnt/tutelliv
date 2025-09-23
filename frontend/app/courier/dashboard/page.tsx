@@ -12,7 +12,8 @@ import {
   setInvoiceDetailedAndPending,
 } from "@/lib/api";
 import type { Mission, Beneficiary } from "@/lib/types";
-import MissionsCalendar from "@/components/MissionsCalendar"; // ✅ AJOUT
+import MissionsCalendar from "@/components/MissionsCalendar"; // ✅ calendrier
+import { connectEvents } from "@/lib/realtime"; // ✅ SSE
 
 // Libellés FR
 const CAT_FR: Record<string, string> = {
@@ -65,10 +66,10 @@ export default function CourierDashboardPage() {
   const [deliveryFee, setDeliveryFee] = useState<string>("38"); // prérempli à 38 €
   const [noteGlobal, setNoteGlobal] = useState<string>("");
 
-  // Chargement initial + polling toutes les 15s
+  // Chargement initial + abonnement SSE
   useEffect(() => {
     let mounted = true;
-    let t: ReturnType<typeof setInterval> | null = null;
+    let unsubscribe: (() => void) | null = null;
 
     async function load() {
       try {
@@ -88,10 +89,22 @@ export default function CourierDashboardPage() {
     }
 
     load();
-    t = setInterval(load, 15000);
+
+    // ✅ Abonnement SSE : recharge sur chaque changement mission/facture
+    unsubscribe = connectEvents((msg) => {
+      if (
+        msg.type === "mission.created" ||
+        msg.type === "mission.updated" ||
+        msg.type === "mission.deleted" ||
+        msg.type === "invoice.updated"
+      ) {
+        load();
+      }
+    });
+
     return () => {
       mounted = false;
-      if (t) clearInterval(t);
+      unsubscribe?.();
     };
   }, []);
 

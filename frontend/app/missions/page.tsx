@@ -60,9 +60,7 @@ export default function MissionsPage() {
   }, [beneficiaries]);
 
   const renderCategories = (m: Mission) => {
-    const cats = (m.categories && m.categories.length > 0)
-      ? m.categories
-      : (m.category ? [m.category] : []);
+    const cats = (m.categories && m.categories.length > 0) ? m.categories : (m.category ? [m.category] : []);
     if (!cats || cats.length === 0) return "—";
     return (
       <div className="flex flex-wrap gap-1">
@@ -77,11 +75,9 @@ export default function MissionsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Missions</h1>
-        <Link href="/missions/new" className="btn btn-primary">
-          Nouvelle mission
-        </Link>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl sm:text-2xl font-semibold">Missions</h1>
+        <Link href="/missions/new" className="btn-primary">Nouvelle mission</Link>
       </div>
 
       {loading && (
@@ -97,52 +93,59 @@ export default function MissionsPage() {
             {missions.length === 0 ? (
               <div className="text-gray-500">Aucune mission.</div>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500">
-                    <th className="py-2">Protégé</th>
-                    <th className="py-2">Catégories</th>
-                    <th className="py-2">Statut</th>
-                    <th className="py-2">Commentaire</th>
-                    <th className="py-2">Créée le</th>
-                    <th className="py-2">ID</th>
-                    <th className="py-2">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {missions.map((m) => {
-                    const b = beneMap.get(Number(m.beneficiary_id));
-                    const who = b ? `${b.last_name} ${b.first_name}` : m.beneficiary_id;
-                    const idShort = m.id.length > 8 ? `${m.id.slice(0, 8)}…` : m.id;
-                    const created = m.created_at ? new Date(m.created_at).toLocaleDateString("fr-FR") : "-";
-                    const canEdit = m.status === "pending";
-                    return (
-                      <tr key={m.id} className="border-t">
-                        <td className="py-2">{who}</td>
-                        <td className="py-2">{renderCategories(m)}</td>
-                        <td className="py-2"><StatusBadge status={m.status} /></td>
-                        <td className="py-2">{m.comment?.trim() || m.general_comment?.trim() || "—"}</td>
-                        <td className="py-2">{created}</td>
-                        <td className="py-2 font-mono">{idShort}</td>
-                        <td className="py-2">
-                          {canEdit ? (
-                            <Link
-                              href={`/missions/${m.id}/edit`}
-                              className="px-3 py-1 rounded-md border hover:bg-gray-50"
-                            >
-                              Modifier
-                            </Link>
-                          ) : (
-                            <button className="px-3 py-1 rounded-md border text-gray-400 cursor-not-allowed" disabled>
-                              Modifier
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500">
+                      <th className="py-2 pr-2">Protégé</th>
+                      <th className="py-2 pr-2">Catégories</th>
+                      <th className="py-2 pr-2">Statut</th>
+                      <th className="py-2 pr-2 hidden sm:table-cell">Commentaire</th>
+                      <th className="py-2 pr-2 hidden md:table-cell">Créée le</th>
+                      <th className="py-2 pr-2 hidden md:table-cell">ID</th>
+                      <th className="py-2 pr-2 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {missions.map((m) => {
+                      const b = beneMap.get(Number(m.beneficiary_id));
+                      const who = b ? `${b.last_name} ${b.first_name}` : m.beneficiary_id;
+                      const idShort = m.id.length > 8 ? `${m.id.slice(0, 8)}…` : m.id;
+                      const created = m.created_at ? new Date(m.created_at).toLocaleDateString("fr-FR") : "-";
+                      const canEdit = m.status === "pending";
+                      return (
+                        <tr key={m.id} className="border-t align-top">
+                          <td className="py-2 pr-2">{who}</td>
+                          <td className="py-2 pr-2">{renderCategories(m)}</td>
+                          <td className="py-2 pr-2"><StatusBadge status={m.status} /></td>
+                          <td className="py-2 pr-2 hidden sm:table-cell">
+                            {m.comment?.trim() || m.general_comment?.trim() || "—"}
+                          </td>
+                          <td className="py-2 pr-2 hidden md:table-cell">{created}</td>
+                          <td className="py-2 pr-2 hidden md:table-cell font-mono">{idShort}</td>
+                          <td className="py-2 pl-2 text-right">
+                            {canEdit ? (
+                              <Link
+                                href={`/missions/${m.id}/edit`}
+                                className="inline-flex items-center px-2 py-1 text-xs sm:text-sm rounded-md border hover:bg-gray-50"
+                              >
+                                Modifier
+                              </Link>
+                            ) : (
+                              <button
+                                className="inline-flex items-center px-2 py-1 text-xs sm:text-sm rounded-md border text-gray-400 cursor-not-allowed"
+                                disabled
+                              >
+                                Modifier
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>

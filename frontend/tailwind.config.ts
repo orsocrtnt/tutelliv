@@ -11,6 +11,9 @@ const config: Config = {
         primary: "#2563eb", // bleu principal
         secondary: "#6b7280", // gris
       },
+      screens: {
+        // (garde le système tailwind par défaut ; ajout optionnel si besoin)
+      },
     },
   },
   plugins: [],

@@ -1,18 +1,28 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// Chemins accessibles sans être connecté
-const PUBLIC_PATHS = ["/login", "/_next", "/favicon.ico", "/public", "/api"];
+// Chemins accessibles sans être connecté (ajout /courier/login, /images, /assets)
+const PUBLIC_PATHS = [
+  "/login",
+  "/courier/login",
+  "/_next",
+  "/favicon.ico",
+  "/public",
+  "/images",
+  "/assets",
+  "/api", // routes API Next (si tu en as)
+];
 
-// Vérifie si la route appartient à l’espace "livreur"
+// Espace "livreur"
 const isCourierPath = (p: string) => p.startsWith("/courier");
 
-// Vérifie si la route appartient à l’espace "MJPM"
+// Espace "MJPM"
 const isMjpmPath = (p: string) =>
   [
+    "/",
     "/dashboard",
     "/missions",
-    "/beneficiaires", // inclut /beneficiaires et toutes ses sous-routes
+    "/beneficiaires",
     "/invoices",
     "/settings",
   ].some((prefix) => p === prefix || p.startsWith(prefix + "/"));
@@ -20,7 +30,7 @@ const isMjpmPath = (p: string) =>
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Laisser passer les chemins publics
+  // Laisser passer les chemins publics (assets, api, login…)
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
@@ -31,7 +41,7 @@ export function middleware(req: NextRequest) {
     | "deliverer"
     | undefined;
 
-  // Pas connecté → redirige vers /login
+  // Pas connecté → /login (avec ?next=…)
   if (!token) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
@@ -52,10 +62,11 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Sinon, accès autorisé
+  // Accès autorisé
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico|public).*)"],
+  // Ignore tout ce qui est statique + API Next
+  matcher: ["/((?!_next|favicon.ico|public|images|assets|api).*)"],
 };

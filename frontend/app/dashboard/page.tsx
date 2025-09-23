@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { listMissions, listBeneficiaries, getStats } from "@/lib/api";
 import type { Mission, Beneficiary, Stats } from "@/lib/types";
 import MissionsCalendar from "@/components/MissionsCalendar";
+import { connectEvents } from "@/lib/realtime"; // ✅ SSE
 
 export default function DashboardMjpmPage() {
   const [missions, setMissions] = useState<Mission[]>([]);
@@ -48,6 +50,19 @@ export default function DashboardMjpmPage() {
 
   useEffect(() => {
     loadAll();
+    // ✅ Abonnement temps réel
+    const unsubscribe = connectEvents((msg) => {
+      if (
+        msg.type === "mission.created" ||
+        msg.type === "mission.updated" ||
+        msg.type === "mission.deleted" ||
+        msg.type === "invoice.updated"
+      ) {
+        loadAll();
+      }
+    });
+    return () => unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onRefresh = () => loadAll();
@@ -55,14 +70,16 @@ export default function DashboardMjpmPage() {
   return (
     <div className="space-y-6">
       {/* --- Header --- */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Tableau de bord – MJPM</h1>
-        <button className="btn btn-secondary" onClick={onRefresh}>
-          Rafraîchir
-        </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl sm:text-2xl font-semibold">Tableau de bord – MJPM</h1>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/missions/new" className="btn-primary">Nouvelle mission</Link>
+          <Link href="/beneficiaires/new" className="btn-primary">Nouveau protégé</Link>
+          <button className="btn-secondary" onClick={onRefresh}>Rafraîchir</button>
+        </div>
       </div>
 
-      {/* --- Widgets (conservés) --- */}
+      {/* --- Widgets --- */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Missions en cours */}
         <div className="rounded-xl border bg-white p-4">
@@ -72,7 +89,7 @@ export default function DashboardMjpmPage() {
           ) : errStats ? (
             <div className="text-red-600 text-sm mt-1">{errStats}</div>
           ) : (
-            <div className="text-3xl font-semibold mt-1">
+            <div className="text-2xl sm:text-3xl font-semibold mt-1">
               {stats?.missions_in_progress ?? 0}
             </div>
           )}
@@ -82,11 +99,11 @@ export default function DashboardMjpmPage() {
         <div className="rounded-xl border bg-white p-4">
           <div className="text-sm text-gray-500">Protégés actifs (30j)</div>
           {loadingStats ? (
-            <div className="h-8 w-16 animate-pulse bg-gray-2 00 rounded mt-1" />
+            <div className="h-8 w-16 animate-pulse bg-gray-200 rounded mt-1" />
           ) : errStats ? (
             <div className="text-red-600 text-sm mt-1">{errStats}</div>
           ) : (
-            <div className="text-3xl font-semibold mt-1">
+            <div className="text-2xl sm:text-3xl font-semibold mt-1">
               {stats?.beneficiaries_active ?? 0}
             </div>
           )}
@@ -100,35 +117,30 @@ export default function DashboardMjpmPage() {
           ) : errStats ? (
             <div className="text-red-600 text-sm mt-1">{errStats}</div>
           ) : (
-            <div className="text-3xl font-semibold mt-1">
+            <div className="text-2xl sm:text-3xl font-semibold mt-1">
               {stats?.invoices_pending ?? 0}
             </div>
           )}
         </div>
       </div>
 
-      {/* Petites meta stats */}
+      {/* Meta stats */}
       {!loadingStats && !errStats && stats?.generated_at && (
         <div className="text-xs text-gray-500">
-          Données générées le{" "}
-          {new Date(stats.generated_at).toLocaleString("fr-FR")}
+          Données générées le {new Date(stats.generated_at).toLocaleString("fr-FR")}
         </div>
       )}
 
-      {/* --- Erreur données (missions/bénéficiaires) --- */}
+      {/* Erreur données */}
       {err && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
           {err}
         </div>
       )}
 
-      {/* --- Calendrier des missions (ajouté en dessous) --- */}
+      {/* Calendrier */}
       {!loading && !err && (
-        <MissionsCalendar
-          missions={missions}
-          beneficiaries={beneficiaries}
-          role="mjpm"
-        />
+        <MissionsCalendar missions={missions} beneficiaries={beneficiaries} role="mjpm" />
       )}
     </div>
   );

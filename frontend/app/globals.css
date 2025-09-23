@@ -22,9 +22,16 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Boutons réutilisables */
 .btn-primary {
-  @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700;
+  @apply inline-flex items-center justify-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition;
 }
 
 .btn-secondary {
-  @apply bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300;
+  @apply inline-flex items-center justify-center bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition;
 }
+
+/* Petites cartes utilitaires (utilisées dans certains écrans) */
+.card { @apply rounded-xl border bg-white; }
+.card-body { @apply p-4 sm:p-5; }
+
+/* Aide accessibilité focus */
+:focus-visible { @apply outline-none ring-2 ring-blue-400; }
