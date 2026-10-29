@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TutelLiv — Connexion · Direction A « Vitrine »</title>
+<meta name="description" content="Maquette statique LANDING-2, direction A : connexion centrée, sobre, avec accès à la démo.">
+<script>
+(function () {
+  var t = new URLSearchParams(location.search).get("theme");
+  if (t !== "dark" && t !== "light") { try { t = localStorage.getItem("tl-theme"); } catch (e) {} }
+  if (t !== "dark" && t !== "light") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f8f6; --surface: #ffffff; --surface-2: #f3f5f2; --ink: #0e1310; --text-2: #4f5953; --muted: #68726b;
+  --border: #e4e8e5; --input: #d5dbd7; --primary: #00d46a; --on-primary: #0e1310; --primary-hover: #00c262; --brand: #08783f;
+  --ring: #0b8a45; --err: #a12c2c; --err-bg: #fdf2f2; --err-line: #f1c9c9; --info-bg: #eef7f2; --info-line: #cdeedb;
+  --shadow: 0 24px 64px rgba(14,19,16,.08);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #141716; --surface: #1c1f1e; --surface-2: #262a28; --ink: #eef1ef; --text-2: #b4bcb7; --muted: #a3aca6;
+  --border: #333936; --input: #3d4440; --primary: #3dd68c; --on-primary: #0e1310; --primary-hover: #55e09e; --brand: #5bd99a;
+  --ring: #5bd99a; --err: #f08a82; --err-bg: #3d2523; --err-line: #5a3330; --info-bg: #1b3328; --info-line: #2a4a39;
+  --shadow: 0 24px 64px rgba(0,0,0,.4);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); color: var(--ink); font: 400 16px/1.55 Sora, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+h1, p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 10px; }
+.logo { height: 28px; width: auto; display: block; }
+.logo-dark { display: none; }
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: block; }
+.sun { display: none; } :root[data-theme="dark"] .sun { display: block; } :root[data-theme="dark"] .moon { display: none; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; max-width: 1180px; width: 100%; margin: 0 auto; }
+.top .right { display: flex; align-items: center; gap: 4px; }
+.top .home { display: inline-flex; align-items: center; min-height: 44px; }
+.link-quiet { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--text-2); text-decoration: none; }
+.link-quiet:hover { color: var(--ink); background: var(--surface-2); }
+.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+.icon-btn svg { width: 18px; height: 18px; }
+
+main { flex: 1; display: grid; place-items: center; padding: 24px 16px 48px; }
+.panel { width: 100%; max-width: 420px; }
+h1 { font-size: clamp(34px, 6vw, 44px); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; text-align: center; }
+.subtitle { margin-top: 10px; text-align: center; color: var(--text-2); }
+
+/* Choix de l'espace : trois segments, 44 px. */
+.seg { margin: 28px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; }
+.seg a { display: grid; place-items: center; min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--text-2); text-decoration: none; }
+.seg a[aria-current="page"] { background: var(--surface); color: var(--ink); box-shadow: 0 2px 8px rgba(14,19,16,.08); }
+
+form { margin-top: 24px; display: grid; gap: 18px; }
+.alert { display: none; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--err-line); background: var(--err-bg); color: var(--err); font-size: 14px; line-height: 1.45; }
+.alert.show { display: flex; }
+.alert svg { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+.alert strong { display: block; color: var(--ink); font-weight: 600; }
+.alert span { color: var(--text-2); }
+label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.field { position: relative; }
+input[type="email"], input[type="password"], input[type="text"] { width: 100%; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--input); background: var(--surface); color: var(--ink); font: 400 16px Sora, sans-serif; }
+input::placeholder { color: var(--muted); }
+input:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; border-color: transparent; border-radius: 14px; }
+input[aria-invalid="true"] { border-color: var(--err); }
+.pw input { padding-right: 60px; }
+.reveal { position: absolute; right: 4px; top: 4px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: var(--muted); border-radius: 10px; cursor: pointer; }
+.reveal svg { width: 20px; height: 20px; }
+.err { margin-top: 6px; font-size: 13px; color: var(--err); display: none; }
+.err.show { display: block; }
+.row { display: flex; justify-content: flex-end; margin-top: -8px; }
+.row a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 500; color: var(--brand); text-decoration: none; }
+.row a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 22px; border-radius: 999px; font: 600 16px/1 Sora, sans-serif; border: 1px solid transparent; cursor: pointer; text-decoration: none; width: 100%; transition: background-color .2s, transform .15s; }
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary[aria-busy="true"] { opacity: .75; cursor: progress; }
+.btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface-2); }
+.note { margin-top: 16px; text-align: center; font-size: 14px; color: var(--text-2); }
+.note a { color: var(--brand); font-weight: 600; text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; }
+.note a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.invite { display: none; margin-top: 20px; padding: 14px 16px; border-radius: 14px; background: var(--info-bg); border: 1px solid var(--info-line); font-size: 14px; color: var(--text-2); }
+.invite.show { display: block; }
+
+.or { display: flex; align-items: center; gap: 12px; margin: 28px 0 20px; font-size: 13px; color: var(--muted); }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+.demo { border: 1px solid var(--border); background: var(--surface); border-radius: 20px; padding: 20px; display: grid; gap: 14px; }
+.demo p { font-size: 14px; color: var(--text-2); }
+.demo b { color: var(--ink); font-weight: 600; }
+.demo code { font: 500 13px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); background: var(--surface-2); padding: 2px 6px; border-radius: 6px; }
+
+footer { text-align: center; padding: 0 16px 28px; font-size: 14px; color: var(--muted); }
+footer a { color: var(--text-2); display: inline-flex; min-height: 44px; align-items: center; }
+
+/* Outil de maquette (absent du produit) : afficher chaque message d'erreur réel. */
+.mock { max-width: 420px; margin: 0 auto 32px; padding: 14px 16px; border: 1px dashed var(--input); border-radius: 14px; font-size: 13px; color: var(--muted); }
+.mock select { width: 100%; min-height: 44px; margin-top: 8px; border-radius: 10px; border: 1px solid var(--input); background: var(--surface); color: var(--ink); font: 400 14px Sora, sans-serif; padding: 0 10px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel { animation: rise .6s cubic-bezier(.2,.8,.2,1) both; }
+  .alert.show { animation: shake .35s ease-out; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes shake { 0%,100% { transform: none; } 30% { transform: translateX(-4px); } 60% { transform: translateX(3px); } }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="home" href="landing.html" aria-label="Retour à l'accueil TutelLiv">
+    <img class="logo logo-light" src="../../../public/brand/logo-horizontal-fond-clair.png" alt="" width="94" height="28">
+    <img class="logo logo-dark" src="../../../public/brand/logo-horizontal-fond-sombre.png" alt="" width="94" height="28">
+  </a>
+  <div class="right">
+    <a class="link-quiet" href="landing.html#contact">Contact</a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Passer en mode sombre">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <div class="panel">
+    <h1 data-title>Connexion</h1>
+    <p class="subtitle" data-subtitle>Accédez à votre espace de pilotage</p>
+
+    <nav class="seg" aria-label="Choisir son espace">
+      <a href="?espace=entreprise" data-space="entreprise">Entreprise</a>
+      <a href="?espace=client" data-space="client">Client</a>
+      <a href="?espace=chauffeur" data-space="chauffeur">Chauffeur</a>
+    </nav>
+
+    <p class="invite" data-invite>La création de compte est réservée à votre administrateur. Utilisez votre e-mail et le mot de passe choisi lors de votre invitation.</p>
+
+    <form novalidate data-form>
+      <div class="alert" role="alert" data-alert>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>
+        <p><strong data-alert-title>Connexion impossible</strong><span data-alert-text></span></p>
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="vous@email.fr" aria-describedby="email-err">
+        <p class="err" id="email-err"></p>
+      </div>
+      <div>
+        <label for="password">Mot de passe</label>
+        <div class="field pw">
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" aria-describedby="pw-err">
+          <button class="reveal" type="button" data-reveal aria-label="Afficher le mot de passe" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <p class="err" id="pw-err"></p>
+      </div>
+      <div class="row"><a href="/forgot-password">Mot de passe oublié ?</a></div>
+      <button class="btn btn-primary" type="submit" data-submit>Se connecter</button>
+    </form>
+    <p class="note" data-register>Pas encore de compte entreprise ? <a href="/register">Créer un compte</a></p>
+
+    <div class="or">ou</div>
+    <div class="demo" data-demo>
+      <p><b>Découvrir sans compte.</b> Le compte de démonstration ouvre l'admin, le portail client et l'app chauffeur sur des données fictives : <code>demo@tutelliv.fr</code> / <code>Demo2026!</code></p>
+      <button class="btn btn-ghost" type="button" data-fill-demo>Remplir avec le compte démo</button>
+    </div>
+  </div>
+</main>
+
+<div class="mock">
+  <label for="mock-msg" style="margin:0;font-weight:500">Outil de maquette, absent du produit : afficher un message réel</label>
+  <select id="mock-msg" data-mock>
+    <option value="">Aucun message</option>
+    <option value="Email ou mot de passe incorrect.">Identifiants faux (401)</option>
+    <option value="Trop de tentatives de connexion. Réessayez dans 5 minutes.">Trop de tentatives (429)</option>
+    <option value="Confirmez votre adresse e-mail avant de vous connecter.">Adresse non confirmée (403)</option>
+    <option value="Compte ou entreprise indisponible. Contactez votre administrateur.">Compte suspendu (403)</option>
+    <option value="Votre compte n'a pas été activé. Contactez votre administrateur pour obtenir vos identifiants.">Compte non activé (403)</option>
+    <option value="Service de connexion momentanément indisponible. Réessayez dans quelques instants.">Service indisponible (503)</option>
+    <option value="Tous les espaces de démonstration sont occupés ou en préparation. Réessayez dans quelques secondes.">Démo occupée (503)</option>
+  </select>
+</div>
+
+<footer>Besoin d'aide ? <a href="mailto:support@tutelliv.fr">&nbsp;support@tutelliv.fr</a></footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function label() { document.querySelectorAll("[data-theme-toggle]").forEach(function (b) { b.setAttribute("aria-label", root.getAttribute("data-theme") === "dark" ? "Passer en mode clair" : "Passer en mode sombre"); }); }
+  document.querySelectorAll("[data-theme-toggle]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("tl-theme", next); } catch (e) {}
+      label();
+    });
+  });
+  label();
+})();
+(function () {
+  /* Textes réels de auth-form.tsx selon l'espace. */
+  var spaces = {
+    entreprise: ["Connexion", "Accédez à votre espace de pilotage"],
+    client: ["Espace client", "Suivez vos commandes et livraisons en temps réel"],
+    chauffeur: ["Espace chauffeur", "Accédez à vos missions du jour et à la navigation"]
+  };
+  var params = new URLSearchParams(location.search);
+  var space = spaces[params.get("espace")] ? params.get("espace") : "entreprise";
+  document.querySelector("[data-title]").textContent = spaces[space][0];
+  document.querySelector("[data-subtitle]").textContent = spaces[space][1];
+  document.querySelectorAll("[data-space]").forEach(function (a) {
+    var theme = params.get("theme"); if (theme) a.href += "&theme=" + theme;
+    if (a.dataset.space === space) a.setAttribute("aria-current", "page");
+  });
+  var invited = space !== "entreprise";
+  document.querySelector("[data-invite]").classList.toggle("show", invited);
+  document.querySelector("[data-register]").hidden = invited;
+  if (invited) document.querySelector("[data-fill-demo]").textContent = "Ouvrir la démo (accès entreprise)";
+
+  var form = document.querySelector("[data-form]"), email = form.email, pw = form.password;
+  var alertBox = document.querySelector("[data-alert]"), alertText = document.querySelector("[data-alert-text]");
+  var submit = document.querySelector("[data-submit]");
+  function showAlert(msg) { alertText.textContent = msg ? " " + msg : ""; alertBox.classList.toggle("show", !!msg); }
+  function fieldErr(input, id, msg) { var p = document.getElementById(id); p.textContent = msg; p.classList.toggle("show", !!msg); input.setAttribute("aria-invalid", msg ? "true" : "false"); }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); showAlert("");
+    var v = email.value.trim(), ok = true;
+    if (!v) { fieldErr(email, "email-err", "L'email est requis"); ok = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { fieldErr(email, "email-err", "Format d'email invalide"); ok = false; }
+    else fieldErr(email, "email-err", "");
+    if (!pw.value) { fieldErr(pw, "pw-err", "Le mot de passe est requis"); ok = false; } else fieldErr(pw, "pw-err", "");
+    if (!ok) { (email.getAttribute("aria-invalid") === "true" ? email : pw).focus(); return; }
+    /* Double clic : bouton désactivé pendant la requête simulée. */
+    submit.disabled = true; submit.setAttribute("aria-busy", "true"); submit.textContent = "Connexion…";
+    setTimeout(function () {
+      submit.disabled = false; submit.removeAttribute("aria-busy"); submit.textContent = "Se connecter";
+      showAlert(v.toLowerCase() === "demo@tutelliv.fr" ? "" : "Email ou mot de passe incorrect.");
+      if (v.toLowerCase() === "demo@tutelliv.fr") submit.textContent = "Ouverture de la démo… (maquette)";
+    }, 700);
+  });
+  document.querySelector("[data-fill-demo]").addEventListener("click", function () {
+    if (invited) { location.search = "?espace=entreprise"; return; }
+    email.value = "demo@tutelliv.fr"; pw.value = "Demo2026!"; submit.focus();
+  });
+  document.querySelector("[data-reveal]").addEventListener("click", function () {
+    var shown = pw.type === "text"; pw.type = shown ? "password" : "text";
+    this.setAttribute("aria-pressed", String(!shown)); this.setAttribute("aria-label", shown ? "Afficher le mot de passe" : "Masquer le mot de passe");
+  });
+  document.querySelector("[data-mock]").addEventListener("change", function () { showAlert(this.value); });
+  var m = params.get("message"); if (m) { var opt = document.querySelector("[data-mock]").options[+m]; if (opt) { opt.selected = true; showAlert(opt.value); } }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LANDING-2 — Trois directions</title>
+<style>
+:root { --bg: #f5f8f6; --surface: #fff; --ink: #0e1310; --muted: #4f5953; --border: #e4e8e5; --brand: #08783f; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #141716; --surface: #1c1f1e; --ink: #eef1ef; --muted: #b4bcb7; --border: #333936; --brand: #5bd99a; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 ui-sans-serif, system-ui, sans-serif; }
+main { width: min(920px, 100% - 32px); margin: 48px auto; }
+h1 { font-size: 32px; letter-spacing: -.03em; margin: 0 0 8px; }
+p { color: var(--muted); margin: 0; }
+ul { list-style: none; padding: 0; margin: 32px 0 0; display: grid; gap: 16px; }
+li { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 24px; }
+h2 { font-size: 20px; margin: 0 0 6px; }
+.links { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border); color: var(--brand); font-weight: 600; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>LANDING-2 — trois directions</h1>
+  <p>Maquettes statiques (phase 1). Chaque page a une bascule Light / Dark ; ajouter <code>?theme=dark</code> à l'adresse pour forcer le mode sombre. Contenu repris de la landing actuelle et des décisions produit ; données de démonstration fictives.</p>
+  <ul>
+    <li><h2>A · Vitrine</h2><p>Une idée par écran, le produit en très grand : une seule image réunit dispatch, suivi client et app chauffeur.</p>
+      <div class="links"><a href="a-vitrine/landing.html">Landing</a><a href="a-vitrine/login.html">Connexion</a></div></li>
+    <li><h2>B · Ligne de mission</h2><p>La carte et le trajet d'une vraie livraison racontent le produit ; la mini-démo devient une ligne à cinq stations.</p>
+      <div class="links"><a href="b-ligne/landing.html">Landing</a><a href="b-ligne/login.html">Connexion</a></div></li>
+    <li><h2>C · Trois espaces</h2><p>Le visiteur choisit son point de vue (entreprise, client, chauffeur) ; connexion en deux temps : l'espace, puis le formulaire.</p>
+      <div class="links"><a href="c-espaces/landing.html">Landing</a><a href="c-espaces/login.html">Connexion</a></div></li>
+  </ul>
+</main>
+</body>
+</html>

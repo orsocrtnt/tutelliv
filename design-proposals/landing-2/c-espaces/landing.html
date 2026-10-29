@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TutelLiv — Landing · Direction C « Trois espaces »</title>
+<meta name="description" content="Maquette statique LANDING-2, direction C : le visiteur choisit son point de vue (entreprise, client, chauffeur).">
+<script>
+(function () {
+  var t = new URLSearchParams(location.search).get("theme");
+  if (t !== "dark" && t !== "light") { try { t = localStorage.getItem("tl-theme"); } catch (e) {} }
+  if (t !== "dark" && t !== "light") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f8f6; --surface: #ffffff; --surface-2: #f3f5f2; --ink: #0e1310; --text-2: #4f5953; --muted: #68726b;
+  --border: #e4e8e5; --primary: #00d46a; --on-primary: #0e1310; --primary-hover: #00c262; --brand: #08783f; --ring: #0b8a45;
+  --green-bg: #e6f8ee; --green-ink: #08783f; --amber-bg: #fdf4e4; --amber-ink: #7a5410; --blue-bg: #eaf1fb; --blue-ink: #1f5fae; --red-bg: #fdecec; --red-ink: #a12c2c;
+  --shadow-lg: 0 30px 80px rgba(14,19,16,.12); --shadow-sm: 0 2px 10px rgba(14,19,16,.08); --chrome: rgba(245,248,246,.84);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #141716; --surface: #1c1f1e; --surface-2: #262a28; --ink: #eef1ef; --text-2: #b4bcb7; --muted: #a3aca6;
+  --border: #333936; --primary: #3dd68c; --on-primary: #0e1310; --primary-hover: #55e09e; --brand: #5bd99a; --ring: #5bd99a;
+  --green-bg: #1b3328; --green-ink: #7be0ab; --amber-bg: #3a2f1c; --amber-ink: #f0b45c; --blue-bg: #1d2a3a; --blue-ink: #9cc0f0; --red-bg: #3d2523; --red-ink: #f08a82;
+  --shadow-lg: 0 30px 80px rgba(0,0,0,.45); --shadow-sm: 0 2px 10px rgba(0,0,0,.35); --chrome: rgba(20,23,22,.86);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.55 Sora, ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 10px; }
+.skip { position: absolute; left: 12px; top: -60px; padding: 12px 16px; background: var(--surface); border-radius: 12px; z-index: 50; }
+.skip:focus { top: 12px; }
+.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+.logo { height: 30px; width: auto; display: block; }
+.logo-dark { display: none; }
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: block; }
+.sun { display: none; } :root[data-theme="dark"] .sun { display: block; } :root[data-theme="dark"] .moon { display: none; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; font: 600 15px/1 Sora, sans-serif; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: background-color .2s, transform .15s; }
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-sm { min-height: 44px; padding: 0 18px; font-size: 14px; }
+.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+.icon-btn svg { width: 18px; height: 18px; }
+
+.top { position: sticky; top: 0; z-index: 30; background: var(--chrome); -webkit-backdrop-filter: saturate(160%) blur(16px); backdrop-filter: saturate(160%) blur(16px); border-bottom: 1px solid var(--border); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 64px; }
+.top nav { display: flex; align-items: center; gap: 4px; }
+.top nav a.link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--text-2); text-decoration: none; }
+.top nav a.link:hover { color: var(--ink); background: var(--surface-2); }
+
+/* Héros : la promesse, puis le visiteur choisit son point de vue. */
+.hero { padding: 64px 0 0; text-align: center; }
+.hero h1 { font-size: clamp(40px, 7vw, 88px); font-weight: 700; line-height: .98; letter-spacing: -.045em; text-wrap: balance; }
+.hero h1 em { font-style: normal; color: var(--brand); }
+.hero .lead { margin: 22px auto 0; max-width: 640px; font-size: clamp(17px, 2vw, 20px); color: var(--text-2); text-wrap: balance; }
+.hero .cta { margin-top: 28px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+.switch { margin: 48px auto 0; display: inline-grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 5px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); width: min(520px, 100%); }
+.switch button { min-height: 48px; border: 0; border-radius: 999px; background: transparent; color: var(--text-2); font: 600 15px Sora, sans-serif; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.switch button svg { width: 18px; height: 18px; }
+.switch button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+
+.stage { margin: 28px auto 0; max-width: 1040px; text-align: left; }
+.panel { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: stretch; }
+.panel[hidden] { display: none; }
+.screen { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-lg); overflow: hidden; min-width: 0; }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.bar b { font-size: 15px; font-weight: 600; }
+.bar small { display: block; font-size: 12px; color: var(--muted); }
+.aside { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+.aside .who { font-size: 13px; font-weight: 600; color: var(--brand); }
+.aside h3 { font-size: 24px; font-weight: 600; letter-spacing: -.025em; line-height: 1.15; }
+.aside p { color: var(--text-2); }
+.aside ul { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 8px; font-size: 14px; color: var(--text-2); flex: 1; }
+.aside li { display: flex; gap: 10px; }
+.aside li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 8px; border-radius: 50%; background: var(--primary); }
+.aside a.go { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: var(--brand); text-decoration: none; }
+.aside a.go:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.chip { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.c-green { background: var(--green-bg); color: var(--green-ink); }
+.c-amber { background: var(--amber-bg); color: var(--amber-ink); }
+.c-blue { background: var(--blue-bg); color: var(--blue-ink); }
+.c-red { background: var(--red-bg); color: var(--red-ink); }
+
+/* Écran entreprise : file du dispatch. */
+.dispatch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; background: var(--surface-2); }
+.lane { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px; min-width: 0; }
+.lane h4 { font-size: 14px; font-weight: 600; }
+.lane .m { font-size: 12px; color: var(--muted); }
+.ord { margin-top: 8px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; }
+.ord b { font-weight: 600; }
+.ord p { font-size: 12px; color: var(--text-2); }
+.queue { padding: 12px 16px 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--text-2); }
+.queue .auto { margin-left: auto; display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 999px; background: var(--primary); color: var(--on-primary); font-weight: 600; font-size: 13px; }
+
+/* Écran client : commande et suivi. */
+.portal { display: grid; grid-template-columns: 1.1fr .9fr; gap: 0; }
+.portal > div { padding: 20px; }
+.portal > div + div { border-left: 1px solid var(--border); background: var(--surface-2); }
+.kv { display: grid; gap: 10px; font-size: 14px; }
+.kv div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.kv span { color: var(--muted); }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { position: relative; padding: 0 0 16px 24px; font-size: 14px; color: var(--muted); }
+.steps li::before { content: ""; position: absolute; left: 0; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); }
+.steps li::after { content: ""; position: absolute; left: 6px; top: 19px; bottom: 0; width: 2px; background: var(--border); }
+.steps li:last-child::after { display: none; }
+.steps li.done { color: var(--ink); }
+.steps li.done::before { background: var(--primary); border-color: var(--primary); }
+.steps li.done::after { background: var(--primary); }
+.steps li.now { color: var(--ink); font-weight: 600; }
+.steps li.now::before { border-color: var(--primary); box-shadow: 0 0 0 4px var(--green-bg); }
+.steps small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); }
+
+/* Écran chauffeur : téléphone. */
+.phone-wrap { display: grid; place-items: center; padding: 28px; background: var(--surface-2); }
+.phone { width: 260px; background: var(--ink); border-radius: 40px; padding: 10px; }
+:root[data-theme="dark"] .phone { background: #2b302e; }
+.phone .in { background: var(--surface); border-radius: 31px; padding: 20px 16px 18px; }
+.phone .m { font-size: 12px; color: var(--muted); }
+.phone h4 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 12px; }
+.navb { background: var(--ink); color: var(--bg); border-radius: 16px; padding: 12px; }
+:root[data-theme="dark"] .navb { background: var(--surface-2); color: var(--ink); }
+.navb b { display: block; font-size: 14px; font-weight: 600; }
+.navb span { font-size: 12px; opacity: .78; }
+.mis { margin-top: 10px; border: 1px solid var(--border); border-radius: 14px; padding: 10px; font-size: 12px; }
+.mis b { font-size: 13px; }
+.mis p { color: var(--text-2); }
+.pcta { margin-top: 10px; display: grid; place-items: center; min-height: 44px; border-radius: 999px; background: var(--primary); color: var(--on-primary); font-weight: 600; font-size: 13px; }
+
+/* Bento : bénéfices, mini-démo, tarifs, contact. */
+.section { padding: 120px 0 0; }
+.kicker { font-size: 13px; font-weight: 600; color: var(--brand); }
+.title { margin-top: 10px; font-size: clamp(30px, 4.6vw, 52px); font-weight: 700; line-height: 1.04; letter-spacing: -.035em; text-wrap: balance; }
+.bento { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 28px; display: flex; flex-direction: column; gap: 10px; min-height: 220px; }
+.tile .ico { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--green-bg); color: var(--green-ink); }
+.tile .ico svg { width: 22px; height: 22px; }
+.tile h3 { margin-top: auto; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+.tile p { color: var(--text-2); }
+
+.demo { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; background: var(--ink); color: var(--bg); border-radius: 32px; padding: 56px; }
+:root[data-theme="dark"] .demo { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+.demo .kicker { color: var(--primary); }
+.demo p.sub { margin-top: 14px; opacity: .78; font-size: 18px; }
+.demo .cta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
+.demo .btn-ghost { background: transparent; color: inherit; border-color: rgba(127,127,127,.45); }
+.views { display: grid; gap: 10px; }
+.view { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px 16px; border-radius: 18px; border: 1px solid rgba(127,127,127,.3); text-decoration: none; }
+.view:hover { background: rgba(127,127,127,.1); }
+.view b { display: block; font-weight: 600; }
+.view span { font-size: 13px; opacity: .75; }
+.view .n { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--primary); color: var(--on-primary); font-weight: 700; font-size: 14px; }
+.demo .fine { margin-top: 14px; font-size: 13px; opacity: .7; }
+
+.plans { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.plan { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 28px; }
+.plan h3 { font-size: 16px; font-weight: 600; color: var(--muted); }
+.plan .amount { margin-top: 6px; font-size: 48px; font-weight: 700; letter-spacing: -.045em; line-height: 1; }
+.plan .amount small { font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.plan .pair { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.plan .pair div { background: var(--surface-2); border-radius: 14px; padding: 12px; }
+.plan .pair b { display: block; font-size: 18px; font-weight: 600; }
+.plan .pair span { font-size: 12px; color: var(--muted); }
+.plan p.inc { margin-top: 14px; font-size: 14px; color: var(--text-2); }
+.fine { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; font-size: 14px; color: var(--muted); }
+.fine a { color: var(--brand); font-weight: 600; display: inline-flex; min-height: 44px; align-items: center; }
+
+.contact { margin-top: 0; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; border: 1px solid var(--border); background: var(--surface); border-radius: 32px; padding: 48px; }
+.contact p { margin-top: 10px; color: var(--text-2); font-size: 18px; }
+.contact .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+footer { margin-top: 96px; border-top: 1px solid var(--border); padding: 28px 0 40px; font-size: 14px; color: var(--muted); }
+footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+footer nav { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+footer nav a { min-height: 44px; display: inline-flex; align-items: center; padding: 0 6px; text-decoration: none; color: var(--text-2); }
+footer nav a:hover { color: var(--ink); text-decoration: underline; }
+.dock { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel:not([hidden]) { animation: swap .45s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes swap { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+@media (prefers-reduced-transparency: reduce) { .top { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+@media (max-width: 960px) {
+  .top nav a.link { display: none; }
+  .panel { grid-template-columns: 1fr; }
+  .bento, .plans { grid-template-columns: 1fr; }
+  .tile { min-height: 0; }
+  .demo { grid-template-columns: 1fr; padding: 36px 24px; }
+  .contact { grid-template-columns: 1fr; padding: 32px 24px; }
+}
+@media (max-width: 720px) {
+  .top nav .btn { display: none; }
+  .hero { padding-top: 40px; }
+  .hero .cta { display: none; }
+  .switch { margin-top: 32px; }
+  .switch button { font-size: 14px; }
+  .switch button svg { display: none; }
+  .dispatch { grid-template-columns: 1fr 1fr; padding: 10px; gap: 8px; }
+  .dispatch .lane:nth-child(3) { display: none; }
+  .portal { grid-template-columns: 1fr; }
+  .portal > div + div { border-left: 0; border-top: 1px solid var(--border); }
+  .phone-wrap { padding: 20px; }
+  .phone { width: 240px; }
+  .section { padding-top: 80px; }
+  footer { margin-top: 72px; }
+  .dock { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 40; padding: 8px; border-radius: 999px; background: var(--chrome); -webkit-backdrop-filter: saturate(160%) blur(16px); backdrop-filter: saturate(160%) blur(16px); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+  .dock a { display: grid; place-items: center; min-height: 48px; border-radius: 999px; font-size: 14px; font-weight: 600; text-decoration: none; color: var(--ink); }
+  .dock a.main { background: var(--primary); color: var(--on-primary); }
+  body { padding-bottom: 92px; }
+}
+@media (max-width: 720px) and (prefers-reduced-transparency: reduce) { .dock { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Aller au contenu</a>
+<header class="top">
+  <div class="wrap">
+    <a href="#" aria-label="TutelLiv, accueil" style="display:inline-flex;min-height:44px;align-items:center">
+      <img class="logo logo-light" src="../../../public/brand/logo-horizontal-fond-clair.png" alt="" width="101" height="30">
+      <img class="logo logo-dark" src="../../../public/brand/logo-horizontal-fond-sombre.png" alt="" width="101" height="30">
+    </a>
+    <nav aria-label="Navigation principale">
+      <a class="link" href="/fonctionnalites">Fonctionnalités</a>
+      <a class="link" href="#tarifs">Tarifs</a>
+      <a class="link" href="#contact">Contact</a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Passer en mode sombre">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn btn-ghost btn-sm" href="login.html">Se connecter</a>
+      <a class="btn btn-primary btn-sm" href="#demo">Voir la démo</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <h1 id="hero-title">Votre équipe pilote. Vos clients suivent. <em>Vos chauffeurs livrent.</em></h1>
+      <p class="lead">TutelLiv réunit commandes, dispatch, suivi et factures sur une seule plateforme, avec un espace pour chacun.</p>
+      <div class="cta"><a class="btn btn-primary" href="#demo">Voir la démo</a><a class="btn btn-ghost" href="login.html">Se connecter</a></div>
+
+      <div class="switch" role="tablist" aria-label="Voir TutelLiv depuis un espace">
+        <button role="tab" id="t-ent" aria-controls="p-ent" aria-selected="true" tabindex="0" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 21V5l8-2v18M12 9h8v12M8 8v.01M8 12v.01M8 16v.01M16 13v.01M16 17v.01"/></svg>Entreprise</button>
+        <button role="tab" id="t-cli" aria-controls="p-cli" aria-selected="false" tabindex="-1" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Client</button>
+        <button role="tab" id="t-drv" aria-controls="p-drv" aria-selected="false" tabindex="-1" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>Chauffeur</button>
+      </div>
+
+      <div class="stage">
+        <div class="panel" role="tabpanel" id="p-ent" aria-labelledby="t-ent">
+          <div class="screen">
+            <div class="bar"><div><b>Dispatch</b><small>File d'attente du jour</small></div><span class="chip c-amber">1 sans livreur</span></div>
+            <div class="dispatch">
+              <div class="lane"><h4>Karim</h4><p class="m">Paris Est · à 1,1 km</p>
+                <div class="ord"><b>#1042</b><p>Roquette, 11e</p><span class="chip c-green">En route</span></div>
+                <div class="ord"><b>#1043</b><p>Oberkampf, 11e</p><span class="chip c-blue">À démarrer</span></div></div>
+              <div class="lane"><h4>Lucas</h4><p class="m">Paris Nord · à 2,3 km</p>
+                <div class="ord"><b>#1044</b><p>Batignolles, 17e</p><span class="chip c-blue">À démarrer</span></div></div>
+              <div class="lane"><h4>Sofia</h4><p class="m">Paris Sud · à 0,9 km</p>
+                <div class="ord" style="border-style:dashed"><p>Disponible</p></div></div>
+            </div>
+            <div class="queue"><span><b style="color:var(--ink)">#1045</b> Alésia, 14e</span><span class="chip c-amber">Sans livreur</span><span class="auto">Dispatch automatique</span></div>
+          </div>
+          <div class="aside">
+            <p class="who">Entreprise et dispatch</p>
+            <h3>Tout piloter depuis un seul écran.</h3>
+            <ul><li>Commandes, dispatch et flotte</li><li>Livraisons et chauffeurs sur une carte</li><li>Facturation et export</li></ul>
+            <a class="go" href="login.html?espace=entreprise">Connexion entreprise →</a>
+          </div>
+        </div>
+
+        <div class="panel" role="tabpanel" id="p-cli" aria-labelledby="t-cli" hidden>
+          <div class="screen">
+            <div class="bar"><div><b>Commande #1042</b><small>Atelier Verde</small></div><span class="chip c-green">En route</span></div>
+            <div class="portal">
+              <div class="kv">
+                <div><span>Retrait</span><b>Entrepôt Ivry-sur-Seine</b></div>
+                <div><span>Livraison</span><b>18 rue de la Roquette, Paris 11e</b></div>
+                <div><span>Créneau</span><b>14 h – 16 h</b></div>
+                <div style="border:0"><span>Facture</span><b>F-2026-1042 · 38,00 €</b></div>
+              </div>
+              <div>
+                <ol class="steps">
+                  <li class="done">Commande reçue</li>
+                  <li class="done">Confiée à Karim</li>
+                  <li class="now">En route<small>Arrivée vers 14 h 21</small></li>
+                  <li>Livrée, avec preuve</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+          <div class="aside">
+            <p class="who">Portail client</p>
+            <h3>Vos clients commandent et suivent seuls.</h3>
+            <ul><li>Passer une commande</li><li>Suivre chaque étape</li><li>Retrouver preuves et factures</li></ul>
+            <a class="go" href="login.html?espace=client">Espace client →</a>
+          </div>
+        </div>
+
+        <div class="panel" role="tabpanel" id="p-drv" aria-labelledby="t-drv" hidden>
+          <div class="screen phone-wrap">
+            <div class="phone"><div class="in">
+              <p class="m">Bonjour Karim</p><h4>Mes missions</h4>
+              <div class="navb"><b>Dans 300 m, tournez à gauche</b><span>Arrivée vers 14 h 21</span></div>
+              <div class="mis"><b>#1042 · Retrait fait</b><p>Rue de la Roquette, Paris 11e</p></div>
+              <div class="mis"><b>#1043</b><p>Oberkampf, Paris 11e</p></div>
+              <div class="pcta">Valider la livraison</div>
+            </div></div>
+          </div>
+          <div class="aside">
+            <p class="who">App chauffeur</p>
+            <h3>Les missions du jour, dans la poche.</h3>
+            <ul><li>Recevoir ses missions</li><li>Naviguer vers chaque arrêt</li><li>Photo et nom du réceptionnaire</li></ul>
+            <a class="go" href="login.html?espace=chauffeur">Espace chauffeur →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="why-title">
+    <div class="wrap">
+      <p class="kicker">Ce que vous y gagnez</p>
+      <h2 id="why-title" class="title">Moins d'appels, plus de visibilité.</h2>
+      <div class="bento">
+        <article class="tile"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.5a7 7 0 1 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><h3>Suivi en temps réel</h3><p>Livraisons et chauffeurs sur une même carte.</p></article>
+        <article class="tile"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 4V5Z"/></svg></span><h3>Moins d'appels</h3><p>Vos clients suivent leur commande eux-mêmes.</p></article>
+        <article class="tile"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></span><h3>Un seul fil</h3><p>De la commande à la facture, sans tableur.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo" class="section" aria-labelledby="demo-title">
+    <div class="wrap">
+      <div class="demo">
+        <div>
+          <p class="kicker">Démo · données fictives</p>
+          <h2 id="demo-title" class="title">Essayez avant de nous parler.</h2>
+          <p class="sub">La mini-démo suit une commande d'un espace à l'autre. La démo complète ouvre l'admin, le portail client et l'app chauffeur.</p>
+          <div class="cta"><a class="btn btn-primary" href="#demo" title="Phase 2 : ouvre la mini-démo existante (DEMO-3)">Lancer la mini-démo</a><a class="btn btn-ghost" href="/demonstration">Démo complète</a></div>
+        </div>
+        <div>
+          <div class="views">
+            <a class="view" href="/demonstration"><span class="n" aria-hidden="true">1</span><span><b>Organiser les missions</b><span>Point de vue entreprise</span></span></a>
+            <a class="view" href="/demonstration"><span class="n" aria-hidden="true">2</span><span><b>Suivre une commande</b><span>Point de vue client</span></span></a>
+            <a class="view" href="/demonstration"><span class="n" aria-hidden="true">3</span><span><b>Parcourir une mission</b><span>Point de vue chauffeur</span></span></a>
+          </div>
+          <p class="fine">Aucune entreprise cliente n'est utilisée pour cette visite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tarifs" class="section" aria-labelledby="price-title">
+    <div class="wrap">
+      <p class="kicker">Tarifs</p>
+      <h2 id="price-title" class="title">Trois formules, sans quota caché.</h2>
+      <div class="plans">
+        <article class="plan"><h3>Starter</h3><p class="amount">79 € <small>HT / mois</small></p><div class="pair"><div><b>5</b><span>livreurs inclus</span></div><div><b>1 000</b><span>commandes / mois</span></div></div><p class="inc">Options à la carte.</p></article>
+        <article class="plan"><h3>Pro</h3><p class="amount">179 € <small>HT / mois</small></p><div class="pair"><div><b>10</b><span>livreurs inclus</span></div><div><b>3 000</b><span>commandes / mois</span></div></div><p class="inc">1 dispatcher, dispatch automatique, carte GPS administrateur.</p></article>
+        <article class="plan"><h3>Business</h3><p class="amount">349 € <small>HT / mois</small></p><div class="pair"><div><b>20</b><span>livreurs inclus</span></div><div><b>6 000</b><span>commandes / mois</span></div></div><p class="inc">En plus : carte GPS client, analytics, assistance prioritaire.</p></article>
+      </div>
+      <p class="fine"><span>Annuel : douze mois pour le prix de dix.</span><a href="/tarifs">Quotas, options et TTC →</a></p>
+    </div>
+  </section>
+
+  <section id="contact" class="section" aria-labelledby="contact-title">
+    <div class="wrap">
+      <div class="contact">
+        <div><h2 id="contact-title" class="title" style="margin:0">Parlons de vos livraisons.</h2><p>Une question, une démonstration accompagnée ou un pilote : nous répondons par e-mail.</p></div>
+        <div class="cta"><a class="btn btn-primary" href="/contact">Nous écrire</a><a class="btn btn-ghost" href="mailto:support@tutelliv.fr">support@tutelliv.fr</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong style="color:var(--ink)">TutelLiv</strong> — pilotage des livraisons B2B</p>
+    <nav aria-label="Pied de page">
+      <a href="/fonctionnalites">Fonctionnalités</a><a href="/tarifs">Tarifs</a><a href="/contact">Contact</a>
+      <a href="login.html?espace=entreprise">Entreprise</a><a href="login.html?espace=client">Client</a><a href="login.html?espace=chauffeur">Chauffeur</a>
+    </nav>
+  </div>
+</footer>
+<nav class="dock" aria-label="Actions rapides"><a href="#demo">Démo</a><a class="main" href="login.html">Se connecter</a><a href="#contact">Contact</a></nav>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  function label() { document.querySelectorAll("[data-theme-toggle]").forEach(function (b) { b.setAttribute("aria-label", root.getAttribute("data-theme") === "dark" ? "Passer en mode clair" : "Passer en mode sombre"); }); }
+  document.querySelectorAll("[data-theme-toggle]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("tl-theme", next); } catch (e) {}
+      label();
+    });
+  });
+  label();
+})();
+/* Onglets accessibles (flèches, Début, Fin) ; ?vue=client|chauffeur pour les captures. */
+(function () {
+  var tabs = [].slice.call(document.querySelectorAll('[role="tab"]'));
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute("aria-selected", String(on)); t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { select(t, false); });
+    t.addEventListener("keydown", function (e) {
+      var j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (j === undefined) return;
+      e.preventDefault(); select(tabs[(j + tabs.length) % tabs.length], true);
+    });
+  });
+  var v = { client: 1, chauffeur: 2 }[new URLSearchParams(location.search).get("vue")];
+  if (v) select(tabs[v], false);
+})();
+</script>
+</body>
+</html>
