@@ -62,7 +62,7 @@ h1 { font-size: clamp(32px, 5.6vw, 48px); font-weight: 700; letter-spacing: -.04
 .tile { position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 200px; padding: 24px; border-radius: 24px; background: var(--surface); border: 1px solid var(--border); text-decoration: none; transition: border-color .2s, transform .2s; }
 .tile:hover { border-color: var(--ink); }
 .tile:active { transform: scale(.985); }
-.tile .ico { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--green-bg); color: var(--green-ink); }
+.tile .ico { flex: none; width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--green-bg); color: var(--green-ink); }
 .tile .ico svg { width: 24px; height: 24px; }
 .tile b { margin-top: auto; font-size: 21px; font-weight: 600; letter-spacing: -.02em; }
 .tile span.d { font-size: 14px; color: var(--text-2); }
