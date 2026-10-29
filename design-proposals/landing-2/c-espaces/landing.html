@@ -100,7 +100,7 @@ a { color: inherit; }
 /* Écran entreprise : file du dispatch. */
 .dispatch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; background: var(--surface-2); }
 .lane { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px; min-width: 0; }
-.lane h4 { font-size: 14px; font-weight: 600; }
+.lane .h4 { font-size: 14px; font-weight: 600; }
 .lane .m { font-size: 12px; color: var(--muted); }
 .ord { margin-top: 8px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; }
 .ord b { font-weight: 600; }
@@ -133,7 +133,7 @@ a { color: inherit; }
 :root[data-theme="dark"] .phone { background: #2b302e; }
 .phone .in { background: var(--surface); border-radius: 31px; padding: 20px 16px 18px; }
 .phone .m { font-size: 12px; color: var(--muted); }
-.phone h4 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 12px; }
+.phone .h4 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 12px; }
 .navb { background: var(--ink); color: var(--bg); border-radius: 16px; padding: 12px; }
 :root[data-theme="dark"] .navb { background: var(--surface-2); color: var(--ink); }
 .navb b { display: block; font-size: 14px; font-weight: 600; }
@@ -234,7 +234,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
 <a class="skip" href="#main">Aller au contenu</a>
 <header class="top">
   <div class="wrap">
-    <a href="#" aria-label="TutelLiv, accueil" style="display:inline-flex;min-height:44px;align-items:center">
+    <a href="landing.html" aria-label="TutelLiv, accueil" style="display:inline-flex;min-height:44px;align-items:center">
       <img class="logo logo-light" src="../../../public/brand/logo-horizontal-fond-clair.png" alt="" width="101" height="30">
       <img class="logo logo-dark" src="../../../public/brand/logo-horizontal-fond-sombre.png" alt="" width="101" height="30">
     </a>
@@ -273,15 +273,15 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
           <div class="screen">
             <div class="bar"><div><b>Dispatch</b><small>File d'attente du jour</small></div><span class="chip c-amber">1 sans livreur</span></div>
             <div class="dispatch">
-              <div class="lane"><h4>Karim</h4><p class="m">Paris Est · à 1,1 km</p>
+              <div class="lane"><p class="h4">Karim</p><p class="m">Paris Est · à 1,1 km</p>
                 <div class="ord"><b>#1042</b><p>Roquette, 11e</p><span class="chip c-green">En route</span></div>
                 <div class="ord"><b>#1043</b><p>Oberkampf, 11e</p><span class="chip c-blue">À démarrer</span></div></div>
-              <div class="lane"><h4>Lucas</h4><p class="m">Paris Nord · à 2,3 km</p>
+              <div class="lane"><p class="h4">Lucas</p><p class="m">Paris Nord · à 2,3 km</p>
                 <div class="ord"><b>#1044</b><p>Batignolles, 17e</p><span class="chip c-blue">À démarrer</span></div></div>
-              <div class="lane"><h4>Sofia</h4><p class="m">Paris Sud · à 0,9 km</p>
+              <div class="lane"><p class="h4">Sofia</p><p class="m">Paris Sud · à 0,9 km</p>
                 <div class="ord" style="border-style:dashed"><p>Disponible</p></div></div>
             </div>
-            <div class="queue"><span><b style="color:var(--ink)">#1045</b> Alésia, 14e</span><span class="chip c-amber">Sans livreur</span><span class="auto">Dispatch automatique</span></div>
+            <div class="queue"><span><b style="color:var(--ink)">#1045</b> Alésia, 14e</span><span class="chip c-amber">Sans livreur</span><span class="auto">Dispatch automatique · Pro et Business</span></div>
           </div>
           <div class="aside">
             <p class="who">Entreprise et dispatch</p>
@@ -293,7 +293,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
 
         <div class="panel" role="tabpanel" id="p-cli" aria-labelledby="t-cli" hidden>
           <div class="screen">
-            <div class="bar"><div><b>Commande #1042</b><small>Atelier Verde</small></div><span class="chip c-green">En route</span></div>
+            <div class="bar"><div><b>Commande #1042</b><small>Atelier Verde</small></div><span class="chip c-green">En livraison</span></div>
             <div class="portal">
               <div class="kv">
                 <div><span>Retrait</span><b>Entrepôt Ivry-sur-Seine</b></div>
@@ -303,10 +303,11 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
               </div>
               <div>
                 <ol class="steps">
-                  <li class="done">Commande reçue</li>
-                  <li class="done">Confiée à Karim</li>
-                  <li class="now">En route<small>Arrivée vers 14 h 21</small></li>
-                  <li>Livrée, avec preuve</li>
+                  <li class="done">En attente</li>
+                  <li class="done">Assigné · Karim</li>
+                  <li class="now">En livraison<small>Créneau 14 h – 16 h</small></li>
+                  <li>Livré, avec preuve</li>
+                  <li>Facturé</li>
                 </ol>
               </div>
             </div>
@@ -322,9 +323,9 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
         <div class="panel" role="tabpanel" id="p-drv" aria-labelledby="t-drv" hidden>
           <div class="screen phone-wrap">
             <div class="phone"><div class="in">
-              <p class="m">Bonjour Karim</p><h4>Mes missions</h4>
-              <div class="navb"><b>Dans 300 m, tournez à gauche</b><span>Arrivée vers 14 h 21</span></div>
-              <div class="mis"><b>#1042 · Retrait fait</b><p>Rue de la Roquette, Paris 11e</p></div>
+              <p class="m">Bonjour Karim</p><p class="h4">Mes missions</p>
+              <div class="navb"><b>Prochain arrêt · Ouvrir l'itinéraire</b><span>Rue de la Roquette, Paris 11e</span></div>
+              <div class="mis"><b>#1042 · En livraison</b><p>Créneau 14 h – 16 h</p></div>
               <div class="mis"><b>#1043</b><p>Oberkampf, Paris 11e</p></div>
               <div class="pcta">Valider la livraison</div>
             </div></div>
@@ -376,11 +377,11 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
   <section id="tarifs" class="section" aria-labelledby="price-title">
     <div class="wrap">
       <p class="kicker">Tarifs</p>
-      <h2 id="price-title" class="title">Trois formules, sans quota caché.</h2>
+      <h2 id="price-title" class="title">Trois formules, quotas affichés.</h2>
       <div class="plans">
-        <article class="plan"><h3>Starter</h3><p class="amount">79 € <small>HT / mois</small></p><div class="pair"><div><b>5</b><span>livreurs inclus</span></div><div><b>1 000</b><span>commandes / mois</span></div></div><p class="inc">Options à la carte.</p></article>
-        <article class="plan"><h3>Pro</h3><p class="amount">179 € <small>HT / mois</small></p><div class="pair"><div><b>10</b><span>livreurs inclus</span></div><div><b>3 000</b><span>commandes / mois</span></div></div><p class="inc">1 dispatcher, dispatch automatique, carte GPS administrateur.</p></article>
-        <article class="plan"><h3>Business</h3><p class="amount">349 € <small>HT / mois</small></p><div class="pair"><div><b>20</b><span>livreurs inclus</span></div><div><b>6 000</b><span>commandes / mois</span></div></div><p class="inc">En plus : carte GPS client, analytics, assistance prioritaire.</p></article>
+        <article class="plan"><h3>Starter</h3><p class="amount">79 € <small>HT / mois</small></p><div class="pair"><div><b>5</b><span>livreurs inclus</span></div><div><b>1 000</b><span>commandes incluses / mois</span></div></div><p class="inc">Options à la carte.</p></article>
+        <article class="plan"><h3>Pro</h3><p class="amount">179 € <small>HT / mois</small></p><div class="pair"><div><b>10</b><span>livreurs inclus</span></div><div><b>3 000</b><span>commandes incluses / mois</span></div></div><p class="inc">1 dispatcher, dispatch automatique, carte GPS administrateur.</p></article>
+        <article class="plan"><h3>Business</h3><p class="amount">349 € <small>HT / mois</small></p><div class="pair"><div><b>20</b><span>livreurs inclus</span></div><div><b>6 000</b><span>commandes incluses / mois</span></div></div><p class="inc">En plus : carte GPS client, analytics, assistance prioritaire.</p></article>
       </div>
       <p class="fine"><span>Annuel : douze mois pour le prix de dix.</span><a href="/tarifs">Quotas, options et TTC →</a></p>
     </div>
@@ -440,7 +441,8 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
       e.preventDefault(); select(tabs[(j + tabs.length) % tabs.length], true);
     });
   });
-  var v = { client: 1, chauffeur: 2 }[new URLSearchParams(location.search).get("vue")];
+  var vue = new URLSearchParams(location.search).get("vue");
+  var v = vue === "client" ? 1 : vue === "chauffeur" ? 2 : 0;
   if (v) select(tabs[v], false);
 })();
 </script>

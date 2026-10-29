@@ -19,7 +19,7 @@
 <style>
 :root {
   --bg: #f5f8f6; --surface: #ffffff; --surface-2: #f3f5f2; --ink: #0e1310; --text-2: #4f5953; --muted: #68726b;
-  --border: #e4e8e5; --input: #d5dbd7; --primary: #00d46a; --on-primary: #0e1310; --primary-hover: #00c262; --brand: #08783f; --ring: #0b8a45;
+  --border: #e4e8e5; --input: #858f88; --primary: #00d46a; --on-primary: #0e1310; --primary-hover: #00c262; --brand: #08783f; --ring: #0b8a45;
   --err: #a12c2c; --err-bg: #fdf2f2; --err-line: #f1c9c9; --info-bg: #eef7f2; --info-line: #cdeedb;
   --map-bg: #e9eeea; --map-street: #ffffff; --map-minor: #f7f9f8; --map-water: #d3e3e6; --map-park: #dcebdf; --route-casing: #0e1310;
   --green-bg: #e6f8ee; --green-ink: #08783f; --shadow-md: 0 12px 32px rgba(14,19,16,.12);
@@ -27,7 +27,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #141716; --surface: #1c1f1e; --surface-2: #262a28; --ink: #eef1ef; --text-2: #b4bcb7; --muted: #a3aca6;
-  --border: #333936; --input: #3d4440; --primary: #3dd68c; --on-primary: #0e1310; --primary-hover: #55e09e; --brand: #5bd99a; --ring: #5bd99a;
+  --border: #333936; --input: #6b746f; --primary: #3dd68c; --on-primary: #0e1310; --primary-hover: #55e09e; --brand: #5bd99a; --ring: #5bd99a;
   --err: #f08a82; --err-bg: #3d2523; --err-line: #5a3330; --info-bg: #1b3328; --info-line: #2a4a39;
   --map-bg: #191c1b; --map-street: #2a2f2d; --map-minor: #212524; --map-water: #1c2a2e; --map-park: #1b2620; --route-casing: #0e1310;
   --green-bg: #1b3328; --green-ink: #7be0ab; --shadow-md: 0 12px 32px rgba(0,0,0,.4);
@@ -54,7 +54,7 @@ a { color: inherit; }
 .side svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .side .brand { position: absolute; left: 24px; top: 20px; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
 .side .say { position: absolute; left: 24px; right: 24px; bottom: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 22px; box-shadow: var(--shadow-md); }
-.side .say h2 { font-size: 24px; font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
+.side .say .say-title { font-size: 24px; font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
 .side .say p { margin-top: 8px; color: var(--text-2); font-size: 15px; }
 .chip { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: var(--green-bg); color: var(--green-ink); }
 .bubble { position: absolute; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; box-shadow: var(--shadow-md); font-size: 12px; }
@@ -151,9 +151,9 @@ input[aria-invalid="true"] { border-color: var(--err); }
       <img class="logo logo-dark" src="../../../public/brand/logo-horizontal-fond-sombre.png" alt="" width="94" height="28">
     </a>
     <div class="bubble" style="right:12%;top:16%"><b>#1042 · Karim</b><span class="chip">En route</span></div>
-    <div class="bubble hide-sm" style="left:10%;top:44%"><span class="m">Arrivée vers</span><b>14 h 21</b></div>
+    <div class="bubble hide-sm" style="left:10%;top:44%"><span class="m">Créneau</span><b>14 h – 16 h</b></div>
     <div class="say">
-      <h2>Vos livraisons vous attendent là où vous les avez laissées.</h2>
+      <p class="say-title">Vos livraisons vous attendent là où vous les avez laissées.</p>
       <p>Commandes, dispatch, suivi et factures, pour votre équipe, vos clients et vos chauffeurs.</p>
     </div>
   </aside>
@@ -247,11 +247,12 @@ input[aria-invalid="true"] { border-color: var(--err); }
     chauffeur: ["Espace chauffeur", "Accédez à vos missions du jour et à la navigation"]
   };
   var params = new URLSearchParams(location.search);
-  var space = spaces[params.get("espace")] ? params.get("espace") : "entreprise";
+  var theme = { dark: "dark", light: "light" }.hasOwnProperty(params.get("theme")) ? params.get("theme") : null;
+  var space = Object.prototype.hasOwnProperty.call(spaces, params.get("espace")) ? params.get("espace") : "entreprise";
   document.querySelector("[data-title]").textContent = spaces[space][0];
   document.querySelector("[data-subtitle]").textContent = spaces[space][1];
   document.querySelectorAll("[data-space]").forEach(function (a) {
-    var theme = params.get("theme"); if (theme) a.href += "&theme=" + theme;
+    if (theme) a.href += "&theme=" + theme;
     if (a.dataset.space === space) a.setAttribute("aria-current", "page");
   });
   var invited = space !== "entreprise";
@@ -277,11 +278,12 @@ input[aria-invalid="true"] { border-color: var(--err); }
       submit.disabled = false; submit.removeAttribute("aria-busy");
       submit.textContent = demo ? "Ouverture de la démo… (maquette)" : "Se connecter";
       showAlert(demo ? "" : "Email ou mot de passe incorrect.");
+      if (demo) submit.disabled = true;
     }, 700);
   });
   /* La démo remplit le formulaire entreprise, comme le compte démo actuel (demo@tutelliv.fr). */
   document.querySelector("[data-fill-demo]").addEventListener("click", function () {
-    if (invited) { location.search = "?espace=entreprise&demo=1" + (params.get("theme") ? "&theme=" + params.get("theme") : ""); return; }
+    if (invited) { location.search = "?espace=entreprise&demo=1" + (theme ? "&theme=" + theme : ""); return; }
     email.value = "demo@tutelliv.fr"; pw.value = "Demo2026!"; submit.focus();
   });
   if (params.get("demo") === "1" && !invited) { email.value = "demo@tutelliv.fr"; pw.value = "Demo2026!"; }

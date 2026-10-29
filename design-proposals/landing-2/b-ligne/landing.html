@@ -149,6 +149,11 @@ footer nav a { min-height: 44px; display: inline-flex; align-items: center; padd
 footer nav a:hover { color: var(--ink); text-decoration: underline; }
 
 .dock { display: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Dark : pas de dalle claire, les blocs « encre » passent en surface élevée. */
+:root[data-theme="dark"] .eta, :root[data-theme="dark"] .mini .nav { background: var(--surface-2); color: var(--ink); border: 1px solid var(--border); }
+:root[data-theme="dark"] .contact { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+:root[data-theme="dark"] .contact .btn-ghost { color: var(--ink); }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .line::after, .st .node, .btn { transition: none; } }
 @media (prefers-reduced-motion: no-preference) {
@@ -193,7 +198,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
 <a class="skip" href="#main">Aller au contenu</a>
 <header class="top">
   <div class="wrap">
-    <a href="#" aria-label="TutelLiv, accueil" style="display:inline-flex;min-height:44px;align-items:center">
+    <a href="landing.html" aria-label="TutelLiv, accueil" style="display:inline-flex;min-height:44px;align-items:center">
       <img class="logo logo-light" src="../../../public/brand/logo-horizontal-fond-clair.png" alt="" width="101" height="30">
       <img class="logo logo-dark" src="../../../public/brand/logo-horizontal-fond-sombre.png" alt="" width="101" height="30">
     </a>
@@ -246,7 +251,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
         <div class="card" style="left:6%;top:6%;max-width:58%"><b>#1042 · Atelier Verde</b><span class="m">Créneau 14 h – 16 h</span><br><span class="chip c-green">En route</span></div>
         <div class="card" style="right:5%;top:30%"><b>Karim</b><span class="m">Paris Est</span></div>
         <div class="card" style="left:6%;bottom:118px"><span class="m">Retrait</span><b>Entrepôt Ivry-sur-Seine</b></div>
-        <div class="eta"><div><b>Arrivée vers 14 h 21</b><span>18 rue de la Roquette, Paris 11e</span></div><div class="ring" aria-hidden="true">K</div></div>
+        <div class="eta"><div><b>Créneau 14 h – 16 h</b><span>18 rue de la Roquette, Paris 11e</span></div><div class="ring" aria-hidden="true">K</div></div>
       </figure>
     </section>
   </div>
@@ -263,7 +268,8 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
           <a class="btn btn-ghost" href="/demonstration">Démo complète</a>
         </div>
       </div>
-      <ol class="line" data-line aria-live="polite">
+      <p class="sr" aria-live="polite" data-live></p>
+      <ol class="line" data-line>
         <li class="st on">
           <span class="node" aria-hidden="true"></span><p class="who">CLIENT</p><h3>Commande</h3>
           <div class="mini"><b>Atelier Verde</b><div class="m">Commande #1042</div><div class="row"><span class="m">Retrait</span><span>Ivry-sur-Seine</span></div><div class="row"><span class="m">Livraison</span><span>Paris 11e</span></div></div>
@@ -274,7 +280,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
         </li>
         <li class="st">
           <span class="node" aria-hidden="true"></span><p class="who">CHAUFFEUR</p><h3>En route</h3>
-          <div class="mini"><div class="m" style="margin-bottom:6px">Bonjour Karim</div><div class="nav"><b>Dans 300 m, tournez à gauche</b><span>Arrivée vers 14 h 21</span></div></div>
+          <div class="mini"><div class="m" style="margin-bottom:6px">Bonjour Karim</div><div class="nav"><b>Prochain arrêt · Ouvrir l'itinéraire</b><span>Créneau 14 h – 16 h</span></div></div>
         </li>
         <li class="st">
           <span class="node" aria-hidden="true"></span><p class="who">CHAUFFEUR</p><h3>Preuve</h3>
@@ -282,7 +288,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
         </li>
         <li class="st">
           <span class="node" aria-hidden="true"></span><p class="who">CLIENT · ENTREPRISE</p><h3>Facture</h3>
-          <div class="mini"><b>F-2026-1042</b><div class="m">Livraison #1042</div><div class="row"><span class="m">Montant</span><b>38,00 €</b></div><div class="row"><span class="m">Statut</span><span class="chip c-green">Livrée</span></div></div>
+          <div class="mini"><b>F-2026-1042</b><div class="m">Livraison #1042</div><div class="row"><span class="m">Montant</span><b>38,00 €</b></div><div class="row"><span class="m">Statut</span><span class="chip c-green">Facturé</span></div></div>
         </li>
       </ol>
       <p class="line-note">Phase 2 : la mini-démo existante (DEMO-3) s'ouvre depuis cette ligne, sans être réécrite.</p>
@@ -305,10 +311,10 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
       <p class="kicker">Tarifs</p>
       <h2 id="price-title" class="title">Trois formules, lisibles d'un regard.</h2>
       <div class="plans" role="table" aria-label="Formules">
-        <div class="plan head" role="row"><span role="columnheader">Formule</span><span role="columnheader">Prix HT / mois</span><span role="columnheader">Livreurs inclus</span><span role="columnheader">Commandes / mois</span><span role="columnheader">Inclus</span></div>
-        <div class="plan" role="row"><h3 role="cell">Starter</h3><p class="price" role="cell">79 € <small>/ mois</small></p><p role="cell">5 <span class="lbl">livreurs</span></p><p role="cell">1 000 <span class="lbl">commandes</span></p><p class="inc" role="cell">L'essentiel, options à la carte</p></div>
-        <div class="plan" role="row"><h3 role="cell">Pro</h3><p class="price" role="cell">179 € <small>/ mois</small></p><p role="cell">10 <span class="lbl">livreurs</span></p><p role="cell">3 000 <span class="lbl">commandes</span></p><p class="inc" role="cell">1 dispatcher, dispatch automatique, carte GPS administrateur</p></div>
-        <div class="plan" role="row"><h3 role="cell">Business</h3><p class="price" role="cell">349 € <small>/ mois</small></p><p role="cell">20 <span class="lbl">livreurs</span></p><p role="cell">6 000 <span class="lbl">commandes</span></p><p class="inc" role="cell">Tout Pro, plus carte GPS client, analytics, assistance prioritaire</p></div>
+        <div class="plan head" role="row"><span role="columnheader">Formule</span><span role="columnheader">Prix HT / mois</span><span role="columnheader">Livreurs inclus</span><span role="columnheader">Commandes incluses / mois</span><span role="columnheader">Inclus</span></div>
+        <div class="plan" role="row"><h3 role="rowheader">Starter</h3><p class="price" role="cell">79 € <small>HT / mois</small></p><p role="cell">5 <span class="lbl">livreurs inclus</span></p><p role="cell">1 000 <span class="lbl">commandes incluses</span></p><p class="inc" role="cell">L'essentiel, options à la carte</p></div>
+        <div class="plan" role="row"><h3 role="rowheader">Pro</h3><p class="price" role="cell">179 € <small>HT / mois</small></p><p role="cell">10 <span class="lbl">livreurs inclus</span></p><p role="cell">3 000 <span class="lbl">commandes incluses</span></p><p class="inc" role="cell">1 dispatcher, dispatch automatique, carte GPS administrateur</p></div>
+        <div class="plan" role="row"><h3 role="rowheader">Business</h3><p class="price" role="cell">349 € <small>HT / mois</small></p><p role="cell">20 <span class="lbl">livreurs inclus</span></p><p role="cell">6 000 <span class="lbl">commandes incluses</span></p><p class="inc" role="cell">Tout Pro, plus carte GPS client, analytics, assistance prioritaire</p></div>
       </div>
       <p class="fine"><span>Prix HT. Annuel : douze mois pour le prix de dix.</span><a href="/tarifs">Quotas, options et TTC →</a></p>
     </div>
@@ -360,7 +366,8 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
   var btn = document.querySelector("[data-play]"), line = document.querySelector("[data-line]");
   var st = line.querySelectorAll(".st"), i = 0, timer = null;
   function show(n) {
-    i = n; st.forEach(function (s, k) { s.classList.toggle("on", k <= n); });
+    i = n; st.forEach(function (s, k) { s.classList.toggle("on", k <= n); if (k === n) s.setAttribute("aria-current", "step"); else s.removeAttribute("aria-current"); });
+    document.querySelector("[data-live]").textContent = "Étape " + (n + 1) + " sur " + st.length + " : " + st[n].querySelector("h3").textContent;
     line.style.setProperty("--p", (n / (st.length - 1)) * 100 + "%");
   }
   btn.addEventListener("click", function () {

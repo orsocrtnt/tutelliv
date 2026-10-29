@@ -19,14 +19,14 @@
 <style>
 :root {
   --bg: #f5f8f6; --surface: #ffffff; --surface-2: #f3f5f2; --ink: #0e1310; --text-2: #4f5953; --muted: #68726b;
-  --border: #e4e8e5; --input: #d5dbd7; --primary: #00d46a; --on-primary: #0e1310; --primary-hover: #00c262; --brand: #08783f; --ring: #0b8a45;
+  --border: #e4e8e5; --input: #858f88; --primary: #00d46a; --on-primary: #0e1310; --primary-hover: #00c262; --brand: #08783f; --ring: #0b8a45;
   --err: #a12c2c; --err-bg: #fdf2f2; --err-line: #f1c9c9; --info-bg: #eef7f2; --info-line: #cdeedb;
   --green-bg: #e6f8ee; --green-ink: #08783f; --shadow-sm: 0 2px 10px rgba(14,19,16,.08);
   color-scheme: light;
 }
 :root[data-theme="dark"] {
   --bg: #141716; --surface: #1c1f1e; --surface-2: #262a28; --ink: #eef1ef; --text-2: #b4bcb7; --muted: #a3aca6;
-  --border: #333936; --input: #3d4440; --primary: #3dd68c; --on-primary: #0e1310; --primary-hover: #55e09e; --brand: #5bd99a; --ring: #5bd99a;
+  --border: #333936; --input: #6b746f; --primary: #3dd68c; --on-primary: #0e1310; --primary-hover: #55e09e; --brand: #5bd99a; --ring: #5bd99a;
   --err: #f08a82; --err-bg: #3d2523; --err-line: #5a3330; --info-bg: #1b3328; --info-line: #2a4a39;
   --green-bg: #1b3328; --green-ink: #7be0ab; --shadow-sm: 0 2px 10px rgba(0,0,0,.35);
   color-scheme: dark;
@@ -252,7 +252,8 @@ footer a { color: var(--text-2); display: inline-flex; min-height: 44px; align-i
     client: ["Espace client", "Suivez vos commandes et livraisons en temps réel"],
     chauffeur: ["Espace chauffeur", "Accédez à vos missions du jour et à la navigation"]
   };
-  var params = new URLSearchParams(location.search), theme = params.get("theme");
+  var params = new URLSearchParams(location.search);
+  var theme = params.get("theme") === "dark" || params.get("theme") === "light" ? params.get("theme") : null;
   var keep = theme ? "&theme=" + theme : "";
   /* Le thème choisi suit la navigation entre les deux temps (captures). */
   document.querySelectorAll("[data-tile],[data-demo-link]").forEach(function (a) { a.href += keep; });
@@ -260,10 +261,10 @@ footer a { color: var(--text-2); display: inline-flex; min-height: 44px; align-i
 
   /* Dernier espace utilisé : simple repère, jamais un saut automatique (l'utilisateur garde le choix). */
   var last = null; try { last = localStorage.getItem("tl-last-space"); } catch (e) {}
-  if (spaces[last]) { var t = document.querySelector('[data-tile="' + last + '"]'); if (t) t.insertAdjacentHTML("beforeend", '<span class="last">Dernier utilisé</span>'); }
+  if (Object.prototype.hasOwnProperty.call(spaces, last)) { var t = document.querySelector('[data-tile="' + last + '"]'); if (t) t.insertAdjacentHTML("beforeend", '<span class="last">Dernier utilisé</span>'); }
 
   var space = params.get("espace");
-  if (!spaces[space]) return; /* Temps 1. */
+  if (!Object.prototype.hasOwnProperty.call(spaces, space)) return; /* Temps 1. */
 
   document.querySelector('[data-step="choose"]').hidden = true;
   document.querySelector('[data-step="sign"]').hidden = false;
@@ -299,7 +300,8 @@ footer a { color: var(--text-2); display: inline-flex; min-height: 44px; align-i
       submit.disabled = false; submit.removeAttribute("aria-busy");
       submit.textContent = demo ? "Ouverture de la démo… (maquette)" : "Se connecter";
       showAlert(demo ? "" : "Email ou mot de passe incorrect.");
-      try { localStorage.setItem("tl-last-space", space); } catch (e) {} /* produit : après succès seulement */
+      /* Repère « Dernier utilisé » : après un succès seulement (ici, la démo). */
+      if (demo) { submit.disabled = true; try { localStorage.setItem("tl-last-space", space); } catch (e) {} }
     }, 700);
   });
   document.querySelector("[data-reveal]").addEventListener("click", function () {

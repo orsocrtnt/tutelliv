@@ -91,7 +91,7 @@ h1, h2, h3, p { margin: 0; }
 .auto { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: var(--primary); color: var(--on-primary); font-size: 13px; font-weight: 600; }
 .board { display: grid; grid-template-columns: 1.1fr repeat(3, 1fr); gap: 12px; padding: 16px; background: var(--surface-2); }
 .lane { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; min-width: 0; }
-.lane h4 { margin: 0 0 2px; font-size: 13px; font-weight: 600; }
+.lane .h4 { margin: 0 0 2px; font-size: 13px; font-weight: 600; }
 .lane .meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
 .order { border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-top: 8px; background: var(--surface); }
 .order b { font-size: 13px; font-weight: 600; }
@@ -107,7 +107,7 @@ h1, h2, h3, p { margin: 0; }
 :root[data-theme="dark"] .phone { background: #2b302e; }
 .screen { background: var(--surface); border-radius: 30px; overflow: hidden; padding: 18px 14px 16px; text-align: left; }
 .screen .hello { font-size: 12px; color: var(--muted); }
-.screen h5 { margin: 2px 0 12px; font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+.screen .h5 { margin: 2px 0 12px; font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
 .nav-banner { background: var(--band); color: var(--band-ink); border-radius: 16px; padding: 12px; }
 :root[data-theme="dark"] .nav-banner { background: var(--surface-2); }
 .nav-banner b { display: block; font-size: 14px; font-weight: 600; }
@@ -119,7 +119,7 @@ h1, h2, h3, p { margin: 0; }
 
 .track { position: absolute; left: -28px; bottom: 24px; width: 290px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px; box-shadow: var(--shadow-md); text-align: left; }
 .track .who { font-size: 12px; color: var(--muted); }
-.track h5 { margin: 2px 0 12px; font-size: 15px; font-weight: 600; }
+.track .h5 { margin: 2px 0 12px; font-size: 15px; font-weight: 600; }
 .steps { list-style: none; margin: 0; padding: 0; }
 .steps li { position: relative; padding: 0 0 12px 22px; font-size: 13px; color: var(--muted); }
 .steps li::before { content: ""; position: absolute; left: 0; top: 4px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); }
@@ -206,6 +206,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
 @media (prefers-reduced-transparency: reduce) { .top { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 
+@media (max-width: 1120px) { .phone { right: 12px; } .track { left: 12px; } }
 @media (max-width: 960px) {
   .top nav .link { display: none; }
   .demo { grid-template-columns: 1fr; padding: 40px 28px; gap: 32px; }
@@ -226,7 +227,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
   .phone, .track { position: static; width: auto; }
   .phone { border-radius: 30px; padding: 7px; } .screen { border-radius: 24px; padding: 14px 10px; }
   .track { padding: 12px; }
-  .track h5 { font-size: 14px; }
+  .track .h5 { font-size: 14px; }
   .steps li { font-size: 12px; padding-left: 18px; }
   section.block { padding: 80px 0; }
   .contact { padding: 32px 24px; }
@@ -243,7 +244,7 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
 
 <header class="top">
   <div class="wrap">
-    <a href="#" aria-label="TutelLiv, accueil">
+    <a href="landing.html" aria-label="TutelLiv, accueil" style="display:inline-flex;min-height:44px;align-items:center">
       <img class="logo logo-light" src="../../../public/brand/logo-horizontal-fond-clair.png" alt="" width="101" height="30">
       <img class="logo logo-dark" src="../../../public/brand/logo-horizontal-fond-sombre.png" alt="" width="101" height="30">
     </a>
@@ -279,24 +280,24 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
         <div class="window">
           <div class="win-bar">
             <p class="win-title">Dispatch<small>File d'attente du jour</small></p>
-            <span class="auto" aria-hidden="true"><span class="dot" style="background:var(--on-primary)"></span>Dispatch automatique</span>
+            <span class="auto" aria-hidden="true"><span class="dot" style="background:var(--on-primary)"></span>Dispatch automatique · Pro et Business</span>
           </div>
           <div class="board">
             <div class="lane queue">
-              <h4>En attente</h4><p class="meta">1 commande</p>
+              <p class="h4">En attente</p><p class="meta">1 commande</p>
               <div class="order"><b>#1045</b><p>Alésia, 14e</p><span class="chip c-amber">Sans livreur</span></div>
             </div>
             <div class="lane">
-              <h4>Karim</h4><p class="meta">Paris Est · à 1,1 km</p>
+              <p class="h4">Karim</p><p class="meta">Paris Est · à 1,1 km</p>
               <div class="order"><b>#1042</b><p>Roquette, 11e</p><span class="chip c-green">En route</span></div>
               <div class="order"><b>#1043</b><p>Oberkampf, 11e</p><span class="chip c-blue">À démarrer</span></div>
             </div>
             <div class="lane">
-              <h4>Lucas</h4><p class="meta">Paris Nord · à 2,3 km</p>
+              <p class="h4">Lucas</p><p class="meta">Paris Nord · à 2,3 km</p>
               <div class="order"><b>#1044</b><p>Batignolles, 17e</p><span class="chip c-blue">À démarrer</span></div>
             </div>
             <div class="lane extra">
-              <h4>Sofia</h4><p class="meta">Paris Sud · à 0,9 km</p>
+              <p class="h4">Sofia</p><p class="meta">Paris Sud · à 0,9 km</p>
               <div class="order" style="border-style:dashed"><p>Disponible</p></div>
             </div>
           </div>
@@ -304,20 +305,20 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
         <div class="duo">
           <div class="track">
             <p class="who">Espace client · Atelier Verde</p>
-            <h5>Commande #1042</h5>
+            <p class="h5">Commande #1042</p>
             <ol class="steps">
-              <li class="done">Commande reçue</li>
-              <li class="done">Confiée à Karim</li>
-              <li class="now">En route<small>Créneau 14 h – 16 h</small></li>
-              <li>Livrée</li>
+              <li class="done">En attente</li>
+              <li class="done">Assigné · Karim</li>
+              <li class="now">En livraison<small>Créneau 14 h – 16 h</small></li>
+              <li>Livré</li>
             </ol>
           </div>
           <div class="phone">
             <div class="screen">
               <p class="hello">Bonjour Karim</p>
-              <h5>Mes missions</h5>
-              <div class="nav-banner"><b>Dans 300 m, tournez à gauche</b><span>Arrivée vers 14 h 21</span></div>
-              <div class="mission"><b>#1042</b><p>Rue de la Roquette, Paris 11e</p></div>
+              <p class="h5">Mes missions</p>
+              <div class="nav-banner"><b>Prochain arrêt · Ouvrir l'itinéraire</b><span>Rue de la Roquette, Paris 11e</span></div>
+              <div class="mission"><b>#1042 · En livraison</b><p>Créneau 14 h – 16 h</p></div>
               <div class="phone-cta">Valider la livraison</div>
             </div>
           </div>
@@ -376,11 +377,11 @@ footer nav a:hover { color: var(--ink); text-decoration: underline; }
   <section id="tarifs" class="block" aria-labelledby="price-title">
     <div class="wrap">
       <p class="kicker">Tarifs</p>
-      <h2 id="price-title" class="title">Trois formules. Sans surprise.</h2>
+      <h2 id="price-title" class="title">Trois formules, lisibles d'un regard.</h2>
       <div class="prices">
-        <article class="price"><h3>Starter</h3><p class="amount">79 € <small>HT / mois</small></p><ul><li>5 livreurs inclus</li><li>1 000 commandes / mois</li><li>Options à la carte</li></ul></article>
-        <article class="price"><h3>Pro</h3><p class="amount">179 € <small>HT / mois</small></p><ul><li>10 livreurs inclus</li><li>3 000 commandes / mois</li><li>1 dispatcher, dispatch automatique</li></ul></article>
-        <article class="price"><h3>Business</h3><p class="amount">349 € <small>HT / mois</small></p><ul><li>20 livreurs inclus</li><li>6 000 commandes / mois</li><li>Carte GPS client, analytics, assistance prioritaire</li></ul></article>
+        <article class="price"><h3>Starter</h3><p class="amount">79 € <small>HT / mois</small></p><ul><li>5 livreurs inclus</li><li>1 000 commandes incluses / mois</li><li>Options à la carte</li></ul></article>
+        <article class="price"><h3>Pro</h3><p class="amount">179 € <small>HT / mois</small></p><ul><li>10 livreurs inclus</li><li>3 000 commandes incluses / mois</li><li>1 dispatcher, dispatch automatique</li></ul></article>
+        <article class="price"><h3>Business</h3><p class="amount">349 € <small>HT / mois</small></p><ul><li>20 livreurs inclus</li><li>6 000 commandes incluses / mois</li><li>Carte GPS client, analytics, assistance prioritaire</li></ul></article>
       </div>
       <p class="fine"><span>Annuel : douze mois pour le prix de dix.</span><a href="/tarifs">Quotas, options et TTC →</a></p>
     </div>
