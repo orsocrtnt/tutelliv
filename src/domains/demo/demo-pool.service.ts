@@ -340,6 +340,12 @@ export async function queueExpiredDemoPoolLeases(now = new Date(), poolKey = DEM
  */
 async function realignLeasedDemo(companyId: string, now: Date): Promise<void> {
   try {
+    // Espace préparé avant un changement du roster (ex. adresses courtes du 6 novembre 2026) : remis au format courant.
+    await ensureDemoSessionRosterUsers(companyId);
+  } catch (error) {
+    console.error("[demo-pool] mise à jour des comptes impossible", error instanceof Error ? error.message : error);
+  }
+  try {
     await realignDemoScenarioClock(companyId, now);
   } catch (error) {
     console.error("[demo-pool] remise à l'heure impossible", error instanceof Error ? error.message : error);
