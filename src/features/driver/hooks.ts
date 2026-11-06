@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { driverApi } from "./api";
+import { markDemoChecklistStep } from "@/features/demo/demo-checklist";
 import { useDriverLocationSettings } from "./location-settings-hooks";
 import { useDriverActionQueue } from "./driver-action-queue-provider";
 import type { DriverPodPayload } from "./offline-action-queue";
@@ -102,6 +103,9 @@ export function useUpdateMissionStatus() {
         longitude,
         pod,
       }),
+    onSuccess: (_result, { status }) => {
+      if (status === "DELIVERED") markDemoChecklistStep("deliver");
+    },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["driver"] });
     },

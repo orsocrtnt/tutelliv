@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateClientOrderInput, UpdateOrderStatusInput } from "@/lib/validations/order";
 import { backOfficeApi } from "./api";
+import { markDemoChecklistStep } from "@/features/demo/demo-checklist";
 import type { CompanyClient, CompanyOrder, CompanySupportTicket } from "./types";
 import { QUERY_STALE_MS } from "@/lib/query/defaults";
 import type { OrderHistoryPage, OrderHistoryQuery } from "@/lib/query/order-history";
@@ -125,6 +126,7 @@ export function useAssignDelivery() {
       force?: boolean;
     }) => backOfficeApi.assignDelivery(deliveryId, driverId, force),
     onSuccess: () => {
+      markDemoChecklistStep("assign");
       qc.invalidateQueries({ queryKey: ["company"] });
     },
   });
@@ -175,6 +177,7 @@ export function useAssignFromSuggestion() {
   return useMutation({
     mutationFn: ({ deliveryId, driverId, replacesDriverId }: { deliveryId: string; driverId: string; replacesDriverId?: string }) =>
       backOfficeApi.assignFromSuggestion(deliveryId, driverId, replacesDriverId),
+    onSuccess: () => markDemoChecklistStep("assign"),
     // Succès comme conflit : la file et les suggestions sont relues.
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["company"] });

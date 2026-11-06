@@ -6,8 +6,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Building2,
+  CheckCircle2,
   ChevronLeft,
+  Circle,
   FlaskConical,
+  ListChecks,
   RotateCcw,
   Truck,
   UserRound,
@@ -29,7 +32,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuthStore } from "@/stores/auth.store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useDemoHeartbeat } from "@/features/demo/use-demo-heartbeat";
+import { markDemoChecklistStep, resetDemoChecklist } from "@/features/demo/demo-checklist";
+import {
+  DEMO_CHECKLIST_EVENT,
+  DEMO_CHECKLIST_STEPS,
+  demoChecklistStepForPath,
+  readDemoChecklist,
+  type DemoChecklistStepId,
+} from "@/lib/demo/demo-checklist";
 import {
   DEMO_PERSONA_LABELS,
   type DemoPersona,
@@ -69,6 +88,7 @@ export function DemoModeBar() {
   const [resetOpen, setResetOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [doneSteps, setDoneSteps] = useState<DemoChecklistStepId[]>([]);
   const barRef = useRef<HTMLDivElement>(null);
 
   const visible = Boolean(demo?.isDemo) && isDemoAppArea(pathname);
@@ -82,6 +102,29 @@ export function DemoModeBar() {
     }
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    const refresh = (event?: Event) => {
+      try {
+        setDoneSteps(readDemoChecklist(window.sessionStorage));
+      } catch {
+        setDoneSteps([]);
+      }
+      const id = (event as CustomEvent<{ id?: DemoChecklistStepId }> | undefined)?.detail?.id;
+      const step = DEMO_CHECKLIST_STEPS.find((candidate) => candidate.id === id);
+      if (step) toast.success(`Étape faite : ${step.label.toLowerCase()}`);
+    };
+    refresh();
+    window.addEventListener(DEMO_CHECKLIST_EVENT, refresh);
+    return () => window.removeEventListener(DEMO_CHECKLIST_EVENT, refresh);
+  }, []);
+
+  // Carte des livraisons ou détail d'une facture ouverts : l'étape se coche à l'arrivée sur la page.
+  useEffect(() => {
+    if (!demo?.isDemo) return;
+    const step = demoChecklistStepForPath(pathname);
+    if (step) markDemoChecklistStep(step);
+  }, [demo?.isDemo, demo?.persona, pathname]);
 
   const persistCollapsed = useCallback((next: boolean) => {
     setCollapsed(next);
@@ -112,7 +155,7 @@ export function DemoModeBar() {
   }, [visible, collapsed, hydrated]);
 
   const switchPersona = useCallback(
-    async (persona: DemoPersona) => {
+    async (persona: DemoPersona, target?: string) => {
       if (!demo || persona === demo.persona) return;
       setSwitching(true);
       try {
@@ -142,7 +185,7 @@ export function DemoModeBar() {
         });
         // Chargement complet : le cache du routeur ne réaffiche aucune page de l'ancienne persona,
         // et l'espace de la nouvelle persona repasse par la garde serveur (AUTH-ROLE).
-        window.location.assign(json.redirectTo);
+        window.location.assign(target ?? json.redirectTo);
         toast.success(`Vue ${DEMO_PERSONA_LABELS[persona]} activée`);
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erreur de changement de vue");
@@ -177,6 +220,7 @@ export function DemoModeBar() {
         saas: json.saas ?? null,
       });
       setResetOpen(false);
+      resetDemoChecklist();
       window.location.assign(json.redirectTo ?? "/dashboard");
       toast.success("Démo réinitialisée — scénario de base restauré");
     } catch (error) {
@@ -189,6 +233,12 @@ export function DemoModeBar() {
   if (!visible || !demo || !hydrated) return null;
 
   const ActiveIcon = PERSONA_ICONS[demo.persona];
+  const doneCount = doneSteps.length;
+  const allDone = doneCount === DEMO_CHECKLIST_STEPS.length;
+  const openStep = (step: (typeof DEMO_CHECKLIST_STEPS)[number]) => {
+    if (step.persona === demo.persona) window.location.assign(step.path);
+    else void switchPersona(step.persona, step.path);
+  };
 
   return (
     <>
@@ -250,6 +300,60 @@ export function DemoModeBar() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-amber-300 bg-white/90 hover:bg-amber-100 max-sm:min-w-11 dark:border-amber-800 dark:bg-amber-950 dark:hover:bg-amber-900"
+                      disabled={switching || resetting}
+                      aria-label={`À essayer : ${doneCount} étapes faites sur ${DEMO_CHECKLIST_STEPS.length}`}
+                    >
+                      <ListChecks className="h-4 w-4" aria-hidden />
+                      <span className="max-sm:sr-only">À essayer</span>
+                      <span className="tabular-nums" aria-hidden>
+                        {doneCount}/{DEMO_CHECKLIST_STEPS.length}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="z-[2100] w-[min(20rem,calc(100vw-1.5rem))]">
+                    <DropdownMenuLabel>À essayer dans la démo</DropdownMenuLabel>
+                    {DEMO_CHECKLIST_STEPS.map((step) => {
+                      const done = doneSteps.includes(step.id);
+                      const StepIcon = done ? CheckCircle2 : Circle;
+                      return (
+                        <DropdownMenuItem
+                          key={step.id}
+                          className="min-h-11 items-start gap-2.5 py-2"
+                          onSelect={() => openStep(step)}
+                        >
+                          <StepIcon
+                            className={done ? "mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" : "mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"}
+                            aria-hidden
+                          />
+                          <span className="flex min-w-0 flex-col">
+                            <span className={done ? "text-muted-foreground line-through" : undefined}>{step.label}</span>
+                            <span className="text-xs text-muted-foreground">
+                              Vue {DEMO_PERSONA_LABELS[step.persona]}
+                              {done ? " · fait" : ""}
+                            </span>
+                          </span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                    {allDone ? (
+                      <>
+                        <DropdownMenuSeparator />
+                        <p className="px-2 py-1.5 text-sm font-medium">Vous avez fait le tour.</p>
+                        <DropdownMenuItem asChild className="min-h-11 font-medium text-primary">
+                          <a href="/contact">Demander un pilote</a>
+                        </DropdownMenuItem>
+                      </>
+                    ) : null}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
                 <Button
                   type="button"

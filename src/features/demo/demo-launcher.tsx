@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { demoRequestKeyFor, useApplyLoginSession } from "@/features/auth/login-session";
 import { AUTH_TIMEOUT_MESSAGE, RequestTimeoutError, requestJsonWithTimeout } from "@/features/auth/request-timeout";
 import { DEMO_DEFAULT_PASSWORD, DEMO_LOGIN_EMAIL } from "@/lib/demo/constants";
+import { resetDemoChecklist } from "@/features/demo/demo-checklist";
 
 /** Espaces tous pris : le serveur en prépare un autre ; on réessaie seul quelques fois avant d'afficher l'erreur. */
 // Un espace se prépare en 30 à 60 s : environ une minute d'attente avant d'abandonner.
@@ -57,6 +58,7 @@ export function DemoLauncher() {
         return;
       }
       const destination = await applyLoginSession(res.json, null);
+      resetDemoChecklist();
       // replace : le retour arrière depuis l'espace ne relance pas l'ouverture.
       router.replace(destination);
     } catch (caught) {

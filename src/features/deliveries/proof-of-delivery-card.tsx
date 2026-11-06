@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { POD_FAILURE_LABELS, type PodFailureCode } from "@/lib/pod/codes";
+import { markDemoChecklistStep } from "@/features/demo/demo-checklist";
 
 export function ProofOfDeliveryCard({
   status,
@@ -64,7 +65,7 @@ export function ProofOfDeliveryCard({
         <p className="text-xs text-muted-foreground">Aucune photo jointe.</p>
       )}
       {pdfUrl ? (
-        <a href={pdfUrl} download className="inline-block text-sm font-medium underline underline-offset-2">
+        <a href={pdfUrl} download onClick={() => markDemoChecklistStep("invoice")} className="inline-block text-sm font-medium underline underline-offset-2">
           Télécharger la preuve (PDF)
         </a>
       ) : null}
