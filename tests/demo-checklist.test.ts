@@ -74,3 +74,8 @@ test("les actions réelles cochent la liste, et une démo neuve ou réinitialis�
   // Aucun suivi envoyé au serveur : la liste ne vit que dans l'onglet.
   assert.doesNotMatch(read("src/features/demo/demo-checklist.ts"), /fetch\(/);
 });
+
+test("l'annonce d'une étape faite est décalée (plantage « removeChild » pendant la fermeture du choix de livreur)", () => {
+  const source = readFileSync(new URL("../src/features/demo/demo-checklist.ts", import.meta.url), "utf8");
+  assert.match(source, /window\.setTimeout\(\(\) => \{\s*window\.dispatchEvent\(new CustomEvent\(DEMO_CHECKLIST_EVENT, \{ detail: \{ id \} \}\)\);/);
+});

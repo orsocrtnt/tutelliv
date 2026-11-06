@@ -23,7 +23,11 @@ export function markDemoChecklistStep(id: DemoChecklistStepId): void {
   if (!demo?.isDemo || !storage) return;
   try {
     if (recordDemoChecklistStep(storage, id, demo.persona)) {
-      window.dispatchEvent(new CustomEvent(DEMO_CHECKLIST_EVENT, { detail: { id } }));
+      // Annonce décalée d'un tour : rendue pendant la fermeture du choix de livreur (Radix Select),
+      // la mise à jour de la barre faisait planter la page (« removeChild », relevé sur tutelliv.fr).
+      window.setTimeout(() => {
+        window.dispatchEvent(new CustomEvent(DEMO_CHECKLIST_EVENT, { detail: { id } }));
+      }, 0);
     }
   } catch {
     /* stockage plein ou refusé : la liste reste simplement non cochée */
