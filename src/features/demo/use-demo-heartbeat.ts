@@ -7,7 +7,7 @@ const HEARTBEAT_MS = 60_000;
 
 /**
  * Pendant une démo, signale chaque minute que l'onglet est ouvert et visible (compteur « en direct » du super admin).
- * Si le serveur répond que l'espace n'existe plus (410), l'onglet part vers /demonstration.
+ * Si le serveur répond que l'espace n'existe plus (410), l'onglet part vers /demo.
  */
 export function useDemoHeartbeat(active: boolean) {
   useEffect(() => {

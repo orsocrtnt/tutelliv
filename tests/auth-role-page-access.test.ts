@@ -212,7 +212,7 @@ function loadMiddleware(session: { id: string } | null, auth: Auth | Error, refr
     "@/lib/demo/constants": {
       DEMO_PERSONA_COOKIE: "tutelliv-demo-persona",
       DEMO_SESSION_COOKIE: "tutelliv-demo-session",
-      DEMO_EXPIRED_PATH: "/demonstration?session=expiree",
+      DEMO_EXPIRED_PATH: "/demo?session=expiree",
     },
     "@/lib/security/origin-check": { isCrossOriginMutation: () => false, isOriginCheckExempt: () => false },
     "@/lib/permissions/page-access": pageAccess,
@@ -285,11 +285,11 @@ test("AUTH-ROLE middleware : anonyme, compte inactif, connexion et refus explici
   const inactive = await call({ id: "auth-off" }, null, "/dashboard");
   assert.equal(inactive.status, 307);
   assert.equal(inactive.location, "http://localhost:3110/login?redirect=%2Fdashboard");
-  // AUDIT-0411 (a) : démo dont l'espace prêté n'existe plus → page de démonstration, jamais l'espace de base.
+  // AUDIT-0411 (a) : démo dont l'espace prêté n'existe plus → lanceur de démo, jamais l'espace de base.
   for (const path of ["/dashboard", "/portal/orders", "/driver/missions"]) {
     const expired = await call({ id: "auth-demo" }, "demo-session-expired", path);
     assert.equal(expired.status, 307, path);
-    assert.equal(expired.location, "http://localhost:3110/demonstration?session=expiree", path);
+    assert.equal(expired.location, "http://localhost:3110/demo?session=expiree", path);
   }
   const expiredLogin = await call({ id: "auth-demo" }, "demo-session-expired", "/login");
   assert.equal(expiredLogin.status, 200);

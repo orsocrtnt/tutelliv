@@ -11,7 +11,7 @@ function expired() {
 /**
  * Signe de vie d'une démo ouverte (onglet visible) : compteur « en direct » du super admin.
  * 410 quand l'espace prêté n'existe plus (bail expiré ou repris après 30 min sans signe de vie) :
- * l'onglet rouvert part vers /demonstration au lieu d'afficher un espace qui n'est plus le sien.
+ * l'onglet rouvert part vers /demo au lieu d'afficher un espace qui n'est plus le sien.
  */
 export async function POST() {
   const sessionId = await getDemoSessionCookie();

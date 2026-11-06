@@ -205,7 +205,7 @@ test("AUTH-ROLE garde réelle : persona de démo active, puis session de démo e
   assert.equal((await active.call("/portal/orders", cookies)).status, 200);
   assert.equal((await active.call("/dashboard", cookies)).location, "http://localhost:3110/portal");
 
-  // Session expirée : getDemoSessionCompanyId lève DemoSessionExpiredError → aucun accès, page de démonstration
+  // Session expirée : getDemoSessionCompanyId lève DemoSessionExpiredError → aucun accès, lanceur de démo
   // (AUDIT-0411 a : un ancien onglet ne doit ni voir l'espace de base ni tomber sur la connexion).
   const expired = loadGuard({
     usersByAuthId: { demo: base },
@@ -214,7 +214,7 @@ test("AUTH-ROLE garde réelle : persona de démo active, puis session de démo e
   });
   const denied = await expired.call("/portal/orders", cookies);
   assert.equal(denied.status, 307);
-  assert.equal(denied.location, "http://localhost:3110/demonstration?session=expiree");
+  assert.equal(denied.location, "http://localhost:3110/demo?session=expiree");
   assert.equal((await expired.call("/login", cookies)).status, 200);
 
   // Cookie de session disparu (8 h) alors que la connexion Supabase dure : jamais de repli sur l'espace de base.
@@ -224,7 +224,7 @@ test("AUTH-ROLE garde réelle : persona de démo active, puis session de démo e
   for (const path of ["/dashboard", "/portal/orders"]) {
     const response = await noCookie.call(path, withoutSession);
     assert.equal(response.status, 307, path);
-    assert.equal(response.location, "http://localhost:3110/demonstration?session=expiree", path);
+    assert.equal(response.location, "http://localhost:3110/demo?session=expiree", path);
   }
 });
 

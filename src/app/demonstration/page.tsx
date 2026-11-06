@@ -17,13 +17,7 @@ const personaVisuals: Record<DemoPersona, { icon: typeof Building2; detail: stri
   driver: { icon: Truck, detail: "Parcourir une mission", className: "bg-[#f2dfb8] dark:bg-[#3a2f1c] text-[#7a5410] dark:text-[#f0b45c]" },
 };
 
-export default async function DemonstrationPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ session?: string | string[] }>;
-}) {
-  const { session } = await searchParams;
-  const sessionExpired = session === "expiree";
+export default async function DemonstrationPage() {
   let available = false;
   let href: string | null = null;
   try {
@@ -54,15 +48,6 @@ export default async function DemonstrationPage({
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
               Ce n&apos;est ni un pilote gratuit, ni une découverte premium, ni une souscription.
             </p>
-
-            {sessionExpired ? (
-              <p
-                role="status"
-                className="mt-6 max-w-xl rounded-xl border border-[#ecd6a8] dark:border-border bg-[#fdf4e4] dark:bg-secondary px-4 py-3 text-sm font-semibold text-[#7a5410] dark:text-[#f0b45c]"
-              >
-                Votre démonstration précédente a expiré. Ouvrez-en une nouvelle : elle est prête en quelques secondes.
-              </p>
-            ) : null}
 
             <div className="mt-7">
               {available && href ? (

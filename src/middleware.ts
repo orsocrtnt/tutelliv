@@ -130,7 +130,7 @@ export async function middleware(request: NextRequest) {
       );
     }
     if (!subject) return withSessionCookies(loginRedirect(request, pathname), supabaseResponse);
-    // Démo expirée (ancien onglet, espace repris) : jamais l'espace de base, retour à la page de démonstration.
+    // Démo expirée (ancien onglet, espace repris) : jamais l'espace de base, retour au lanceur qui en ouvre une neuve.
     if (subject === DEMO_SESSION_EXPIRED) {
       const url = new URL(DEMO_EXPIRED_PATH, request.url);
       return withSessionCookies(NextResponse.redirect(url), supabaseResponse);

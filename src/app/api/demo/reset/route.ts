@@ -18,7 +18,7 @@ export async function POST() {
   const sessionCompanyId = await getDemoSessionCompanyIdOrNull();
   if (!sessionCompanyId) {
     return NextResponse.json(
-      // L'interface renvoie vers /demonstration (AUDIT-0411) : un ancien onglet ne reste pas bloqué.
+      // L'interface renvoie vers /demo (AUDIT-0411) : un ancien onglet ne reste pas bloqué.
       { error: "Cette démonstration a expiré.", redirectTo: DEMO_EXPIRED_PATH },
       { status: 409 }
     );

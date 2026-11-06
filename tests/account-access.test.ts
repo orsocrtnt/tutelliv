@@ -215,7 +215,7 @@ test("routes démo : persona suspendue et reset avec admin suspendu refusés san
   }
 });
 
-test("routes démo : démo expirée → 409 avec renvoi vers /demonstration, sans mutation (AUDIT-0411)", async () => {
+test("routes démo : démo expirée → 409 avec renvoi vers /demo, sans mutation (AUDIT-0411)", async () => {
   for (const file of ["persona", "reset"]) {
     const { POST } = load<{ POST: (r: Request) => Promise<Response> }>(`src/app/api/demo/${file}/route.ts`, {
       zod: await import("zod"), "@/lib/auth/account-access": access,
@@ -230,7 +230,7 @@ test("routes démo : démo expirée → 409 avec renvoi vers /demonstration, san
     });
     const response = await POST(new Request("http://local", { method: "POST", body: JSON.stringify({ persona: "client" }) }));
     assert.equal(response.status, 409, file);
-    assert.equal((await response.json()).redirectTo, "/demonstration?session=expiree", file);
+    assert.equal((await response.json()).redirectTo, "/demo?session=expiree", file);
   }
 });
 

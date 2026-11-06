@@ -26,6 +26,8 @@ export function DemoLauncher() {
   const applyLoginSession = useApplyLoginSession();
   const [error, setError] = useState<string | null>(null);
   const [preparing, setPreparing] = useState(false);
+  // Arrivée depuis un ancien onglet dont la démo a expiré (`DEMO_EXPIRED_PATH`) : on le dit, puis on en ouvre une neuve.
+  const [expired, setExpired] = useState(false);
   const running = useRef(false);
 
   const open = useCallback(async () => {
@@ -64,6 +66,7 @@ export function DemoLauncher() {
   }, [applyLoginSession, router]);
 
   useEffect(() => {
+    setExpired(new URLSearchParams(window.location.search).get("session") === "expiree");
     void open();
     // Une seule ouverture au chargement ; « Réessayer » relance à la demande.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,6 +95,9 @@ export function DemoLauncher() {
           <h1 className="mt-5 text-balance text-[clamp(28px,5vw,40px)] font-bold leading-[1.06] tracking-[-0.04em]">
             Ouverture de la démo…
           </h1>
+          {expired ? (
+            <p className="mt-2.5 font-semibold text-foreground">Votre démonstration précédente a expiré.</p>
+          ) : null}
           <p className="mt-2.5 text-text-secondary">
             {preparing
               ? "Tous les espaces sont occupés : un nouvel espace se prépare, encore quelques secondes."

@@ -20,7 +20,7 @@ export interface ServerAuthContext {
   isDemoSession: boolean;
 }
 
-/** Démo dont l'espace prêté n'existe plus : la garde de pages renvoie vers /demonstration, pas vers /login. */
+/** Démo dont l'espace prêté n'existe plus : la garde de pages renvoie vers /demo, pas vers /login. */
 export const DEMO_SESSION_EXPIRED = "demo-session-expired" as const;
 
 async function resolveUserFromAuthId(
