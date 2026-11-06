@@ -11,7 +11,8 @@ import { AUTH_TIMEOUT_MESSAGE, RequestTimeoutError, requestJsonWithTimeout } fro
 import { DEMO_DEFAULT_PASSWORD, DEMO_LOGIN_EMAIL } from "@/lib/demo/constants";
 
 /** Espaces tous pris : le serveur en prépare un autre ; on réessaie seul quelques fois avant d'afficher l'erreur. */
-const BUSY_RETRIES = 4;
+// Un espace se prépare en 30 à 60 s : environ une minute d'attente avant d'abandonner.
+const BUSY_RETRIES = 12;
 const MAX_BUSY_WAIT_SECONDS = 10;
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));

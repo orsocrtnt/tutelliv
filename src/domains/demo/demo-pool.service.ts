@@ -560,6 +560,43 @@ export async function recoverStaleDemoPoolWorkers(now = new Date(), poolKey = DE
   return result.count;
 }
 
+/** Sans signe de vie depuis ce délai (onglet fermé ou caché), un espace réservé peut être repris. */
+export const DEMO_POOL_IDLE_MS = 30 * 60 * 1000;
+/** Espaces libres ou en préparation à garder pour les prochains visiteurs. */
+export const DEMO_POOL_MIN_SPARE = 2;
+
+/**
+ * Un prêt dure 8 h même si l'onglet est fermé : six visites suffisaient à bloquer la démo pour tous.
+ * Quand il reste moins de `DEMO_POOL_MIN_SPARE` espaces libres ou en préparation, les prêts sans signe
+ * de vie depuis 30 min (les plus anciens d'abord) sont remis en préparation. Une démo encore ouverte
+ * et visible envoie un signe de vie chaque minute : elle n'est jamais reprise.
+ */
+export async function reclaimIdleDemoPoolLeases(now = new Date(), poolKey = DEMO_POOL_KEY): Promise<number> {
+  const spare = await prisma.demoPoolEnvironment.count({
+    where: { poolKey, state: { in: ["READY", "PREPARING", "RECYCLING"] } },
+  });
+  const missing = DEMO_POOL_MIN_SPARE - spare;
+  if (missing <= 0) return 0;
+  const idleBefore = new Date(now.getTime() - DEMO_POOL_IDLE_MS);
+  const idle = await prisma.demoPoolEnvironment.findMany({
+    where: { poolKey, state: "LEASED", updatedAt: { lt: idleBefore } },
+    orderBy: { updatedAt: "asc" },
+    take: missing,
+    select: { id: true },
+  });
+  if (idle.length === 0) return 0;
+  const result = await prisma.demoPoolEnvironment.updateMany({
+    where: { id: { in: idle.map((environment) => environment.id) }, state: "LEASED", updatedAt: { lt: idleBefore } },
+    data: {
+      state: "RECYCLING",
+      leaseKeyHash: null,
+      recycleRequestedAt: now,
+      lastFailureCode: null,
+    },
+  });
+  return result.count;
+}
+
 /** Espaces libres préparés avec une ancienne version du scénario : à recycler. */
 export async function queueOutdatedDemoPoolEnvironments(now = new Date(), poolKey = DEMO_POOL_KEY): Promise<number> {
   const ready = await prisma.demoPoolEnvironment.findMany({
@@ -586,6 +623,7 @@ export async function maintainDemoPool(options: {
   const limit = Math.max(1, Math.min(options.limit ?? 3, 10));
   await queueExpiredDemoPoolLeases(now, poolKey);
   await queueOutdatedDemoPoolEnvironments(now, poolKey);
+  await reclaimIdleDemoPoolLeases(now, poolKey);
   await recoverStaleDemoPoolWorkers(now, poolKey);
   const queued = await prisma.demoPoolEnvironment.findMany({
     where: { poolKey, state: "RECYCLING" },

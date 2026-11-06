@@ -302,3 +302,41 @@ test("DEMO-LIVE : « tout remettre à neuf » épargne les démos en direct ; un
   assert.match(route, /gatePlatformWrite\(auth\.context, denied, "OVERVIEW", "POST"\)/);
   assert.match(route, /after\(rebuild\)/);
 });
+
+test("DEMO-REFONTE : un prêt sans signe de vie depuis 30 min est repris quand il manque des espaces libres", async (t) => {
+  const { reclaimIdleDemoPoolLeases, DEMO_POOL_IDLE_MS, DEMO_POOL_MIN_SPARE } = await import("../src/domains/demo/demo-pool.service");
+  let spare = 0;
+  const finds: Array<{ where: { updatedAt: { lt: Date } }; take: number; orderBy: unknown }> = [];
+  const updates: Array<{ where: { id: { in: string[] } }; data: { state: string; leaseKeyHash: null } }> = [];
+  Object.defineProperty(prisma, "demoPoolEnvironment", {
+    configurable: true,
+    value: {
+      count: async () => spare,
+      findMany: async (args: (typeof finds)[number]) => { finds.push(args); return [{ id: "a" }, { id: "b" }].slice(0, args.take); },
+      updateMany: async (args: (typeof updates)[number]) => { updates.push(args); return { count: args.where.id.in.length }; },
+    },
+  });
+  t.after(() => { Reflect.deleteProperty(prisma, "demoPoolEnvironment"); });
+  const now = new Date("2026-11-06T22:00:00Z");
+  assert.equal(DEMO_POOL_IDLE_MS, 30 * 60 * 1000);
+  assert.equal(DEMO_POOL_MIN_SPARE, 2);
+
+  // Tous les espaces prêtés : les deux plus anciens sans signe de vie sont remis en préparation.
+  assert.equal(await reclaimIdleDemoPoolLeases(now), 2);
+  assert.equal(finds[0]!.take, 2);
+  assert.deepEqual(finds[0]!.orderBy, { updatedAt: "asc" });
+  assert.equal(finds[0]!.where.updatedAt.lt.toISOString(), "2026-11-06T21:30:00.000Z");
+  assert.deepEqual(updates[0]!.where.id.in, ["a", "b"]);
+  assert.equal(updates[0]!.data.state, "RECYCLING");
+  assert.equal(updates[0]!.data.leaseKeyHash, null, "l'ancien visiteur perd sa réservation");
+
+  // Un seul espace libre : un seul prêt repris. Assez d'espaces libres : aucun.
+  spare = 1;
+  assert.equal(await reclaimIdleDemoPoolLeases(now), 1);
+  spare = 2;
+  assert.equal(await reclaimIdleDemoPoolLeases(now), 0);
+  assert.equal(finds.length, 2, "aucune recherche quand le stock suffit");
+
+  // La maintenance (lancée après chaque ouverture de démo et quand tout est pris) applique la reprise.
+  assert.match(readFileSync("src/domains/demo/demo-pool.service.ts", "utf8"), /await reclaimIdleDemoPoolLeases\(now, poolKey\);/);
+});
