@@ -28,6 +28,7 @@ import {
 import { getPrimaryCourierPickupFields } from "@/lib/order/courier-pickups";
 import { demoInvoiceLineItems } from "@/domains/demo/demo-invoice-lines";
 import { DEMO_SIGNAL_LAG_SECONDS } from "@/lib/demo/demo-live-position";
+import { attachDemoProofFiles } from "@/domains/demo/demo-proof-files.service";
 import { DEMO_SCENARIO_ANCHOR_KEY } from "@/domains/demo/demo-time-shift.service";
 import { fromParisDateTimeInput, toParisDateTimeInput } from "@/lib/format/paris-datetime-input";
 
@@ -144,7 +145,7 @@ export function parisClockOffsetHours(anchor: Date, days: number, time: string):
   return (new Date(target).getTime() - anchor.getTime()) / (60 * 60 * 1000);
 }
 
-/** Preuve de remise : nom du réceptionnaire, heure et position (sans photo ni signature stockées). */
+/** Preuve de remise : nom du réceptionnaire, heure et position ; photo et signature jointes après coup (`attachDemoProofFiles`). */
 const proof = (recipientName: string) => ({ recipientName });
 
 /**
@@ -1128,10 +1129,15 @@ export async function resetDemoScenario(
   // Deux transactions simultanées conservent un montage rapide tout en laissant de
   // la capacité aux lectures d'authentification et aux autres requêtes du serveur.
   const scenarioConcurrency = 2;
+  const deliveredWithProof: string[] = [];
   for (let start = 0; start < scenarios.length; start += scenarioConcurrency) {
     const batch = scenarios.slice(start, start + scenarioConcurrency);
-    await Promise.all(batch.map((scenario, batchIndex) =>
+    const created = await Promise.all(batch.map((scenario, batchIndex) =>
       createScenarioDelivery(actorsFor(scenario, start + batchIndex), scenario, anchor)));
+    created.forEach(({ deliveryId }, batchIndex) => {
+      const scenario = batch[batchIndex]!;
+      if (scenario.proof && scenario.completedAtOffsetHours != null) deliveredWithProof.push(deliveryId);
+    });
   }
   await createScenarioHistory(history, actorsFor, anchor);
 
@@ -1155,6 +1161,8 @@ export async function resetDemoScenario(
     companyId,
     drivers.map((driver) => driver.id)
   );
+  // Photo et signature des livraisons du jour (stock de démo seulement ; un échec est journalisé).
+  await attachDemoProofFiles(companyId, deliveredWithProof);
 
   // Marque la version du scénario : la maintenance du pool recycle les espaces dépassés.
   await updateCompanySettingsWithClaim(companyId, {
