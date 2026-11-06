@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   buildScenario,
   buildScenarioHistory,
+  scenarioReceivedOffsetHours,
   demoScenarioAnchor,
   parisClockOffsetHours,
   type ScenarioItem,
@@ -124,4 +125,16 @@ test("DEMO-REFONTE : en journée, les échéances du jour restent entre 7 h et 2
     assert.ok(hour >= 7 && hour < 20, `${item.label} : ${local}`);
   }
   assert.equal(parisClockOffsetHours(anchor, 1, "10:00"), 23, "T = 11 h à Paris : demain 10 h = T + 23 h");
+});
+
+test("DEMO-REFONTE : les commandes de l'historique sont reçues les jours passés, pas « aujourd'hui »", () => {
+  const anchor = demoScenarioAnchor(REFERENCE);
+  for (const item of buildScenarioHistory(anchor)) {
+    const received = toParisDateTimeInput(at(anchor, scenarioReceivedOffsetHours(item)));
+    assert.ok(received < "2026-11-05T00:00", `${item.label} reçue le ${received}`);
+  }
+  for (const item of buildScenario(anchor)) {
+    assert.ok(scenarioReceivedOffsetHours(item) <= 0, `${item.label} : jamais reçue dans le futur`);
+  }
+  assert.equal(scenarioReceivedOffsetHours({ tracking: [] }), 0, "sans suivi : reçue maintenant");
 });

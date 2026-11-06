@@ -118,6 +118,15 @@ function hoursFromNow(hours: number, referenceDate: Date = new Date()): Date {
   return new Date(referenceDate.getTime() + hours * 60 * 60 * 1000);
 }
 
+/**
+ * Heure de réception d'une commande de démo : son premier événement de suivi,
+ * jamais dans le futur. Sans elle, la base daterait toutes les commandes du moment
+ * de la préparation et la liste Clients compterait l'historique dans « Aujourd'hui ».
+ */
+export function scenarioReceivedOffsetHours(item: Pick<ScenarioItem, "tracking">): number {
+  return Math.min(0, ...item.tracking.map((event) => event.offsetHours));
+}
+
 const QUARTER_HOUR_MS = 15 * 60 * 1000;
 
 /** Instant d'ancrage du scénario : arrondi au quart d'heure, pour des heures lisibles. */
@@ -774,10 +783,13 @@ async function createScenarioDelivery(
   const destinationCoordinates = demoCoordinates(scenario.shipping);
   const pickupCoordinates = isCourier ? demoCoordinates(firstPickup) : null;
 
+  const receivedAt = hoursFromNow(scenarioReceivedOffsetHours(scenario), referenceDate);
+
   return prisma.$transaction(async (tx) => {
     const order = await tx.order.create({
       data: {
         reference: orderReference,
+        createdAt: receivedAt,
         status: scenario.orderStatus,
         source: "CLIENT",
         totalAmount,
@@ -843,6 +855,7 @@ async function createScenarioDelivery(
     const delivery = await tx.delivery.create({
       data: {
         reference: deliveryReference,
+        createdAt: receivedAt,
         status: scenario.deliveryStatus,
         deliveryCategory: scenario.deliveryCategory,
         pickupAddress: isCourier ? (primaryPickup?.pickupAddress ?? null) : null,
@@ -975,6 +988,7 @@ async function createScenarioHistory(
         const lines = item.items ?? [];
         return {
           reference: orderReferences[index]!,
+          createdAt: hoursFromNow(scenarioReceivedOffsetHours(item), referenceDate),
           status: item.orderStatus,
           source: "CLIENT" as const,
           totalAmount: lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0),
@@ -1011,6 +1025,7 @@ async function createScenarioHistory(
         const completedAt = at(item.completedAtOffsetHours);
         return {
           reference: deliveryReferences[index]!,
+          createdAt: hoursFromNow(scenarioReceivedOffsetHours(item), referenceDate),
           status: item.deliveryStatus,
           deliveryCategory: item.deliveryCategory,
           address: item.shipping.address,

@@ -87,7 +87,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Si tu relances un jour l'ancien projet Supabase `wlomrzil…` (en pause, plus utilisé) : change d'abord son mot de passe, exposé le 26 octobre.
 
 **2. Claude — peut le faire seul, dans cet ordre**
-- DEMO-REFONTE : lot 3 en ligne et vérifié (clients en entreprises, adresses `.demo`). Ensuite : compteur « Aujourd'hui » faux dans la liste Clients (l'historique compte comme du jour), puis session expirée renvoyée vers /demonstration, liste « À essayer », photo et signature sur les preuves, ménage de l'espace de base (liste à te montrer avant suppression).
+- DEMO-REFONTE : lot 3 en ligne et vérifié ; compteur « Aujourd'hui » de la liste Clients corrigé le 6 novembre (commandes datées de leur réception). Ensuite : contrôle en ligne de ce compteur, puis session expirée renvoyée vers /demonstration, liste « À essayer », photo et signature sur les preuves, ménage de l'espace de base (liste à te montrer avant suppression).
 - AUDIT-0411 : corrections en ligne depuis le 5 novembre, vérifiées dans Chrome sur tutelliv.fr. Suite : session de démo expirée (ton nom visible dans la démo), date prévue vide côté client, puis le reste de la liste (statuts uniformes, téléphone du livreur, recherche du client, données de démo, console interne, mineurs).
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - OPS-FIAB : dès tes trois commandes lancées, déclencher une panne fictive et vérifier l'e-mail d'alerte dans Gmail, puis l'alerte d'une tâche de fond en retard.
@@ -193,7 +193,10 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Non fait : téléphones au format `06 12 34 56 78` (stockés sans espaces ; les liens `tel:` ne les nettoient pas partout).
   Vérifié en ligne après le déploiement `9544ba6` (Playwright, démos neuves sur tutelliv.fr) : Gestion des comptes = 5 livreurs en `@logiexpress.demo`, 5 clients sur leur domaine `.demo`, administrateur `alex.demo.xxxxxx@tutelliv.fr` ; Commandes et Clients affichent les 5 entreprises et Marc Lefort, plus aucun « Client Démo » ni « Livreur Démo » ; fiche Pharmacie du Marais : adresse enregistrée « Officine, 12 Rue de Rivoli, 75001 Paris » (carnet recréé) ; 1 alerte.
   Relevé en passant (non corrigé) : la liste Clients annonce « Aujourd'hui : 9 commandes » pour un client dont la plupart des commandes datent des 7 jours d'historique (date de création des commandes de l'historique = moment de la préparation ?).
-  Suite : corriger ce compteur « Aujourd'hui » de l'historique, puis session expirée, liste « À essayer », ménage de l'espace de base ; téléphones au format lisible si souhaité.
+  Compteur « Aujourd'hui » corrigé le 6 novembre 2026 : cause confirmée, les commandes et livraisons de démo n'avaient pas de date de création (la base mettait l'heure de préparation, donc les 21 de l'historique comptaient comme du jour ; la liste Clients compte `order.createdAt` depuis minuit). Nouvelle fonction `scenarioReceivedOffsetHours` (`demo-scenario.service.ts`) : chaque commande et livraison, du jour comme de l'historique, est datée de son premier événement de suivi (« Commande reçue »), jamais dans le futur. `DEMO_SCENARIO_VERSION` = `2026-11-06-receptions` : les espaces libres sont recréés à la prochaine maintenance.
+  Vérifications : test ajouté dans `tests/demo-scenario-story.test.ts` (historique reçu avant minuit du jour de l'ancrage, aucune réception future ; 8/8) ; `npm run check` vert (1 707 tests).
+  Non vérifié : compteur sur une démo neuve en ligne (après déploiement, une fois les espaces recréés). Limite connue, hors de ce lot : « aujourd'hui » se calcule depuis minuit du serveur (UTC sur Vercel), pas de Paris.
+  Suite : session expirée renvoyée vers /demonstration, liste « À essayer », ménage de l'espace de base ; téléphones au format lisible si souhaité.
 
 - [ ] **SEC-AUDIT — Durcissement du 28 octobre et correctifs de l'audit Codex.**
 
