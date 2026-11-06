@@ -122,6 +122,10 @@ export function DemoModeBar() {
           body: JSON.stringify({ persona }),
         });
         const json = await res.json();
+        if (res.status === 409 && json.redirectTo) {
+          window.location.assign(json.redirectTo);
+          return;
+        }
         if (!res.ok) {
           throw new Error(json.error ?? "Impossible de changer de vue");
         }
@@ -154,6 +158,10 @@ export function DemoModeBar() {
     try {
       const res = await fetch("/api/demo/reset", { method: "POST" });
       const json = await res.json();
+      if (res.status === 409 && json.redirectTo) {
+        window.location.assign(json.redirectTo);
+        return;
+      }
       if (!res.ok) {
         throw new Error(json.error ?? "Impossible de réinitialiser la démo");
       }

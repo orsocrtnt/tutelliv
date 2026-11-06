@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getDemoBaseAuthUser } from "@/domains/demo/demo-auth.service";
 import { getDemoPersonaUser } from "@/domains/demo/demo-users.service";
 import {
+  DEMO_EXPIRED_PATH,
   DEMO_LOGIN_EMAIL,
   DEMO_PERSONA_PATHS,
   type DemoPersona,
@@ -10,7 +11,7 @@ import {
 import { setDemoPersonaCookie } from "@/lib/demo/persona-cookie";
 import { isAccountActive } from "@/lib/auth/account-access";
 import { extractPermissionSlugs } from "@/domains/user/user.service";
-import { getDemoSessionCompanyId } from "@/domains/demo/demo-session.service";
+import { getDemoSessionCompanyIdOrNull } from "@/domains/demo/demo-session.service";
 import { getSessionSaasAccess } from "@/domains/saas/saas-session";
 
 const bodySchema = z.object({
@@ -29,10 +30,11 @@ export async function POST(request: Request) {
   }
 
   const persona = parsed.data.persona as DemoPersona;
-  const sessionCompanyId = await getDemoSessionCompanyId();
+  const sessionCompanyId = await getDemoSessionCompanyIdOrNull();
   if (!sessionCompanyId) {
     return NextResponse.json(
-      { error: "Session de démonstration absente. Reconnectez-vous." },
+      // L'interface renvoie vers /demonstration (AUDIT-0411) : un ancien onglet ne reste pas bloqué.
+      { error: "Cette démonstration a expiré.", redirectTo: DEMO_EXPIRED_PATH },
       { status: 409 }
     );
   }

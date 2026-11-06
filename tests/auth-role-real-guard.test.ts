@@ -205,7 +205,8 @@ test("AUTH-ROLE garde réelle : persona de démo active, puis session de démo e
   assert.equal((await active.call("/portal/orders", cookies)).status, 200);
   assert.equal((await active.call("/dashboard", cookies)).location, "http://localhost:3110/portal");
 
-  // Session expirée : getDemoSessionCompanyId lève AccountUnavailableError → aucun accès, connexion.
+  // Session expirée : getDemoSessionCompanyId lève DemoSessionExpiredError → aucun accès, page de démonstration
+  // (AUDIT-0411 a : un ancien onglet ne doit ni voir l'espace de base ni tomber sur la connexion).
   const expired = loadGuard({
     usersByAuthId: { demo: base },
     personaUsers: [clientPersona],
@@ -213,8 +214,18 @@ test("AUTH-ROLE garde réelle : persona de démo active, puis session de démo e
   });
   const denied = await expired.call("/portal/orders", cookies);
   assert.equal(denied.status, 307);
-  assert.equal(denied.location, "http://localhost:3110/login/client?redirect=%2Fportal%2Forders");
+  assert.equal(denied.location, "http://localhost:3110/demonstration?session=expiree");
   assert.equal((await expired.call("/login", cookies)).status, 200);
+
+  // Cookie de session disparu (8 h) alors que la connexion Supabase dure : jamais de repli sur l'espace de base.
+  const basePersona = user(demoPersonaAuthId("client", "demo-template"), "CLIENT", { company: template });
+  const noCookie = loadGuard({ usersByAuthId: { demo: base }, personaUsers: [clientPersona, basePersona] });
+  const withoutSession = { ...session("demo"), "tutelliv-demo-persona": "client" };
+  for (const path of ["/dashboard", "/portal/orders"]) {
+    const response = await noCookie.call(path, withoutSession);
+    assert.equal(response.status, 307, path);
+    assert.equal(response.location, "http://localhost:3110/demonstration?session=expiree", path);
+  }
 });
 
 test("AUTH-ROLE garde réelle : l'en-tête interne usurpé est effacé et remplacé par l'identité vérifiée", async () => {

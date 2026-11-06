@@ -191,7 +191,7 @@ test("AUTH-ROLE navigation : chaque lien du menu d'un rôle mène à une page qu
   }
 });
 
-type Auth = { user: { role: { systemRole: SystemRole }; settings: unknown }; permissions: string[] } | null;
+type Auth = { user: { role: { systemRole: SystemRole }; settings: unknown }; permissions: string[] } | "demo-session-expired" | null;
 
 function loadMiddleware(session: { id: string } | null, auth: Auth | Error, refreshed = false) {
   const module = { exports: {} as { middleware: (request: NextRequest) => Promise<Response> } };
@@ -209,10 +209,15 @@ function loadMiddleware(session: { id: string } | null, auth: Auth | Error, refr
       },
     },
     "@/lib/constants": { AUTH_ROUTES: ["/login", "/register", "/forgot-password", "/reset-password", "/login/client", "/login/driver"] },
-    "@/lib/demo/constants": { DEMO_PERSONA_COOKIE: "tutelliv-demo-persona", DEMO_SESSION_COOKIE: "tutelliv-demo-session" },
+    "@/lib/demo/constants": {
+      DEMO_PERSONA_COOKIE: "tutelliv-demo-persona",
+      DEMO_SESSION_COOKIE: "tutelliv-demo-session",
+      DEMO_EXPIRED_PATH: "/demonstration?session=expiree",
+    },
     "@/lib/security/origin-check": { isCrossOriginMutation: () => false, isOriginCheckExempt: () => false },
     "@/lib/permissions/page-access": pageAccess,
     "@/lib/api/server-auth": {
+      DEMO_SESSION_EXPIRED: "demo-session-expired",
       resolveServerAuthForAuthId: async (authId: string) => {
         resolved.push(authId);
         if (auth instanceof Error) throw auth;
@@ -280,6 +285,14 @@ test("AUTH-ROLE middleware : anonyme, compte inactif, connexion et refus explici
   const inactive = await call({ id: "auth-off" }, null, "/dashboard");
   assert.equal(inactive.status, 307);
   assert.equal(inactive.location, "http://localhost:3110/login?redirect=%2Fdashboard");
+  // AUDIT-0411 (a) : démo dont l'espace prêté n'existe plus → page de démonstration, jamais l'espace de base.
+  for (const path of ["/dashboard", "/portal/orders", "/driver/missions"]) {
+    const expired = await call({ id: "auth-demo" }, "demo-session-expired", path);
+    assert.equal(expired.status, 307, path);
+    assert.equal(expired.location, "http://localhost:3110/demonstration?session=expiree", path);
+  }
+  const expiredLogin = await call({ id: "auth-demo" }, "demo-session-expired", "/login");
+  assert.equal(expiredLogin.status, 200);
   // … et la page de connexion reste affichée : pas de boucle.
   const inactiveLogin = await call({ id: "auth-off" }, null, "/login");
   assert.equal(inactiveLogin.status, 200);

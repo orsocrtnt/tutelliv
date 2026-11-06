@@ -42,6 +42,9 @@ export function isDemoLockedAccountEmail(email: string): boolean {
 
 export const DEMO_PERSONA_COOKIE = "tutelliv-demo-persona";
 export const DEMO_SESSION_COOKIE = "tutelliv-demo-session";
+
+/** Où renvoyer un visiteur dont la démo a expiré (la page explique et propose d'en ouvrir une neuve). */
+export const DEMO_EXPIRED_PATH = "/demonstration?session=expiree";
 export const DEMO_SESSION_COMPANY_PREFIX = `${DEMO_COMPANY_SLUG}-session-`;
 export const DEMO_POOL_COMPANY_PREFIX = `${DEMO_COMPANY_SLUG}-pool-`;
 export const DEMO_POOL_KEY = "public";

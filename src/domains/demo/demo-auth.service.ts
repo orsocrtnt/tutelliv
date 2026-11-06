@@ -10,7 +10,7 @@ import {
 import { getDemoPersonaCookie } from "@/lib/demo/persona-cookie";
 import { getDemoPersonaUser } from "@/domains/demo/demo-users.service";
 import { getDemoSessionCompanyId } from "@/domains/demo/demo-session.service";
-import { isAccountActive } from "@/lib/auth/account-access";
+import { DemoSessionExpiredError, isAccountActive } from "@/lib/auth/account-access";
 
 export interface DemoSessionInfo {
   isDemo: true;
@@ -48,11 +48,12 @@ export async function resolveDemoActiveUser(
 
   const activePersona = persona ?? (await getDemoPersonaCookie());
   const activeCompanyId = sessionCompanyId ?? (await getDemoSessionCompanyId());
-  const personaUser = await getDemoPersonaUser(
-    activeCompanyId ?? baseUser.companyId,
-    activePersona
-  );
-  return personaUser ?? baseUser;
+  // Sans espace prêté actif, jamais de repli sur l'espace de base : il est partagé et
+  // peut contenir des données d'essai réelles (AUDIT-0411, constat a).
+  if (!activeCompanyId) throw new DemoSessionExpiredError();
+  const personaUser = await getDemoPersonaUser(activeCompanyId, activePersona);
+  if (!personaUser) throw new DemoSessionExpiredError();
+  return personaUser;
 }
 
 export async function resolveAuthUserWithDemoPersona(

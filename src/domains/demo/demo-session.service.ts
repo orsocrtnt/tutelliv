@@ -9,7 +9,7 @@ import { ensureDemoSessionRosterUsers } from "@/domains/demo/demo-users.service"
 import { resetDemoScenario } from "@/domains/demo/demo-scenario.service";
 import { DEFAULT_DISPATCH_SETTINGS } from "@/lib/validations/dispatch-settings";
 import { demoRetentionSettings, demoSessionExpiry } from "@/lib/demo/retention";
-import { AccountUnavailableError } from "@/lib/auth/account-access";
+import { DemoSessionExpiredError } from "@/lib/auth/account-access";
 import {
   DEMO_POOL_LEASE_MS,
   DEMO_POOL_TEST_LEASE_MS,
@@ -191,8 +191,18 @@ export async function getDemoSessionCompanyId(): Promise<string | null> {
     where: { slug: demoSessionCompanySlug(sessionId) },
     select: { id: true, isDemo: true, status: true, slug: true, settings: true, createdAt: true },
   });
-  if (!company?.isDemo || company.status === "INACTIVE") throw new AccountUnavailableError();
+  if (!company?.isDemo || company.status === "INACTIVE") throw new DemoSessionExpiredError();
   const expiry = demoSessionExpiry(company);
-  if (!expiry || expiry.getTime() <= Date.now()) throw new AccountUnavailableError();
+  if (!expiry || expiry.getTime() <= Date.now()) throw new DemoSessionExpiredError();
   return company.id;
+}
+
+/** Comme `getDemoSessionCompanyId`, mais une démo expirée donne `null` (routes qui répondent « session absente »). */
+export async function getDemoSessionCompanyIdOrNull(): Promise<string | null> {
+  try {
+    return await getDemoSessionCompanyId();
+  } catch (error) {
+    if (error instanceof DemoSessionExpiredError) return null;
+    throw error;
+  }
 }

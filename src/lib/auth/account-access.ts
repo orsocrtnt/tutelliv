@@ -15,6 +15,17 @@ export class AccountUnavailableError extends Error {
   }
 }
 
+/**
+ * Compte de démo dont l'espace prêté n'existe plus (bail expiré, repris après 30 min sans signe de vie,
+ * ou cookie de session disparu). Hérite d'AccountUnavailableError : tout appelant existant refuse l'accès.
+ */
+export class DemoSessionExpiredError extends AccountUnavailableError {
+  constructor() {
+    super();
+    this.name = "DemoSessionExpiredError";
+  }
+}
+
 export function assertAccountActive(user: UserWithRole): void {
   if (!isAccountActive(user)) throw new AccountUnavailableError();
 }

@@ -205,7 +205,7 @@ test("routes démo : persona suspendue et reset avec admin suspendu refusés san
       "@/domains/demo/demo-auth.service": { getDemoBaseAuthUser: async () => user() },
       "@/domains/demo/demo-users.service": { getDemoPersonaUser: async () => persona },
       "@/domains/demo/demo-scenario.service": { resetDemoScenario: async () => assert.fail("no reset allowed") },
-      "@/domains/demo/demo-session.service": { getDemoSessionCompanyId: async () => "a" },
+      "@/domains/demo/demo-session.service": { getDemoSessionCompanyIdOrNull: async () => "a" },
       "@/lib/demo/constants": constants,
       "@/lib/demo/persona-cookie": { setDemoPersonaCookie: async () => assert.fail("no cookie change allowed") },
       "@/domains/user/user.service": userService,
@@ -213,4 +213,39 @@ test("routes démo : persona suspendue et reset avec admin suspendu refusés san
     });
     assert.equal((await POST(new Request("http://local", { method: "POST", body: JSON.stringify({ persona: "client" }) }))).status, 403);
   }
+});
+
+test("routes démo : démo expirée → 409 avec renvoi vers /demonstration, sans mutation (AUDIT-0411)", async () => {
+  for (const file of ["persona", "reset"]) {
+    const { POST } = load<{ POST: (r: Request) => Promise<Response> }>(`src/app/api/demo/${file}/route.ts`, {
+      zod: await import("zod"), "@/lib/auth/account-access": access,
+      "@/domains/demo/demo-auth.service": { getDemoBaseAuthUser: async () => user() },
+      "@/domains/demo/demo-users.service": { getDemoPersonaUser: async () => assert.fail("no persona lookup") },
+      "@/domains/demo/demo-scenario.service": { resetDemoScenario: async () => assert.fail("no reset allowed") },
+      "@/domains/demo/demo-session.service": { getDemoSessionCompanyIdOrNull: async () => null },
+      "@/lib/demo/constants": constants,
+      "@/lib/demo/persona-cookie": { setDemoPersonaCookie: async () => assert.fail("no cookie change allowed") },
+      "@/domains/user/user.service": userService,
+      "@/domains/saas/saas-session": { getSessionSaasAccess: async () => null },
+    });
+    const response = await POST(new Request("http://local", { method: "POST", body: JSON.stringify({ persona: "client" }) }));
+    assert.equal(response.status, 409, file);
+    assert.equal((await response.json()).redirectTo, "/demonstration?session=expiree", file);
+  }
+});
+
+test("démo : sans espace prêté actif, la persona n'est jamais lue dans l'espace de base (AUDIT-0411)", async () => {
+  const e = environment();
+  const base = user("COMPANY_ADMIN");
+  base.company!.isDemo = true;
+  base.email = constants.DEMO_LOGIN_EMAIL;
+  const lookups: string[] = [];
+  const demo = load<typeof import("../src/domains/demo/demo-auth.service")>("src/domains/demo/demo-auth.service.ts", {
+    ...e.deps,
+    "@/domains/demo/demo-session.service": { getDemoSessionCompanyId: async () => null },
+    "@/domains/demo/demo-users.service": { getDemoPersonaUser: async (companyId: string) => { lookups.push(companyId); return user(); } },
+  });
+  await assert.rejects(() => demo.resolveDemoActiveUser(base), access.DemoSessionExpiredError);
+  await assert.rejects(() => demo.resolveAuthUserWithDemoPersona("auth", base), access.AccountUnavailableError);
+  assert.deepEqual(lookups, []);
 });

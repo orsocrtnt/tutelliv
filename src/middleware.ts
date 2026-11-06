@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/services/supabase/middleware";
 import { AUTH_ROUTES } from "@/lib/constants";
-import { DEMO_PERSONA_COOKIE, DEMO_SESSION_COOKIE } from "@/lib/demo/constants";
+import { DEMO_EXPIRED_PATH, DEMO_PERSONA_COOKIE, DEMO_SESSION_COOKIE } from "@/lib/demo/constants";
 import { isCrossOriginMutation, isOriginCheckExempt } from "@/lib/security/origin-check";
 import {
   evaluatePageAccess,
@@ -9,7 +9,7 @@ import {
   isProtectedPagePath,
   type PageAccessSubject,
 } from "@/lib/permissions/page-access";
-import { resolveServerAuthForAuthId } from "@/lib/api/server-auth";
+import { DEMO_SESSION_EXPIRED, resolveServerAuthForAuthId } from "@/lib/api/server-auth";
 
 const NO_STORE = "no-store";
 
@@ -20,16 +20,17 @@ const NO_STORE = "no-store";
  */
 const SUBJECT_TTL_MS = 5_000;
 const SUBJECT_MAX_ENTRIES = 500;
-const subjectCache = new Map<string, { subject: PageAccessSubject | null; until: number }>();
-const subjectInflight = new Map<string, Promise<PageAccessSubject | null>>();
+type PageSubject = PageAccessSubject | typeof DEMO_SESSION_EXPIRED | null;
+const subjectCache = new Map<string, { subject: PageSubject; until: number }>();
+const subjectInflight = new Map<string, Promise<PageSubject>>();
 
-async function loadSubject(authId: string): Promise<PageAccessSubject | null> {
+async function loadSubject(authId: string): Promise<PageSubject> {
   const auth = await resolveServerAuthForAuthId(authId);
-  if (!auth) return null;
+  if (!auth || auth === DEMO_SESSION_EXPIRED) return auth;
   return { role: auth.user.role.systemRole, permissions: auth.permissions, settings: auth.user.settings };
 }
 
-async function resolvePageSubject(request: NextRequest, authId: string): Promise<PageAccessSubject | null> {
+async function resolvePageSubject(request: NextRequest, authId: string): Promise<PageSubject> {
   const key = [
     authId,
     request.cookies.get(DEMO_PERSONA_COOKIE)?.value ?? "",
@@ -118,7 +119,7 @@ export async function middleware(request: NextRequest) {
     if (!user) return withSessionCookies(loginRedirect(request, pathname), supabaseResponse);
     // AUTH-ROLE : rôle, permissions, modules, compte et entreprise relus en base
     // (jamais depuis le JWT ni les métadonnées utilisateur) avant tout rendu, RSC et préchargement compris.
-    let subject: PageAccessSubject | null;
+    let subject: PageSubject;
     try {
       subject = await resolvePageSubject(request, user.id);
     } catch {
@@ -129,6 +130,11 @@ export async function middleware(request: NextRequest) {
       );
     }
     if (!subject) return withSessionCookies(loginRedirect(request, pathname), supabaseResponse);
+    // Démo expirée (ancien onglet, espace repris) : jamais l'espace de base, retour à la page de démonstration.
+    if (subject === DEMO_SESSION_EXPIRED) {
+      const url = new URL(DEMO_EXPIRED_PATH, request.url);
+      return withSessionCookies(NextResponse.redirect(url), supabaseResponse);
+    }
     const decision = evaluatePageAccess(pathname, subject);
     if (decision.kind === "redirect") {
       // Page d'un autre rôle : l'accueil affiche pourquoi on y revient (le renvoi était silencieux).
@@ -149,7 +155,7 @@ export async function middleware(request: NextRequest) {
     // Session valide mais compte inactif, non provisionné ou démo expirée : la page de
     // connexion reste affichée (sinon boucle connexion ↔ espace protégé). Base indisponible : idem.
     const subject = await resolvePageSubject(request, user.id).catch(() => null);
-    if (subject) {
+    if (subject && subject !== DEMO_SESSION_EXPIRED) {
       const home = getRoleHomePath(subject.role, subject.settings);
       if (evaluatePageAccess(home, subject).kind === "allow") {
         return withSessionCookies(redirectTo(request, home), supabaseResponse);

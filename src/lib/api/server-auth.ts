@@ -9,7 +9,7 @@ import type { PermissionSlug } from "@/lib/permissions/rbac";
 import type { SystemRole } from "@prisma/client";
 import type { UserWithRole } from "@/types";
 import { resolveAuthUserWithDemoPersona } from "@/domains/demo/demo-auth.service";
-import { isAccountActive, AccountUnavailableError } from "@/lib/auth/account-access";
+import { isAccountActive, AccountUnavailableError, DemoSessionExpiredError } from "@/lib/auth/account-access";
 import { isDemoLoginEmail } from "@/lib/demo/constants";
 import { TUTELLIV_AUTH_ID_HEADER } from "@/lib/auth/auth-headers";
 
@@ -20,10 +20,21 @@ export interface ServerAuthContext {
   isDemoSession: boolean;
 }
 
+/** Démo dont l'espace prêté n'existe plus : la garde de pages renvoie vers /demonstration, pas vers /login. */
+export const DEMO_SESSION_EXPIRED = "demo-session-expired" as const;
+
 async function resolveUserFromAuthId(
   authId: string,
   email?: string
 ): Promise<ServerAuthContext | null> {
+  const outcome = await resolveAuthOutcome(authId, email);
+  return outcome === DEMO_SESSION_EXPIRED ? null : outcome;
+}
+
+async function resolveAuthOutcome(
+  authId: string,
+  email?: string
+): Promise<ServerAuthContext | typeof DEMO_SESSION_EXPIRED | null> {
   // Aucun cache inter-requêtes : une modification validée en base est relue
   // dès la prochaine requête, indépendamment de l'instance qui la reçoit.
   let user = await getUserByAuthId(authId);
@@ -41,6 +52,7 @@ async function resolveUserFromAuthId(
   try {
     resolved = await resolveAuthUserWithDemoPersona(authId, user);
   } catch (error) {
+    if (error instanceof DemoSessionExpiredError) return DEMO_SESSION_EXPIRED;
     if (error instanceof AccountUnavailableError) return null;
     throw error;
   }
@@ -58,8 +70,10 @@ async function resolveUserFromAuthId(
  * compte et entreprise actifs, rôle, permissions et persona de démo. Ne lit jamais
  * l'en-tête interne : le middleware l'appelle avec l'authId qu'il vient de valider.
  */
-export async function resolveServerAuthForAuthId(authId: string): Promise<ServerAuthContext | null> {
-  return resolveUserFromAuthId(authId);
+export async function resolveServerAuthForAuthId(
+  authId: string
+): Promise<ServerAuthContext | typeof DEMO_SESSION_EXPIRED | null> {
+  return resolveAuthOutcome(authId);
 }
 
 /**

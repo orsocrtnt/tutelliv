@@ -3,10 +3,10 @@ import { getDemoBaseAuthUser } from "@/domains/demo/demo-auth.service";
 import { resetDemoScenario } from "@/domains/demo/demo-scenario.service";
 import { setDemoPersonaCookie } from "@/lib/demo/persona-cookie";
 import { isAccountActive } from "@/lib/auth/account-access";
-import { DEMO_LOGIN_EMAIL } from "@/lib/demo/constants";
+import { DEMO_EXPIRED_PATH, DEMO_LOGIN_EMAIL } from "@/lib/demo/constants";
 import { ensureDemoSessionRosterUsers, getDemoPersonaUser } from "@/domains/demo/demo-users.service";
 import { extractPermissionSlugs } from "@/domains/user/user.service";
-import { getDemoSessionCompanyId } from "@/domains/demo/demo-session.service";
+import { getDemoSessionCompanyIdOrNull } from "@/domains/demo/demo-session.service";
 import { getSessionSaasAccess } from "@/domains/saas/saas-session";
 
 export async function POST() {
@@ -15,10 +15,11 @@ export async function POST() {
     return NextResponse.json({ error: "Réservé à l'environnement de démo" }, { status: 403 });
   }
 
-  const sessionCompanyId = await getDemoSessionCompanyId();
+  const sessionCompanyId = await getDemoSessionCompanyIdOrNull();
   if (!sessionCompanyId) {
     return NextResponse.json(
-      { error: "Session de démonstration absente. Reconnectez-vous." },
+      // L'interface renvoie vers /demonstration (AUDIT-0411) : un ancien onglet ne reste pas bloqué.
+      { error: "Cette démonstration a expiré.", redirectTo: DEMO_EXPIRED_PATH },
       { status: 409 }
     );
   }
