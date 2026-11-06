@@ -223,7 +223,7 @@ export async function deliverGuestTrackingEmail(
     freezeContent,
   });
   if (delivery.status === "disabled") {
-    if (delivery.reason === "disabled") throw skippedJobError("GUEST_TRACKING_EMAIL_DISABLED");
+    if (delivery.reason === "disabled" || delivery.reason === "demo-recipient") throw skippedJobError("GUEST_TRACKING_EMAIL_DISABLED");
     throw new Error("GUEST_TRACKING_EMAIL_NOT_CONFIGURED");
   }
   return delivery;
@@ -281,7 +281,7 @@ export async function deliverInboundOrderConfirmation(
     freezeContent,
   });
   if (delivery.status === "disabled") {
-    if (delivery.reason === "disabled") throw skippedJobError("INBOUND_CONFIRMATION_EMAIL_DISABLED");
+    if (delivery.reason === "disabled" || delivery.reason === "demo-recipient") throw skippedJobError("INBOUND_CONFIRMATION_EMAIL_DISABLED");
     throw new Error("INBOUND_CONFIRMATION_EMAIL_NOT_CONFIGURED");
   }
   return delivery;

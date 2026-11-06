@@ -145,3 +145,19 @@ test("le bandeau du logo est une image blanche pleine largeur, pour rester blanc
   const metadata = await sharp("public/brand/email-bandeau-logo.png").metadata();
   assert.deepEqual([metadata.width, metadata.height, metadata.hasAlpha], [1116, 198, false]);
 });
+
+test("aucun e-mail n'est envoyé vers une adresse .demo des espaces de démonstration", async () => {
+  let calls = 0;
+  const result = await sendTransactionalEmail(
+    { to: "contact.236bde@pharmacie-du-marais.demo", subject: "Facture", text: "Bonjour,", idempotencyKey: "k:demo", replayWindowStart: null },
+    {
+      env: { EMAIL_DELIVERY_MODE: "live", RESEND_API_KEY: "test-key", MAIL_FROM: "TutelLiv <no-reply@example.test>" },
+      fetcher: async () => {
+        calls += 1;
+        return { ok: true, status: 200, json: async () => ({ id: "x" }), text: async () => "{}" };
+      },
+    }
+  );
+  assert.equal(calls, 0);
+  assert.deepEqual({ status: result.status, reason: "reason" in result ? result.reason : null }, { status: "disabled", reason: "demo-recipient" });
+});

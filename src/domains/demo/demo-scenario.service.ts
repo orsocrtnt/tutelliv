@@ -90,6 +90,7 @@ const DEMO_ADDRESS_COORDINATES: Record<string, Coordinates> = {
   "12 Rue de Rivoli|75001": { latitude: 48.86244, longitude: 2.3362 },
   "45 Avenue des Champs-Élysées|75008": { latitude: 48.87105, longitude: 2.30373 },
   "8 Boulevard Haussmann|75009": { latitude: 48.87234, longitude: 2.33864 },
+  "18 Rue de Belleville|75020": { latitude: 48.87254, longitude: 2.37897 },
   "22 Rue de la Roquette|75011": { latitude: 48.85399, longitude: 2.37112 },
   "5 Place de la Bastille|75012": { latitude: 48.85277, longitude: 2.36994 },
   "18 Rue de Vaugirard|75015": { latitude: 48.83956, longitude: 2.30316 },
@@ -494,13 +495,13 @@ export function buildScenarioHistory(anchor: Date): ScenarioItem[] {
 const CLIENT_ADDRESS_SEEDS = [
   [
     {
-      label: "Siège",
+      label: "Officine",
       address: "12 Rue de Rivoli",
       city: "Paris",
       postalCode: "75001",
     },
     {
-      label: "Entrepôt",
+      label: "Réserve",
       address: "9 Rue de l'Ourcq",
       city: "Paris",
       postalCode: "75019",
@@ -517,14 +518,14 @@ const CLIENT_ADDRESS_SEEDS = [
   [
     {
       label: "Boutique",
-      address: "8 Boulevard Haussmann",
+      address: "18 Rue de Belleville",
       city: "Paris",
-      postalCode: "75009",
+      postalCode: "75020",
     },
   ],
   [
     {
-      label: "Atelier",
+      label: "Agence",
       address: "22 Rue de la Roquette",
       city: "Paris",
       postalCode: "75011",
@@ -532,10 +533,10 @@ const CLIENT_ADDRESS_SEEDS = [
   ],
   [
     {
-      label: "Agence",
-      address: "27 Rue de Lévis",
+      label: "Atelier",
+      address: "8 Place de la Nation",
       city: "Paris",
-      postalCode: "75017",
+      postalCode: "75011",
     },
   ],
 ] as const;
@@ -587,11 +588,8 @@ async function ensureDemoClientAddresses(
 ) {
   await Promise.all(clients.map(async (client, index) => {
     const seeds = CLIENT_ADDRESS_SEEDS[index] ?? CLIENT_ADDRESS_SEEDS[0];
-    const addressCount = await prisma.customerAddress.count({
-      where: { userId: client.id },
-    });
-    if (addressCount > 0) return;
-
+    // Carnet recréé à chaque remise à neuf : rien de ce qu'un visiteur a ajouté ne reste pour le suivant.
+    await prisma.customerAddress.deleteMany({ where: { userId: client.id } });
     await prisma.customerAddress.createMany({
       data: seeds.map((seed, seedIndex) => ({
         userId: client.id,

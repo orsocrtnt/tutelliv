@@ -9,21 +9,26 @@ export const DEMO_DRIVER_EMAIL = "demo-driver@tutelliv.fr";
 export const DEMO_COMPANY_SLUG = "logiexpress-demo";
 export const DEMO_COMPANY_NAME = "LogiExpress Démo";
 
-/** Comptes figés de la démo — restent après reset, non supprimables. */
+/**
+ * Comptes figés de la démo — restent après reset, non supprimables.
+ * `email` identifie le compte de l'espace de base (ne pas changer) ; `sessionEmail` est l'adresse lisible
+ * des espaces prêtés aux visiteurs, sur un domaine `.demo` qui ne reçoit jamais de courrier.
+ * Les clients sont des entreprises : le nom s'affiche « prénom nom », d'où le découpage.
+ */
 export const DEMO_FIXTURE_CLIENTS = [
-  { email: DEMO_CLIENT_EMAIL, firstName: "Marie", lastName: "Client Démo" },
-  { email: "demo-client-2@tutelliv.fr", firstName: "Sophie", lastName: "Martin" },
-  { email: "demo-client-3@tutelliv.fr", firstName: "Louis", lastName: "Bernard" },
-  { email: "demo-client-4@tutelliv.fr", firstName: "Camille", lastName: "Petit" },
-  { email: "demo-client-5@tutelliv.fr", firstName: "Thomas", lastName: "Moreau" },
+  { email: DEMO_CLIENT_EMAIL, firstName: "Pharmacie", lastName: "du Marais", sessionEmail: "contact@pharmacie-du-marais.demo" },
+  { email: "demo-client-2@tutelliv.fr", firstName: "Cabinet", lastName: "Lefèvre Avocats", sessionEmail: "accueil@lefevre-avocats.demo" },
+  { email: "demo-client-3@tutelliv.fr", firstName: "Fleurs", lastName: "de Belleville", sessionEmail: "bonjour@fleurs-de-belleville.demo" },
+  { email: "demo-client-4@tutelliv.fr", firstName: "Agence", lastName: "Bastille Immobilier", sessionEmail: "contact@bastille-immobilier.demo" },
+  { email: "demo-client-5@tutelliv.fr", firstName: "Atelier", lastName: "Nation", sessionEmail: "atelier@atelier-nation.demo" },
 ] as const;
 
 export const DEMO_FIXTURE_DRIVERS = [
-  { email: DEMO_DRIVER_EMAIL, firstName: "Marc", lastName: "Livreur Démo" },
-  { email: "demo-driver-2@tutelliv.fr", firstName: "Jean", lastName: "Dupont" },
-  { email: "demo-driver-3@tutelliv.fr", firstName: "Karim", lastName: "Benali" },
-  { email: "demo-driver-4@tutelliv.fr", firstName: "Sophie", lastName: "Laurent" },
-  { email: "demo-driver-5@tutelliv.fr", firstName: "Lucas", lastName: "Garnier" },
+  { email: DEMO_DRIVER_EMAIL, firstName: "Marc", lastName: "Lefort", sessionEmail: "marc.lefort@logiexpress.demo" },
+  { email: "demo-driver-2@tutelliv.fr", firstName: "Jean", lastName: "Dupont", sessionEmail: "jean.dupont@logiexpress.demo" },
+  { email: "demo-driver-3@tutelliv.fr", firstName: "Karim", lastName: "Benali", sessionEmail: "karim.benali@logiexpress.demo" },
+  { email: "demo-driver-4@tutelliv.fr", firstName: "Sophie", lastName: "Laurent", sessionEmail: "sophie.laurent@logiexpress.demo" },
+  { email: "demo-driver-5@tutelliv.fr", firstName: "Lucas", lastName: "Garnier", sessionEmail: "lucas.garnier@logiexpress.demo" },
 ] as const;
 
 export function isDemoLockedAccountEmail(email: string): boolean {
@@ -46,7 +51,7 @@ export const DEMO_POOL_MIN_READY = 3;
  * Version du scénario de démo. À changer à chaque modification du scénario : les espaces
  * du pool préparés avec une autre version sont recyclés par la maintenance du pool.
  */
-export const DEMO_SCENARIO_VERSION = "2026-11-05-journee";
+export const DEMO_SCENARIO_VERSION = "2026-11-06-entreprises";
 
 export function isDemoScenarioOutdated(settings: unknown): boolean {
   const marker = settings && typeof settings === "object" && !Array.isArray(settings)

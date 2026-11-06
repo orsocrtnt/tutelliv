@@ -23,7 +23,9 @@ export type TransactionalEmailConfiguration = {
     | "unset"
     | "invalid-mode"
     | "missing-provider"
-    | "missing-test-recipient";
+    | "missing-test-recipient"
+    /** Destinataire sur un domaine `.demo` (comptes des espaces de démonstration) : jamais envoyé. */
+    | "demo-recipient";
 };
 
 /**
@@ -190,12 +192,21 @@ async function providerErrorName(response: { text?: () => Promise<string> }): Pr
   }
 }
 
+export function isDemoRecipient(address: string): boolean {
+  return /\.demo$/i.test(address.trim());
+}
+
 export async function sendTransactionalEmail(
   input: TransactionalEmailInput,
   options: SendOptions = {}
 ) {
   const env = options.env ?? process.env;
   const configuration = getTransactionalEmailConfiguration(env);
+  // Les comptes des démos ont des adresses `.demo`, qui n'existent pas : un envoi rebondirait et
+  // abîmerait la réputation du domaine d'envoi.
+  if (isDemoRecipient(input.to)) {
+    return { status: "disabled" as const, mode: configuration.mode, reason: "demo-recipient" as const };
+  }
   if (!configuration.enabled) {
     return { status: "disabled" as const, mode: configuration.mode, reason: configuration.reason };
   }

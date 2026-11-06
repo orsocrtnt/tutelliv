@@ -124,17 +124,20 @@ test("deep legacy inventory checks Storage and tenant boundaries without changin
   assert.ok(!JSON.stringify(result).includes("safe-company"));
 });
 
-test("les adresses des comptes de démo sont courtes et l'ancien format reste reconnu", () => {
+test("les adresses des comptes de démo sont courtes, sur des domaines .demo, et l'ancien format reste reconnu", () => {
   const companyId = "cmh7x2k9a0000abcdefghijkl";
   const seeds = demoPersonaSeedUsers(companyId);
   const emails = seeds.map((seed) => demoSessionEmail(seed, companyId));
   assert.equal(new Set(emails).size, seeds.length);
   for (const email of emails) {
-    assert.match(email, /^[a-z0-9.-]+\.[0-9a-f]{6}@tutelliv\.fr$/);
-    assert.ok(email.length <= 40, email);
+    assert.match(email, /^[a-z0-9.-]+\.[0-9a-f]{6}@[a-z0-9.-]+$/);
+    assert.ok(email.length <= 42, email);
   }
-  assert.equal(demoSessionEmail({ email: "x@tutelliv.fr", firstName: "Karim", lastName: "Benali" }, companyId).split(".").slice(0, 2).join("."), "karim.benali");
-  assert.notEqual(demoSessionEmail(seeds[0]!, companyId), demoSessionEmail(seeds[0]!, "autre-espace"));
+  const people = seeds.filter((seed) => seed.roleSlug !== "company-admin").map((seed) => demoSessionEmail(seed, companyId));
+  assert.ok(people.every((email) => email.endsWith(".demo")), "clients et livreurs : jamais d'adresse qui reçoit du courrier");
+  assert.match(people[0]!, /^contact\.[0-9a-f]{6}@pharmacie-du-marais\.demo$/);
+  assert.ok(seeds.every((seed) => !/d[ée]mo/i.test(`${seed.firstName} ${seed.lastName}`) || seed.roleSlug === "company-admin"), "aucun client ni livreur nommé « Démo »");
+  assert.notEqual(demoSessionEmail(seeds[1]!, companyId), demoSessionEmail(seeds[1]!, "autre-espace"));
   const legacy = legacyDemoSessionEmail(seeds[1]!.email, companyId);
   assert.ok(isDemoSessionRosterEmail(legacy, seeds[1]!, companyId));
   assert.ok(!isDemoSessionRosterEmail(legacy, seeds[1]!, "autre-espace"));

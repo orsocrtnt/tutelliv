@@ -134,17 +134,30 @@ function emailSlug(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-type DemoSessionEmailSeed = { email: string; firstName: string; lastName: string };
+type DemoSessionEmailSeed = { email: string; firstName: string; lastName: string; sessionEmail?: string | null };
+
+function sessionTag(companyId: string): string {
+  return createHash("sha256").update(companyId).digest("hex").slice(0, 6);
+}
+
+function withTag(email: string, tag: string): string {
+  const [local, domain] = email.toLowerCase().split("@");
+  return `${local}.${tag}@${domain}`;
+}
+
+/** Compte sans adresse dédiée (administrateur) : prénom.nom sur le domaine du compte de base. */
+function nameDemoSessionEmail(seed: DemoSessionEmailSeed, companyId: string): string {
+  const domain = seed.email.toLowerCase().split("@")[1] || "tutelliv.fr";
+  const name = [emailSlug(seed.firstName), emailSlug(seed.lastName)].filter(Boolean).join(".");
+  return withTag(`${name || "compte"}@${domain}`, sessionTag(companyId));
+}
 
 /**
- * Adresse lisible d'un compte d'un espace de démonstration : `prenom.nom.xxxxxx@domaine`.
+ * Adresse lisible d'un compte d'un espace de démonstration : `contact.xxxxxx@pharmacie-du-marais.demo`.
  * Le suffixe court (6 caractères tirés de l'identifiant de l'espace) garde l'adresse unique d'un espace à l'autre.
  */
 export function demoSessionEmail(seed: DemoSessionEmailSeed, companyId: string): string {
-  const domain = seed.email.toLowerCase().split("@")[1] || "tutelliv.fr";
-  const tag = createHash("sha256").update(companyId).digest("hex").slice(0, 6);
-  const name = [emailSlug(seed.firstName), emailSlug(seed.lastName)].filter(Boolean).join(".");
-  return `${name || "compte"}.${tag}@${domain}`;
+  return seed.sessionEmail ? withTag(seed.sessionEmail, sessionTag(companyId)) : nameDemoSessionEmail(seed, companyId);
 }
 
 /** Ancien format (avant le 6 novembre 2026), encore présent dans les espaces préparés avant. */
@@ -153,6 +166,7 @@ export function legacyDemoSessionEmail(seedEmail: string, companyId: string): st
   return `${localPart}+session-${companyId}@${domain}`;
 }
 
+/** Un espace garde ses adresses jusqu'à son prochain prêt : le ménage reconnaît aussi l'ancien format. */
 export function isDemoSessionRosterEmail(email: string, seed: DemoSessionEmailSeed, companyId: string): boolean {
   return email === demoSessionEmail(seed, companyId) || email === legacyDemoSessionEmail(seed.email, companyId);
 }
@@ -171,6 +185,7 @@ export function demoPersonaSeedUsers(companyId: string) {
     ...DEMO_FIXTURE_CLIENTS.map((client, index) => ({
       persona: index === 0 ? ("client" as const) : null,
       email: client.email,
+      sessionEmail: client.sessionEmail as string | null,
       firstName: client.firstName,
       lastName: client.lastName,
       roleSlug: "client" as const,
@@ -181,6 +196,7 @@ export function demoPersonaSeedUsers(companyId: string) {
     ...DEMO_FIXTURE_DRIVERS.map((driver, index) => ({
       persona: index === 0 ? ("driver" as const) : null,
       email: driver.email,
+      sessionEmail: driver.sessionEmail as string | null,
       firstName: driver.firstName,
       lastName: driver.lastName,
       roleSlug: "driver" as const,
