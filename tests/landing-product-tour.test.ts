@@ -9,6 +9,8 @@ import {
   dispatchStepIndex,
   goToStep,
   initialTourState,
+  nextStep,
+  previousStep,
   restartTour,
 } from "../src/features/landing/product-tour/tour-machine";
 import { TOUR_LANES, TOUR_QUEUE, interludeFor } from "../src/features/landing/product-tour/tour-data";
@@ -54,6 +56,16 @@ test("on ne saute pas vers une étape future", () => {
 
 test("rejouer un geste passé garde l'étape la plus avancée", () => {
   assert.deepEqual(advanceTour({ current: 0, reached: 2 }, "order"), { current: 1, reached: 2 });
+});
+
+test("la flèche suivant avance sans geste, la flèche précédent garde la progression", () => {
+  const next = nextStep(initialTourState());
+  assert.deepEqual(next, { current: 1, reached: 1 });
+  assert.deepEqual(previousStep(next), { current: 0, reached: 1 });
+  assert.deepEqual(previousStep(initialTourState()), initialTourState());
+  const last = { current: TOUR_STEPS.length - 1, reached: TOUR_STEPS.length - 1 };
+  assert.deepEqual(nextStep(last), last);
+  assert.deepEqual(nextStep({ current: 0, reached: 4 }), { current: 1, reached: 4 });
 });
 
 test("rejouer remet la démo au début", () => {

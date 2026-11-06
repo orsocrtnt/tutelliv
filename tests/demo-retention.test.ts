@@ -6,7 +6,7 @@ import * as crypto from "node:crypto";
 import ts from "typescript";
 import { prisma } from "../src/services/prisma/client";
 import { demoRetentionSettings, demoSessionExpiry } from "../src/lib/demo/retention";
-import { demoPersonaSeedUsers } from "../src/domains/demo/demo-users.service";
+import { demoPersonaSeedUsers, demoSessionEmail } from "../src/domains/demo/demo-users.service";
 import { demoFixtureAuthId } from "../src/lib/demo/constants";
 import {
   cleanupDemoSessionOnLogout,
@@ -39,8 +39,7 @@ test("demo retention requires all markers and an exact eight-hour persisted expi
 function harness(t: TestContext) {
   const c = company();
   const users = demoPersonaSeedUsers(c.id).map((seed) => {
-    const [local, domain] = seed.email.split("@");
-    return { ...seed, id: seed.authId ?? "admin", authId: seed.authId ?? demoFixtureAuthId("admin", c.id), email: `${local}+session-${c.id}@${domain}`, role: { slug: seed.roleSlug }, avatarUrl: null };
+    return { ...seed, id: seed.authId ?? "admin", authId: seed.authId ?? demoFixtureAuthId("admin", c.id), email: demoSessionEmail(seed, c.id), role: { slug: seed.roleSlug }, avatarUrl: null };
   });
   const calls: string[] = [];
   const counts: Record<string, number> = {};

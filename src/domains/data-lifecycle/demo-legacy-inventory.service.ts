@@ -1,5 +1,5 @@
 import { Prisma, type CompanyStatus } from "@prisma/client";
-import { demoPersonaSeedUsers } from "@/domains/demo/demo-users.service";
+import { demoPersonaSeedUsers, isDemoSessionRosterEmail } from "@/domains/demo/demo-users.service";
 import {
   hasCrossTenantDemoReference,
   inspectDemoStorage,
@@ -63,11 +63,9 @@ function hasExactSyntheticRoster(company: LegacyDemoCandidate) {
   const seeds = demoPersonaSeedUsers(company.id);
   return company.users.length === seeds.length && seeds.every((seed) => {
     const expectedAuthId = seed.authId ?? demoFixtureAuthId("admin", company.id);
-    const [local, domain] = seed.email.toLowerCase().split("@");
-    const expectedEmail = `${local}+session-${company.id}@${domain}`;
     return company.users.some((user) =>
       user.authId === expectedAuthId &&
-      user.email === expectedEmail &&
+      isDemoSessionRosterEmail(user.email, seed, company.id) &&
       user.role.slug === seed.roleSlug &&
       !user.avatarUrl
     );

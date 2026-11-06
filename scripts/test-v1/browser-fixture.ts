@@ -8,6 +8,7 @@ import { provisionDemoEnvironment } from "@/domains/demo/demo-provision.service"
 import {
   demoKeepEmails,
   demoPersonaSeedUsers,
+  demoSessionEmail,
   demoRosterAuthIds,
 } from "@/domains/demo/demo-users.service";
 import { hasCrossTenantDemoReference } from "@/domains/data-lifecycle/demo-cleanup.service";
@@ -93,13 +94,12 @@ function ownedSlug(slug: string) {
 
 function expectedSessionUsers(companyId: string) {
   return demoPersonaSeedUsers(companyId).map((seed) => {
-    const [local, domain = "tutelliv.fr"] = seed.email.toLowerCase().split("@");
     return {
       authId:
         seed.persona === "admin"
           ? demoFixtureAuthId("admin", companyId)
           : seed.authId,
-      email: `${local}+session-${companyId}@${domain}`,
+      email: demoSessionEmail(seed, companyId),
       roleSlug: seed.roleSlug,
     };
   });

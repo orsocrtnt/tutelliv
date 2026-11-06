@@ -34,6 +34,19 @@ export function goToStep(state: TourState, step: TourStep): TourState {
   return { ...state, current: index };
 }
 
+/** Flèche « suivant » : passe à l'étape d'après sans faire le geste, pour qui veut aller vite. */
+export function nextStep(state: TourState): TourState {
+  if (state.current >= TOUR_STEPS.length - 1) return state;
+  const current = state.current + 1;
+  return { current, reached: Math.max(state.reached, current) };
+}
+
+/** Flèche « précédent » : revient d'une étape, la progression est gardée. */
+export function previousStep(state: TourState): TourState {
+  if (state.current <= 0) return state;
+  return { ...state, current: state.current - 1 };
+}
+
 export function restartTour(): TourState {
   return initialTourState();
 }

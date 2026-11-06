@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
-import { Building2, Lock, Truck, UserRound } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight, Lock, Truck, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GuideBubble } from "@/features/landing/product-tour/guide-bubble";
 import { GuideCursor } from "@/features/landing/product-tour/guide-cursor";
@@ -21,6 +21,8 @@ import {
   advanceTour,
   goToStep,
   initialTourState,
+  nextStep,
+  previousStep,
   restartTour,
   type TourStep,
 } from "@/features/landing/product-tour/tour-machine";
@@ -173,11 +175,34 @@ export function ProductTour() {
 
   const sceneProps: SceneProps = { onDone, onStart, onReset: reset, reducedMotion, interacted };
 
+  /** Flèches : avant le départ, « suivant » lance la démo ; ensuite elles passent d'une étape à l'autre sans geste. */
+  const canGoBack = started && state.current > 0;
+  const canGoForward = !started || state.current < TOUR_STEPS.length - 1;
+  const goBack = () => {
+    if (canGoBack) navigate(previousStep(state));
+  };
+  const goForward = () => {
+    if (!started) startFromCover();
+    else if (canGoForward) navigate(nextStep(state));
+  };
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.closest("input, textarea, select, [contenteditable='true']")) return;
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goForward();
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goBack();
+    }
+  };
+
   return (
     <MotionConfig reducedMotion="user">
       <figure
         aria-label="Démonstration interactive du parcours d'une livraison"
         data-started={started ? "true" : "false"}
+        onKeyDown={onKeyDown}
         className="relative w-full overflow-hidden rounded-[24px] border border-border bg-card p-1.5 shadow-[0_1px_2px_rgba(14,19,16,0.04),0_20px_50px_-30px_rgba(14,19,16,0.25)]"
       >
         <div className="flex items-center gap-3 px-2 py-2 sm:px-3">
@@ -254,7 +279,8 @@ export function ProductTour() {
           </AnimatePresence>
         </div>
 
-        <ol aria-label="Étapes de la démonstration" className="grid grid-cols-7 gap-1 px-1 pb-0.5 pt-1.5 max-md:flex max-md:gap-0 max-md:overflow-x-auto max-md:px-0">
+        <div className="flex items-center gap-2 pb-0.5 pt-1.5">
+        <ol aria-label="Étapes de la démonstration" className="grid min-w-0 flex-1 grid-cols-7 gap-1 px-1 max-md:flex max-md:gap-0 max-md:overflow-x-auto max-md:px-0">
           {TOUR_STEPS.map((item, index) => {
             const isCurrent = index === state.current;
             const locked = index > state.reached;
@@ -298,6 +324,29 @@ export function ProductTour() {
             );
           })}
         </ol>
+          <div className="flex shrink-0 items-center gap-1.5 pr-1">
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={!canGoBack}
+              aria-label="Étape précédente"
+              title="Étape précédente"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#0e1310]/15 bg-white text-[#0e1310] shadow-sm transition-colors hover:bg-[#f0f4f1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white max-md:h-11 max-md:w-11"
+            >
+              <ChevronLeft className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={goForward}
+              disabled={!canGoForward}
+              aria-label={started ? "Étape suivante" : "Lancer la démonstration"}
+              title={started ? "Étape suivante" : "Lancer la démonstration"}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0e1310] text-[#00d46a] shadow-sm transition-colors hover:bg-[#1f2a24] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-[#0e1310] max-md:h-11 max-md:w-11"
+            >
+              <ChevronRight className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+            </button>
+          </div>
+        </div>
       </figure>
     </MotionConfig>
   );

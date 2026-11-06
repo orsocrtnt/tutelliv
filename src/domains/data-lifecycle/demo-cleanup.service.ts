@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/services/prisma/client";
 import { createAdminClient } from "@/services/supabase/admin";
-import { demoPersonaSeedUsers } from "@/domains/demo/demo-users.service";
+import { demoPersonaSeedUsers, isDemoSessionRosterEmail } from "@/domains/demo/demo-users.service";
 import { demoFixtureAuthId } from "@/lib/demo/constants";
 import { DEMO_CLEANUP_GRACE_MS, demoSessionExpiry } from "@/lib/demo/retention";
 
@@ -201,8 +201,7 @@ async function cleanupManagedDemoSession(companyId: string, options: {
         // Missing/extra users are ambiguous too: this stage only owns the exact synthetic roster.
         if (users.length !== seeds.length || !seeds.every((seed) => {
           const authId = seed.authId ?? demoFixtureAuthId("admin", companyId);
-          const [local, domain] = seed.email.toLowerCase().split("@");
-          return users.some((user) => user.authId === authId && user.email === `${local}+session-${companyId}@${domain}` && user.role.slug === seed.roleSlug && !user.avatarUrl);
+          return users.some((user) => user.authId === authId && isDemoSessionRosterEmail(user.email, seed, companyId) && user.role.slug === seed.roleSlug && !user.avatarUrl);
         })) block("NON_SYNTHETIC_OR_CHANGED_ROSTER");
 
         const [photos, pdfs, runningJobs] = await Promise.all([

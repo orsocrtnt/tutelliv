@@ -2,16 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { Prisma } from "@prisma/client";
 import { inspectLegacyDemoSessions } from "../src/domains/data-lifecycle/demo-legacy-inventory.service";
-import { demoPersonaSeedUsers } from "../src/domains/demo/demo-users.service";
+import { demoPersonaSeedUsers, demoSessionEmail, isDemoSessionRosterEmail, legacyDemoSessionEmail } from "../src/domains/demo/demo-users.service";
 import { demoFixtureAuthId } from "../src/lib/demo/constants";
 
 function candidate(id: string, overrides: Record<string, unknown> = {}) {
   const users = demoPersonaSeedUsers(id).map((seed) => {
-    const [local, domain] = seed.email.toLowerCase().split("@");
     return {
       id: `user-${seed.roleSlug}-${seed.authId ?? "admin"}`,
       authId: seed.authId ?? demoFixtureAuthId("admin", id),
-      email: `${local}+session-${id}@${domain}`,
+      email: demoSessionEmail(seed, id),
       avatarUrl: null,
       role: { slug: seed.roleSlug },
     };
@@ -123,4 +122,20 @@ test("deep legacy inventory checks Storage and tenant boundaries without changin
   assert.equal(result.limitations.deletionEligibilityEstablished, false);
   assert.equal(visited.length, 6);
   assert.ok(!JSON.stringify(result).includes("safe-company"));
+});
+
+test("les adresses des comptes de démo sont courtes et l'ancien format reste reconnu", () => {
+  const companyId = "cmh7x2k9a0000abcdefghijkl";
+  const seeds = demoPersonaSeedUsers(companyId);
+  const emails = seeds.map((seed) => demoSessionEmail(seed, companyId));
+  assert.equal(new Set(emails).size, seeds.length);
+  for (const email of emails) {
+    assert.match(email, /^[a-z0-9.-]+\.[0-9a-f]{6}@tutelliv\.fr$/);
+    assert.ok(email.length <= 40, email);
+  }
+  assert.equal(demoSessionEmail({ email: "x@tutelliv.fr", firstName: "Karim", lastName: "Benali" }, companyId).split(".").slice(0, 2).join("."), "karim.benali");
+  assert.notEqual(demoSessionEmail(seeds[0]!, companyId), demoSessionEmail(seeds[0]!, "autre-espace"));
+  const legacy = legacyDemoSessionEmail(seeds[1]!.email, companyId);
+  assert.ok(isDemoSessionRosterEmail(legacy, seeds[1]!, companyId));
+  assert.ok(!isDemoSessionRosterEmail(legacy, seeds[1]!, "autre-espace"));
 });

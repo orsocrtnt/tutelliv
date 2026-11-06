@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { prisma } from "@/services/prisma/client";
 import type { SystemRole } from "@prisma/client";
 import type { UserWithRole } from "@/types";
@@ -123,9 +124,37 @@ export function demoRosterAuthIds(companyId: string): string[] {
   ];
 }
 
-function scopedDemoEmail(email: string, companyId: string): string {
-  const [localPart, domain = "tutelliv.fr"] = email.toLowerCase().split("@");
+function emailSlug(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+type DemoSessionEmailSeed = { email: string; firstName: string; lastName: string };
+
+/**
+ * Adresse lisible d'un compte d'un espace de démonstration : `prenom.nom.xxxxxx@domaine`.
+ * Le suffixe court (6 caractères tirés de l'identifiant de l'espace) garde l'adresse unique d'un espace à l'autre.
+ */
+export function demoSessionEmail(seed: DemoSessionEmailSeed, companyId: string): string {
+  const domain = seed.email.toLowerCase().split("@")[1] || "tutelliv.fr";
+  const tag = createHash("sha256").update(companyId).digest("hex").slice(0, 6);
+  const name = [emailSlug(seed.firstName), emailSlug(seed.lastName)].filter(Boolean).join(".");
+  return `${name || "compte"}.${tag}@${domain}`;
+}
+
+/** Ancien format (avant le 6 novembre 2026), encore présent dans les espaces préparés avant. */
+export function legacyDemoSessionEmail(seedEmail: string, companyId: string): string {
+  const [localPart, domain = "tutelliv.fr"] = seedEmail.toLowerCase().split("@");
   return `${localPart}+session-${companyId}@${domain}`;
+}
+
+export function isDemoSessionRosterEmail(email: string, seed: DemoSessionEmailSeed, companyId: string): boolean {
+  return email === demoSessionEmail(seed, companyId) || email === legacyDemoSessionEmail(seed.email, companyId);
 }
 
 export function demoPersonaSeedUsers(companyId: string) {
@@ -206,7 +235,7 @@ export async function ensureDemoRosterUsers(companyId: string, adminAuthId?: str
 export async function ensureDemoSessionRosterUsers(companyId: string) {
   const seedUsers = demoPersonaSeedUsers(companyId).map((seed) => ({
     ...seed,
-    email: scopedDemoEmail(seed.email, companyId),
+    email: demoSessionEmail(seed, companyId),
     authId:
       seed.persona === "admin"
         ? demoFixtureAuthId("admin", companyId)
