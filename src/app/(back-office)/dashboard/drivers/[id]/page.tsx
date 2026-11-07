@@ -75,7 +75,7 @@ export default function CompanyDriverDetailPage() {
         backHref="/dashboard/drivers"
         role="Livreur"
         name={name}
-        contact={[driver.phone, driver.email].filter(Boolean).join(" · ")}
+        contact={[driver.phone && formatPhoneDisplay(driver.phone), driver.email].filter(Boolean).join(" · ")}
       />
 
       <div className="grid gap-4 lg:grid-cols-3">

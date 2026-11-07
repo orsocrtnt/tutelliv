@@ -90,7 +90,7 @@ export default function CompanyClientDetailPage() {
         backHref="/dashboard/clients"
         role="Client"
         name={name}
-        contact={[client.email, client.phone].filter(Boolean).join(" · ")}
+        contact={[client.email, client.phone && formatPhoneDisplay(client.phone)].filter(Boolean).join(" · ")}
       />
 
       <div className="grid gap-4 md:grid-cols-3">

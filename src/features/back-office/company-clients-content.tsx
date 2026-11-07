@@ -10,6 +10,7 @@ import { isInitialQueryLoading } from "@/lib/query/is-initial-loading";
 import { Users } from "lucide-react";
 import type { TableColumn } from "@/types";
 import type { CompanyClient } from "@/features/back-office/types";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 interface CompanyClientsContentProps {
   initialClients?: CompanyClient[];
@@ -47,7 +48,7 @@ export function CompanyClientsContent({ initialClients }: CompanyClientsContentP
           <TablePersonCell
             href={`/dashboard/clients/${row.id}`}
             name={row.name}
-            detail={[row.email, row.phone].filter(Boolean).join(" · ")}
+            detail={[row.email, row.phone && formatPhoneDisplay(row.phone)].filter(Boolean).join(" · ")}
           />
         ),
       },
@@ -89,7 +90,7 @@ export function CompanyClientsContent({ initialClients }: CompanyClientsContentP
       <DataGrid
         data={(clients ?? []).map((c) => ({ ...c, name: `${c.firstName} ${c.lastName}`.trim() })) as unknown as Record<string, unknown>[]}
         columns={columns as unknown as TableColumn<Record<string, unknown>>[]}
-        searchText={(row) => [row.name, row.email, row.phone].filter(Boolean).join(" ")}
+        searchText={(row) => [row.name, row.email, row.phone, formatPhoneDisplay(row.phone ? String(row.phone) : null)].filter(Boolean).join(" ")}
         searchPlaceholder="Nom, e-mail ou téléphone…"
         paginate={false}
         emptyTitle="Aucun client"

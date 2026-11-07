@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAdminSubscriptions } from "@/features/admin/hooks";
 import { isInitialQueryLoading } from "@/lib/query/is-initial-loading";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 const PLANS = [
   { value: "STARTER", label: "Starter" },
@@ -177,7 +178,7 @@ export default function AdminSubscriptionsPage() {
                 <TableCell className="font-medium">
                   <Link href={`/companies/${row.companyId}`} className="max-md:inline-flex max-md:min-h-11 max-md:items-center">{row.company}</Link>
                 </TableCell>
-                <TableCell>{row.email ?? "—"}{row.phone ? ` · ${row.phone}` : ""}</TableCell>
+                <TableCell>{row.email ?? "—"}{row.phone ? ` · ${formatPhoneDisplay(row.phone)}` : ""}</TableCell>
                 <TableCell>{row.plan ? planLabel[row.plan] : "Non déterminée"}</TableCell>
                 <TableCell>{FOLLOW_UP[row.followUp]}</TableCell>
                 <TableCell>{euroFormat.format(row.amountCents / 100)}</TableCell>

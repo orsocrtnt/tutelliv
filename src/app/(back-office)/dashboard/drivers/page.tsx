@@ -10,6 +10,7 @@ import { TableDriverDayCell, TableLastSeenCell, TablePersonCell } from "@/featur
 import { Truck } from "lucide-react";
 import type { TableColumn } from "@/types";
 import type { CompanyDriver } from "@/features/back-office/types";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 export default function CompanyDriversPage() {
   const { data: drivers, isLoading, error } = useCompanyDrivers();
@@ -24,7 +25,7 @@ export default function CompanyDriversPage() {
           <TablePersonCell
             href={`/dashboard/drivers/${row.id}`}
             name={row.name}
-            detail={[row.phone, row.email].filter(Boolean).join(" · ")}
+            detail={[row.phone && formatPhoneDisplay(row.phone), row.email].filter(Boolean).join(" · ")}
           />
         ),
       },
@@ -80,7 +81,7 @@ export default function CompanyDriversPage() {
           name: `${d.firstName} ${d.lastName}`.trim(),
         })) as unknown as Record<string, unknown>[]}
         columns={columns as unknown as TableColumn<Record<string, unknown>>[]}
-        searchText={(row) => [row.name, row.email, row.phone].filter(Boolean).join(" ")}
+        searchText={(row) => [row.name, row.email, row.phone, formatPhoneDisplay(row.phone ? String(row.phone) : null)].filter(Boolean).join(" ")}
         searchPlaceholder="Nom, e-mail ou téléphone…"
         paginate={false}
         emptyTitle="Aucun livreur"

@@ -38,6 +38,7 @@ import { HomeCard } from "@/features/admin/home/home-card";
 import { UNLIMITED_MONTHLY_ORDERS } from "@/domains/billing/subscription-view.types";
 import type { PlatformCompanyFile } from "@/domains/admin/company-file.service";
 import { AccessToggleButton } from "@/features/admin/access/access-toggle-button";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 const LINES: ReadonlyArray<DailyLine<"orders" | "delivered">> = [
   { key: "orders", label: "Commandes créées", short: "Commandes", ...CHART_COLORS.blue },
@@ -63,7 +64,7 @@ function IdentityBlock({ company }: { company: Company }) {
         <Field label="Créée le">{formatDate(company.createdAt)}</Field>
         <Field label="Slug">{company.slug}</Field>
         <Field label="E-mail">{text(company.email)}</Field>
-        <Field label="Téléphone">{text(company.phone)}</Field>
+        <Field label="Téléphone">{text(company.phone && formatPhoneDisplay(company.phone))}</Field>
         <Field label="Adresse">{text(company.address)}</Field>
         <Field label="Ville">{text(company.city)}</Field>
         <Field label="Pays">{text(company.country)}</Field>
