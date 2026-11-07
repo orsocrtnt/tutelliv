@@ -40,6 +40,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       </SessionProvider>
       <Toaster
         position={isMobile ? "bottom-center" : "top-right"}
+        // Sous la barre de démonstration quand elle est affichée (sinon les annonces la recouvrent).
+        offset={{ top: "calc(var(--demo-banner-height, 0px) + 24px)", right: 24, bottom: 24, left: 24 }}
         toastOptions={{
           classNames: {
             toast: "rounded-xl border border-border bg-card shadow-lg",
