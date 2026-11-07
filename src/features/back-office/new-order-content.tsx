@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormField } from "@/components/ui/form-field";
 import { PageLoader } from "@/components/ui/loader";
 import { backOfficeApi } from "@/features/back-office/api";
+import { ClientPicker } from "@/features/back-office/client-picker";
 import { useCompanyClients, useCreateCustomerOrder, useOrderCreateOptions } from "@/features/back-office/hooks";
 import { OrderFormFields } from "@/features/client-portal/create-order-form";
 import { useCanOpenPage } from "@/hooks/use-can-open-page";
@@ -20,9 +21,6 @@ import {
   type CreateClientOrderFormInput,
   type CreateClientOrderInput,
 } from "@/lib/validations/order";
-
-const selectClass =
-  "flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm max-md:h-11 max-md:text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1";
 
 const CUSTOMER_REQUIRED = "Choisissez le client de la commande.";
 
@@ -42,7 +40,7 @@ export function NewOrderContent({ backHref, backLabel, ordersHref }: NewOrderCon
   const canOpenClients = useCanOpenPage("/dashboard/clients");
   // Une clé par formulaire : un double clic ou une réponse perdue rend la même commande.
   const idempotencyKey = React.useRef(crypto.randomUUID());
-  const customerSelect = React.useRef<HTMLSelectElement>(null);
+  const customerSelect = React.useRef<HTMLInputElement>(null);
   const [customerId, setCustomerId] = React.useState("");
   const [customerError, setCustomerError] = React.useState<string>();
 
@@ -139,24 +137,17 @@ export function NewOrderContent({ backHref, backLabel, ordersHref }: NewOrderCon
             }}
           >
             <FormField label="Client" htmlFor="new-order-customer" error={customerError} required>
-              <select
-                ref={customerSelect}
+              <ClientPicker
                 id="new-order-customer"
-                className={selectClass}
+                inputRef={customerSelect}
+                clients={activeClients}
                 value={customerId}
-                aria-invalid={Boolean(customerError)}
-                onChange={(event) => {
-                  setCustomerId(event.target.value);
-                  setCustomerError(undefined);
+                invalid={Boolean(customerError)}
+                onChange={(id) => {
+                  setCustomerId(id);
+                  if (id) setCustomerError(undefined);
                 }}
-              >
-                <option value="">Choisir un client</option>
-                {activeClients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {`${client.firstName} ${client.lastName}`.trim() || client.email} — {client.email}
-                  </option>
-                ))}
-              </select>
+              />
             </FormField>
             <OrderFormFields
               audience="staff"
