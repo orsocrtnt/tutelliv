@@ -16,7 +16,7 @@ export const DEMO_CHECKLIST_STEPS = [
   {
     id: "track",
     label: "Suivre le livreur en direct",
-    how: "Sur la carte, cliquez une livraison « En route » dans la liste : le livreur avance en direct.",
+    how: "Sur la carte, ouvrez « Livraisons en cours » en haut à gauche, puis cliquez une livraison : le livreur avance en direct.",
     persona: "client",
     path: "/portal/deliveries",
   },
