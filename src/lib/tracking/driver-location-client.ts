@@ -98,3 +98,29 @@ export function driverLocationStatusMessage(input: {
     case "sync-error": return `${input.error ?? "Synchronisation GPS impossible."}${suffix}`;
   }
 }
+
+const PARIS_TIME = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+
+/** États GPS qui demandent une action du livreur : ils gardent le bandeau complet avec « Réessayer ». */
+export function driverLocationNeedsAttention(status: DriverLocationClientStatus): boolean {
+  return ["denied", "unavailable", "timeout", "offline", "sync-error", "stale", "unsupported"].includes(status);
+}
+
+/**
+ * Ligne courte sous « Service ouvert » quand tout va bien (AUDIT-0411 : la mission en cours
+ * arrivait sous quatre bandeaux sur téléphone). Heure de Paris, comme le reste de l'application.
+ */
+export function driverLocationShortLabel(input: {
+  status: DriverLocationClientStatus;
+  serviceActive: boolean;
+  hasActiveMission: boolean;
+  lastSyncedAt?: string | null;
+}): string {
+  if (input.status === "requesting") return "Recherche du signal GPS…";
+  if (!input.serviceActive) return "Position non partagée";
+  if (!input.hasActiveMission) return "Position partagée dès qu’une mission démarre";
+  if (input.status === "synced") {
+    return input.lastSyncedAt ? `Position envoyée à ${PARIS_TIME.format(new Date(input.lastSyncedAt))}` : "Position envoyée";
+  }
+  return driverLocationStatusMessage({ status: input.status, lastSyncedAt: input.lastSyncedAt });
+}

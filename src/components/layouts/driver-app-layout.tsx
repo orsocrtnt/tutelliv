@@ -1,5 +1,4 @@
 "use client";
-import { DriverServiceControl } from "@/features/driver/driver-service-control";
 import { OrderMessagesInbox } from "@/components/shared/order-conversation";
 import { useAlertAccessPresent } from "@/components/shared/operational-alerts";
 import { alertModeForPath } from "@/lib/operational-alerts-placement";
@@ -47,6 +46,13 @@ function DriverBottomNavLink({
   );
 }
 
+/** Alertes et échanges du livreur, sous la carte « service + position » ; absents de l'écran de navigation. */
+export function DriverInbox() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/driver/navigate")) return null;
+  return <div className="px-4"><OrderMessagesInbox space="driver" /></div>;
+}
+
 interface DriverAppLayoutProps {
   children: React.ReactNode;
 }
@@ -82,7 +88,7 @@ export function DriverAppLayout({ children }: DriverAppLayoutProps) {
         </div>
       </AppleNavbar>
 
-      <main id="main-content" tabIndex={-1}><DriverServiceControl /><OrderMessagesInbox space="driver" />{children}</main>
+      <main id="main-content" tabIndex={-1}>{children}</main>
 
       <nav aria-label="Navigation livreur" className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1.5">

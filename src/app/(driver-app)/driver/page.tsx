@@ -38,21 +38,13 @@ export default function DriverDashboardPage() {
   const assignedMissions = missions.filter((m) => m.status === "ASSIGNED");
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-5 px-4 pb-4 pt-1">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">
           {user?.firstName?.trim() ? `Bonjour ${user.firstName.trim()}` : "Bonjour"}
         </h1>
         <p className="text-sm text-muted-foreground">Vos missions assignées par le dispatch</p>
       </div>
-
-      {/* Une phrase et une barre plutôt que trois compteurs. */}
-      <section aria-label="Ma journée" className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-        <p className="mb-2 text-sm font-semibold text-foreground">Ma journée</p>
-        <TableDriverDayCell
-          day={{ delivered: stats?.deliveredToday ?? 0, inTransit: stats?.inTransit ?? 0, toDo: stats?.assigned ?? 0 }}
-        />
-      </section>
 
       {inProgressMissions.length > 0 ? (
         <div className="space-y-3">
@@ -88,6 +80,14 @@ export default function DriverDashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Une phrase et une barre plutôt que trois compteurs ; sous les missions, qui passent en premier (AUDIT-0411). */}
+      <section aria-label="Ma journée" className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <p className="mb-2 text-sm font-semibold text-foreground">Ma journée</p>
+        <TableDriverDayCell
+          day={{ delivered: stats?.deliveredToday ?? 0, inTransit: stats?.inTransit ?? 0, toDo: stats?.assigned ?? 0 }}
+        />
+      </section>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { DriverAppLayout } from "@/components/layouts/driver-app-layout";
+import { DriverAppLayout, DriverInbox } from "@/components/layouts/driver-app-layout";
 import { DriverGuard } from "@/features/driver/driver-guard";
 import { DriverLocationTracker } from "@/features/driver/driver-location-tracker";
 import { DriverActionQueueProvider } from "@/features/driver/driver-action-queue-provider";
@@ -12,6 +12,7 @@ export default function DriverAppRootLayout({ children }: { children: React.Reac
       <DriverGuard>
         <DriverActionQueueProvider>
           <DriverLocationTracker />
+          <DriverInbox />
           <DriverActionQueueStatus />
           {children}
         </DriverActionQueueProvider>

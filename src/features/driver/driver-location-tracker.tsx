@@ -1,6 +1,6 @@
 "use client";
 
-import { useDriverService } from "@/features/driver/driver-service-control";
+import { DriverServiceControl, useDriverService } from "@/features/driver/driver-service-control";
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { DEFAULT_DRIVER_LOCATION_SETTINGS } from "@/lib/validations/driver-location-settings";
@@ -9,6 +9,7 @@ import { useDriverMissions } from "@/features/driver/hooks";
 import { useDriverLocationSettings } from "@/features/driver/location-settings-hooks";
 import { useDriverLivePosition } from "@/features/driver/use-driver-live-position";
 import { DriverLocationStatus } from "@/features/driver/driver-location-status";
+import { driverLocationNeedsAttention, driverLocationShortLabel } from "@/lib/tracking/driver-location-client";
 
 export function DriverLocationTracker() {
   const service = useDriverService();
@@ -50,20 +51,35 @@ export function DriverLocationTracker() {
     detail = "Partage GPS en attente : aucune mission démarrée.";
   }
 
+  const statusProps = {
+    status,
+    detail,
+    error,
+    lastPositionAt: tracking.lastPositionAt,
+    lastSyncedAt: tracking.lastSyncedAt,
+    onRetry: () => {
+      tracking.retry();
+      void service.refetch();
+      void missions.refetch();
+    },
+  };
+
+  // Une panne du service s'affiche déjà dans la carte : pas de second message identique.
+  const problem = driverLocationNeedsAttention(status);
   return (
-    <div className="mx-4 mb-4" aria-label="État de synchronisation GPS">
-      <DriverLocationStatus
-        status={status}
-        detail={detail}
-        error={error}
-        lastPositionAt={tracking.lastPositionAt}
-        lastSyncedAt={tracking.lastSyncedAt}
-        onRetry={() => {
-          tracking.retry();
-          void service.refetch();
-          void missions.refetch();
-        }}
-      />
-    </div>
+    <DriverServiceControl
+      gps={
+        problem || service.error ? undefined : (
+          <p role="status" aria-live="polite">
+            {driverLocationShortLabel({ status, serviceActive, hasActiveMission, lastSyncedAt: tracking.lastSyncedAt })}
+          </p>
+        )
+      }
+      gpsProblem={
+        problem && !service.error ? (
+          <div aria-label="État de synchronisation GPS"><DriverLocationStatus {...statusProps} /></div>
+        ) : undefined
+      }
+    />
   );
 }

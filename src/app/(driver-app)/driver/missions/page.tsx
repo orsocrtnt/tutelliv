@@ -36,13 +36,9 @@ export default function DriverMissionsPage() {
   const hasContent = activeMissions.length > 0 || availableMissions.length > 0;
 
   return (
-    <div className="space-y-6 p-4">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Missions</h1>
-        <p className="text-sm text-muted-foreground">
-          Confirmez la prise en charge des missions affectées, puis démarrez quand vous êtes prêt.
-        </p>
-      </div>
+    <div className="space-y-5 px-4 pb-4 pt-1">
+      {/* Titre seul : la consigne est déjà sous « Assignées » (AUDIT-0411, mission plus haut sur téléphone). */}
+      <h1 className="text-xl font-semibold tracking-tight">Missions</h1>
 
       {!hasContent ? (
         <EmptyState
@@ -54,12 +50,7 @@ export default function DriverMissionsPage() {
         <>
           {inProgressMissions.length > 0 && (
             <section className="space-y-3">
-              <div>
-                <h2 className="text-sm font-medium">En cours</h2>
-                <p className="text-xs text-muted-foreground">
-                  {inProgressMissions.length} en cours
-                </p>
-              </div>
+              <h2 className="text-sm font-medium">En cours ({inProgressMissions.length})</h2>
               {inProgressMissions.map((mission) => (
                 <MissionCard key={mission.id} mission={mission} />
               ))}

@@ -312,10 +312,6 @@ export function MissionCard({ mission, showActions = true }: MissionCardProps) {
             />
           </div>
           <MissionAcknowledgement {...mission} compact />
-          <div className="flex flex-wrap gap-2">
-            <OrderTrackingTrigger orderId={mission.orderId} />
-            <OrderConversationTrigger orderId={mission.orderId} />
-          </div>
           {showActions && (
             <MissionStepper status={mission.status} category={mission.deliveryCategory} />
           )}
@@ -484,6 +480,11 @@ export function MissionCard({ mission, showActions = true }: MissionCardProps) {
               )}
             </div>
           )}
+          {/* Après les boutons d'action : sur téléphone, l'action de la mission passe en premier (AUDIT-0411). */}
+          <div className="flex flex-wrap gap-2">
+            <OrderTrackingTrigger orderId={mission.orderId} />
+            <OrderConversationTrigger orderId={mission.orderId} />
+          </div>
           {(mission.status === "DELIVERED" || mission.status === "FAILED") && (
             <ProofOfDeliveryCard
               status={mission.status}

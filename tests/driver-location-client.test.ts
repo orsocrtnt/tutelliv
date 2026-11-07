@@ -5,6 +5,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { DriverLocationStatus } from "../src/features/driver/driver-location-status";
 import {
   DriverLocationPublishError,
+  driverLocationNeedsAttention,
+  driverLocationShortLabel,
   driverLocationStatusMessage,
   geolocationErrorStatus,
   locationIsStale,
@@ -94,4 +96,19 @@ test("MOB-01A : les erreurs, la péremption et l’arrêt sont visibles dans l�
   }));
   assert.match(stopped, /role="status"/);
   assert.match(stopped, /service fermé/);
+});
+
+test("AUDIT-0411 : ligne GPS courte sous le service, heure de Paris", () => {
+  const base = { serviceActive: true, hasActiveMission: true };
+  assert.equal(driverLocationShortLabel({ ...base, status: "synced", lastSyncedAt: "2026-11-04T21:43:45.000Z" }), "Position envoyée à 22:43");
+  assert.equal(driverLocationShortLabel({ ...base, status: "synced" }), "Position envoyée");
+  assert.equal(driverLocationShortLabel({ ...base, status: "requesting" }), "Recherche du signal GPS…");
+  assert.equal(driverLocationShortLabel({ ...base, status: "stopped", serviceActive: false }), "Position non partagée");
+  assert.equal(driverLocationShortLabel({ ...base, status: "stopped", hasActiveMission: false }), "Position partagée dès qu’une mission démarre");
+  for (const status of ["denied", "unavailable", "timeout", "offline", "sync-error", "stale", "unsupported"] as const) {
+    assert.equal(driverLocationNeedsAttention(status), true, status);
+  }
+  for (const status of ["synced", "requesting", "stopped"] as const) {
+    assert.equal(driverLocationNeedsAttention(status), false, status);
+  }
 });
