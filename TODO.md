@@ -4,13 +4,12 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**108 tâches terminées sur 139 — 78 %**
+**109 tâches terminées sur 139 — 78 %**
 
-`████████████████░░░░` · 31 tâches restantes
+`████████████████░░░░` · 30 tâches restantes
 
 **À faire par Claude**
 
-- DEMO-ESSAYER-2 — Liste « À essayer » plus explicative, qui se coche toute seule partout
 - AUDIT-0411 — Corriger ce que les pilotes remarqueraient (audit de bout en bout du 4 novembre 2026)
 - V1-GO — Valider la V1 prête à être essayée (après les essais téléphone et la vérification de conformité)
 - DATA-02 — Prévoir sortie, export et conservation des données (après la vérification de conformité)
@@ -53,6 +52,7 @@ _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
+- Démo, liste « À essayer » (DEMO-ESSAYER-2, close le 6 novembre, vérifiée en ligne) : chaque étape dit quoi faire, une bande sous la barre de démo guide l'étape en cours, chaque étape se coche toute seule dans n'importe quelle vue, puis l'annonce propose « Y aller » vers la suivante. Au passage : /dispatch ne plante plus à l'affectation d'un livreur (environ 1 fois sur 3 avant). Rien à faire.
 - Démo refondue (DEMO-REFONTE close le 6 novembre, tout vérifié en ligne) : journée claire remise à l'heure à l'ouverture (1 seul retard), clients entreprises, liste « À essayer 0/4 », démo expirée renvoyée vers une neuve, espaces abandonnés repris après 30 min, preuves du jour avec photo et signature (PDF : titre « PHOTO » gardé avec sa photo), téléphones « 06 12 34 56 78 », espace de base vidé (ton script). À regarder en ouvrant une démo neuve. Rien à faire.
 - Mini-démo de l'accueil (6 novembre, MINI-DEMO-FLECHES, terminé) : flèches « précédent / suivant » et adresses de démo courtes, vérifiées en ligne sur tutelliv.fr. Rien à faire.
 - Espace super admin (ADMIN-ESPACE, 5 novembre) : lots 1 à 5 en ligne. Pour voir ton fichier de prospection dans `/admin/prospection`, suivre `docs/operations/prospection/SHEET.md` (compte de service Google, partage de la Sheet en lecteur, 4 variables sur Vercel Preview `preproduction`, redéploiement), puis dire à Claude de vérifier.
@@ -103,14 +103,6 @@ Mise à jour : 29 octobre 2026, en fin de journée (revue de cohérence : matric
 ## Tâches ouvertes
 
 _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
-
-- [ ] **DEMO-ESSAYER-2 — Liste « À essayer » plus explicative, qui se coche toute seule partout.** Demande du propriétaire le 6 novembre 2026 : « ça doit être plus explicatif et une fois la tâche faite ça se valide seul ». Choix en questionnaire : consignes dans la liste et bande « étape en cours ».
-
-  **Qui : Claude.**
-
-  Fait le 6 novembre 2026 : chaque étape a une consigne concrète (`how` dans `src/lib/demo/demo-checklist.ts`) et un numéro ; en-tête de la liste « 4 gestes… Chacun se coche tout seul quand vous le faites ». Cliquer une étape ouvre la bonne vue et affiche sous la barre de démo une bande « Étape n/4 : … Elle se cochera toute seule. » (bouton « Masquer »), qui disparaît quand l'étape est faite. Annonce « Étape n/4 faite » avec l'étape suivante et un bouton « Y aller ». Cause relevée : une étape ne se cochait que dans « sa » vue (une facture ouverte en vue Administrateur ne comptait pas) ; elle se coche maintenant dans toutes les vues. Étape 2 : arriver sur la carte client ne coche plus rien (la consigne restait invisible), le clic sur une livraison de la liste de la carte la coche (aussi : détail d'une livraison client, carte en direct de l'administrateur).
-  Vérifications : `tests/demo-checklist.test.ts` (7 tests : consignes, cochage dans toute vue, étape en cours puis suivante, pages, déclencheurs branchés dont la carte) ; `npm run check` vert (1 725 tests, types et lint).
-  Non vérifié : parcours cliqué en ligne (après le push).
 
 - [ ] **ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire.**
 
