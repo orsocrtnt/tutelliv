@@ -233,15 +233,18 @@ export function AssignDriverSelect({
     return (
       <>
         <div className="space-y-1">
+          {/* Toujours contrôlé (« » = aucun livreur) et toujours avec un contenu explicite : sinon Radix recopie
+              le nom choisi dans le bouton pendant que React le réécrit au rafraîchissement, et /dispatch plantait
+              (« removeChild », une affectation sur trois en ligne, 6 novembre 2026). */}
           <Select
-            value={driverId || undefined}
+            value={driverId ?? ""}
             onValueChange={requestAssign}
             disabled={assign.isPending}
           >
             <SelectTrigger aria-label="Assigner un livreur" className={TABLE_SELECT_TRIGGER_CLASS}>
               {/* Le livreur affecté n'est pas toujours dans la liste filtrée : on affiche quand même son nom. */}
               <SelectValue placeholder={selectableCount > 0 ? "Livreur" : "Aucun compatible"}>
-                {driverId && assignedLabel ? withoutRolePrefix(assignedLabel) : undefined}
+                {driverId && assignedLabel ? withoutRolePrefix(assignedLabel) : null}
               </SelectValue>
             </SelectTrigger>
             <SelectContent align="start" className="max-h-48 min-w-[8.5rem]">
