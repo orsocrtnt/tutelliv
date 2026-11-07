@@ -5,6 +5,7 @@ import {
   buildOrderHistoryWhere,
   csvCell,
   exportOrderHistoryCsv,
+  getClientOrderStats,
   listClientOrderHistory,
   listCompanyOrderHistory,
 } from "../src/domains/order/order.service";
@@ -87,6 +88,25 @@ test("DATA-01 pagination serveur stable pour entreprise et client", async (t) =>
   const scope = (calls[0]?.where as { AND: Array<Record<string, unknown>> }).AND;
   assert.deepEqual(scope[0], { customerId: "client-a", companyId: "company-a" });
   assert.deepEqual(scope[1], { status: { in: ["DELIVERED", "INVOICED", "PAID", "CANCELLED", "FAILED"] } });
+  // AUDIT-0411 : « Mes commandes » affichait « — » faute de lire la date prévue.
+  assert.equal((calls[0]?.select as Record<string, unknown>).requestedDeliveryDate, true);
+});
+
+test("AUDIT-0411 « Prochaine livraison » du client ignore les heures estimées déjà passées", async (t) => {
+  const wheres: Array<Record<string, unknown>> = [];
+  replaceMethod(t, prisma.order, "groupBy", async () => [] as never);
+  replaceMethod(t, prisma.delivery, "groupBy", async () => [] as never);
+  replaceMethod(t, prisma.order, "findFirst", async () => null);
+  replaceMethod(t, prisma.delivery, "findFirst", async (args: { where: Record<string, unknown> }) => {
+    wheres.push(args.where);
+    return null;
+  });
+  const before = Date.now();
+  const stats = await getClientOrderStats("client-a", "company-a");
+  assert.equal(stats.nextDeliveryEta, null);
+  const eta = wheres[0]?.estimatedArrival as { gte?: Date };
+  assert.ok(eta.gte instanceof Date, "borne inférieure attendue sur l'heure estimée");
+  assert.ok(eta.gte.getTime() >= before && eta.gte.getTime() <= Date.now());
 });
 
 test("DATA-01 exporte 1 000 lignes par lots, dans un ordre stable et sans formule CSV", async (t) => {

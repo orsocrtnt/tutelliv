@@ -47,7 +47,7 @@
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
 <!-- TODO_PROGRESS_END -->
 
-## Ce qu'il reste vraiment à faire (vue simple, à jour au 6 novembre 2026)
+## Ce qu'il reste vraiment à faire (vue simple, à jour au 7 novembre 2026)
 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
@@ -86,7 +86,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Si tu relances un jour l'ancien projet Supabase `wlomrzil…` (en pause, plus utilisé) : change d'abord son mot de passe, exposé le 26 octobre.
 
 **2. Claude — peut le faire seul, dans cet ordre**
-- AUDIT-0411 : corrections en ligne depuis le 5 novembre, vérifiées dans Chrome sur tutelliv.fr ; session de démo expirée corrigée le 6 novembre. Suite : date prévue vide côté client, puis le reste de la liste (statuts uniformes, téléphone du livreur, recherche du client, données de démo, console interne, mineurs).
+- AUDIT-0411 : corrections en ligne depuis le 5 novembre, vérifiées dans Chrome sur tutelliv.fr ; session de démo expirée corrigée le 6 novembre ; date prévue et « Prochaine livraison » côté client corrigées le 7 novembre (vérification en ligne en cours). Suite : le reste de la liste (pool de démo, statuts uniformes, téléphone du livreur, recherche du client, données de démo, console interne, mineurs).
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - OPS-FIAB : dès tes trois commandes lancées, déclencher une panne fictive et vérifier l'e-mail d'alerte dans Gmail, puis l'alerte d'une tâche de fond en retard.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
@@ -156,7 +156,7 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Nouveaux constats de cette recette : (a) un ancien onglet resté connecté à la démo ouvre un espace dont la session a expiré : « Réinitialiser la démo » échoue (409 « Session de démonstration absente ») et cet espace contient deux courses au nom d'Orso Carotenuto avec son adresse Gmail ; (b) côté client, « Mes commandes » affiche « — » dans Livraison prévue pour les 3 commandes, et l'accueil client « Prochaine livraison 01:11 hier » ; (c) nouvelle commande client : les deux listes « Adresse enregistrée » et « Créneau » n'ont toujours pas de libellé lié ; (d) restent visibles : « 0 action » sur l'accueil, « 3000 / mois » sans espace sur /tarifs, LIV-… et CMD-… pour la même livraison, statut « Attente ».
 
   Reste à faire, Claude :
-  1. Constats (b) et (c) ci-dessus : date prévue côté client, libellés des listes. Constat (a) corrigé le 6 novembre (démo expirée renvoyée vers le lanceur qui en ouvre une neuve, plus de repli sur l'espace de base : détail dans DEMO-REFONTE) ; les deux courses au nom du propriétaire ont été supprimées au ménage de DEMO-REFONTE (6 novembre).
+  1. Constats (b) et (c) : corrigés le 7 novembre (code), vérification en ligne en cours. Causes : la liste « Mes commandes » ne lisait pas la date prévue en base (`CLIENT_ORDER_HISTORY_SELECT` sans `requestedDeliveryDate`, donc toujours « — ») ; « Prochaine livraison » prenait la plus ancienne heure estimée des livraisons actives, même passée (« 01:11 hier ») : elle ne garde plus que les heures à venir. Libellés : les « Adresse enregistrée » étaient déjà liées à leur liste (l'audit comptait la copie native cachée de Radix, `aria-hidden`, hors clavier) ; le vrai défaut était « Créneau de livraison » (commande et commande récurrente), libellé relié à un autre identifiant : relié à sa liste, erreur reliée par `aria-describedby`. Tests : `tests/order-history.test.ts` (date prévue lue, heure passée exclue), 5/5 ; `npm run check` 1 727/1 727. Constat (a) corrigé le 6 novembre (démo expirée renvoyée vers le lanceur qui en ouvre une neuve, plus de repli sur l'espace de base : détail dans DEMO-REFONTE) ; les deux courses au nom du propriétaire ont été supprimées au ménage de DEMO-REFONTE (6 novembre).
   2. Vérifier les 3 espaces de démo en quarantaine et la capacité du pool avant les appels de prospection.
   3. Statuts et références uniformes (LIV-… au dispatch contre CMD-… dans Commandes ; Attente / En attente / Sans livreur), avec MOTS-UNIFIES.
   4. Livreur sur téléphone : mission en cours et boutons plus haut que les quatre bandeaux.

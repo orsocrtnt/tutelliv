@@ -767,12 +767,12 @@ export function OrderFormFields({
               />
             </FormField>
             {slotSettings?.mode === "SLOTS" && (
-              <FormField label="Créneau de livraison" error={errors.requestedDeliverySlot?.message} required>
+              <FormField label="Créneau de livraison" htmlFor="order-delivery-slot" error={errors.requestedDeliverySlot?.message} required>
                 <Select
                   value={selectedSlot ?? ""}
                   onValueChange={(value) => form.setValue("requestedDeliverySlot", value, { shouldValidate: true })}
                 >
-                  <SelectTrigger id="order-delivery-slot" aria-label="Créneau de livraison">
+                  <SelectTrigger id="order-delivery-slot" aria-invalid={errors.requestedDeliverySlot ? true : undefined} aria-describedby={errors.requestedDeliverySlot ? "order-delivery-slot-error" : undefined}>
                     <SelectValue placeholder={openSlots.length ? "Choisir un créneau..." : "Plus de créneau ce jour-là"} />
                   </SelectTrigger>
                   <SelectContent>

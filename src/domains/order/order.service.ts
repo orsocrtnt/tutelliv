@@ -214,6 +214,8 @@ const CLIENT_ORDER_HISTORY_SELECT = {
   totalAmount: true,
   itemCount: true,
   createdAt: true,
+  // Colonne « Livraison prévue » de « Mes commandes » : sans ce champ, toujours « — ».
+  requestedDeliveryDate: true,
   deliveryCategory: true,
   shippingAddress: true,
   shippingCity: true,
@@ -476,8 +478,9 @@ export async function getClientOrderStats(customerId: string, companyId: string)
       ] },
       _count: { _all: true },
     }),
+    // « Prochaine » : une heure estimée déjà passée (« 01:11 hier ») n'est pas une prochaine livraison.
     prisma.delivery.findFirst({
-      where: { customerId, companyId, status: { in: ["ASSIGNED", "PURCHASING", "IN_DELIVERY", "PENDING"] }, estimatedArrival: { not: null } },
+      where: { customerId, companyId, status: { in: ["ASSIGNED", "PURCHASING", "IN_DELIVERY", "PENDING"] }, estimatedArrival: { gte: new Date() } },
       orderBy: { estimatedArrival: "asc" }, select: { estimatedArrival: true },
     }),
     prisma.order.findFirst({

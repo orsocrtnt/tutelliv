@@ -219,12 +219,12 @@ export function CreateRecurringOrderForm({
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {slotSettings?.mode === "SLOTS" && (
-            <FormField label="Créneau de livraison" error={form.formState.errors.deliverySlot?.message} required>
+            <FormField label="Créneau de livraison" htmlFor="recurring-delivery-slot" error={form.formState.errors.deliverySlot?.message} required>
               <Select
                 value={form.watch("deliverySlot") ?? ""}
                 onValueChange={(value) => form.setValue("deliverySlot", value, { shouldValidate: true })}
               >
-                <SelectTrigger id="recurring-delivery-slot" aria-label="Créneau de livraison">
+                <SelectTrigger id="recurring-delivery-slot" aria-invalid={form.formState.errors.deliverySlot ? true : undefined} aria-describedby={form.formState.errors.deliverySlot ? "recurring-delivery-slot-error" : undefined}>
                   <SelectValue placeholder="Choisir un créneau..." />
                 </SelectTrigger>
                 <SelectContent>
