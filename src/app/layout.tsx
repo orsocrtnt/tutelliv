@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { AppProviders } from "@/components/providers/app-providers";
 import { APP_NAME } from "@/lib/constants";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+// Police hébergée dans le dépôt (src/fonts) : le build ne télécharge plus rien chez Google Fonts.
+const inter = localFont({
+  src: "../fonts/inter-latin-wght.woff2",
+  weight: "100 900",
   variable: "--font-sans",
 });
 

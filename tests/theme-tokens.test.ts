@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
@@ -232,7 +232,7 @@ test("la barre du portail tient à 320 px : thème et avatar passent dans le men
 
 test("Sora (titres DESIGN.md) est chargée par le seul portail ; le layout racine garde Inter", () => {
   const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
-  assert.match(read("src/app/(client-portal)/portal-font.ts"), /Sora\(/);
+  assert.match(read("src/app/(client-portal)/portal-font.ts"), /sora-latin-wght\.woff2/);
   const portalLayout = read("src/app/(client-portal)/layout.tsx");
   // Variable et attribut portés sur <html> : les fenêtres Radix rendues dans <body> héritent de Sora.
   assert.match(portalLayout, /documentElement[\s\S]*classList\.add\(sora\.variable\)[\s\S]*setAttribute\("data-portal"/);
@@ -240,6 +240,27 @@ test("Sora (titres DESIGN.md) est chargée par le seul portail ; le layout racin
   assert.match(css, /html\[data-portal\] :is\(h1, h2, h3, \[data-slot="dropdown-menu-label"\]\) \{\s*font-family: var\(--font-sora\)/);
   assert.match(read("src/components/ui/dropdown-menu.tsx"), /data-slot="dropdown-menu-label"/);
   assert.doesNotMatch(read("src/app/layout.tsx"), /Sora/);
+});
+
+test("polices hébergées dans le dépôt : aucun téléchargement Google Fonts pendant le build", () => {
+  // next/font/google faisait échouer le build CI quand Google renvoyait une adresse sans extension .woff2.
+  const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+  const fontFiles = {
+    "src/app/layout.tsx": "inter-latin-wght.woff2",
+    "src/app/(client-portal)/portal-font.ts": "sora-latin-wght.woff2",
+    "src/features/landing/growth-font.ts": "plus-jakarta-sans-latin-wght.woff2",
+  };
+  for (const [file, font] of Object.entries(fontFiles)) {
+    const source = read(file);
+    assert.match(source, /from "next\/font\/local"/, file);
+    assert.doesNotMatch(source, /next\/font\/google/, file);
+    assert.ok(readFileSync(new URL(`../src/fonts/${font}`, import.meta.url)).subarray(0, 4).toString() === "wOF2", font);
+  }
+  const srcFiles = readdirSync(new URL("../src", import.meta.url), { recursive: true }) as string[];
+  const googleImports = srcFiles
+    .filter((file) => /\.(ts|tsx)$/.test(file))
+    .filter((file) => /from "next\/font\/google"/.test(read(`src/${file}`)));
+  assert.deepEqual(googleImports, []);
 });
 
 test("verre des cartes : valeurs historiques en repli hors portail, surfaces sombres en Dark", async () => {

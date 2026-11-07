@@ -1,9 +1,9 @@
-import { Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 /** Police du site public, partagée par la barre et les pages : la barre reste identique partout, accueil compris. */
-export const growthFont = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+export const growthFont = localFont({
+  src: "../../fonts/plus-jakarta-sans-latin-wght.woff2",
+  weight: "200 800",
   variable: "--font-growth",
   display: "swap",
 });

@@ -4,7 +4,7 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**109 tâches terminées sur 139 — 78 %**
+**110 tâches terminées sur 140 — 79 %**
 
 `████████████████░░░░` · 30 tâches restantes
 
@@ -84,6 +84,8 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - WHATSAPP-1 : option A codée (le dispatcher transfère le message au numéro TutelLiv). Dès le SIREN : créer le compte Meta Business au nom de la société et lancer sa vérification, prévoir une ligne dédiée jamais utilisée sur WhatsApp, puis me donner accès pour créer l'application Meta ; tu poseras ensuite dans Vercel `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_DISPLAY_NUMBER`. En même temps : demander à Meta le statut de prestataire technique pour l'option B.
 - INTAKE-1 : fournir une vingtaine de vrais messages de commande anonymisés pour mesurer la qualité d'extraction et le coût ; décider si la fonction entre dans le portail client.
 - Si tu relances un jour l'ancien projet Supabase `wlomrzil…` (en pause, plus utilisé) : change d'abord son mot de passe, exposé le 26 octobre.
+
+- E-mails « Run failed » de GitHub (7 novembre, CI-POLICES, fait) : la cause était le téléchargement des polices chez Google pendant le build ; les polices sont maintenant dans le dépôt. Rien à faire.
 
 **2. Claude — peut le faire seul, dans cet ordre**
 - AUDIT-0411 : corrections en ligne depuis le 5 novembre, vérifiées dans Chrome sur tutelliv.fr ; session de démo expirée corrigée le 6 novembre ; date prévue et « Prochaine livraison » côté client corrigées et vérifiées en ligne le 7 novembre. Suite : le reste de la liste (pool de démo, statuts uniformes, téléphone du livreur, recherche du client, données de démo, console interne, mineurs).
