@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  ArrowRight,
   Building2,
   CheckCircle2,
   ChevronLeft,
@@ -41,12 +42,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDemoHeartbeat } from "@/features/demo/use-demo-heartbeat";
-import { markDemoChecklistStep, resetDemoChecklist } from "@/features/demo/demo-checklist";
+import { markDemoChecklistStep, resetDemoChecklist, setActiveDemoChecklistStep } from "@/features/demo/demo-checklist";
 import {
   DEMO_CHECKLIST_EVENT,
   DEMO_CHECKLIST_STEPS,
   demoChecklistStepForPath,
+  demoChecklistStepNumber,
+  nextDemoChecklistStep,
+  readActiveDemoChecklistStep,
   readDemoChecklist,
+  type DemoChecklistStep,
   type DemoChecklistStepId,
 } from "@/lib/demo/demo-checklist";
 import {
@@ -89,6 +94,9 @@ export function DemoModeBar() {
   const [collapsed, setCollapsed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [doneSteps, setDoneSteps] = useState<DemoChecklistStepId[]>([]);
+  const [activeStep, setActiveStep] = useState<DemoChecklistStepId | null>(null);
+  // Ouvre une étape depuis l'annonce « Étape faite » (écouteur posé une seule fois, d'où la référence).
+  const openStepRef = useRef<(step: DemoChecklistStep) => void>(() => {});
   const barRef = useRef<HTMLDivElement>(null);
 
   const visible = Boolean(demo?.isDemo) && isDemoAppArea(pathname);
@@ -105,14 +113,22 @@ export function DemoModeBar() {
 
   useEffect(() => {
     const refresh = (event?: Event) => {
+      let done: DemoChecklistStepId[] = [];
       try {
-        setDoneSteps(readDemoChecklist(window.sessionStorage));
+        done = readDemoChecklist(window.sessionStorage);
+        setActiveStep(readActiveDemoChecklistStep(window.sessionStorage));
       } catch {
-        setDoneSteps([]);
+        setActiveStep(null);
       }
+      setDoneSteps(done);
       const id = (event as CustomEvent<{ id?: DemoChecklistStepId }> | undefined)?.detail?.id;
       const step = DEMO_CHECKLIST_STEPS.find((candidate) => candidate.id === id);
-      if (step) toast.success(`Étape faite : ${step.label.toLowerCase()}`);
+      if (!step) return;
+      const next = nextDemoChecklistStep(done);
+      toast.success(`Étape ${demoChecklistStepNumber(step.id)}/${DEMO_CHECKLIST_STEPS.length} faite : ${step.label.toLowerCase()}`, {
+        description: next ? `Suivante : ${next.label.toLowerCase()}.` : "Vous avez fait le tour de la démo.",
+        action: next ? { label: "Y aller", onClick: () => openStepRef.current(next) } : undefined,
+      });
     };
     refresh();
     window.addEventListener(DEMO_CHECKLIST_EVENT, refresh);
@@ -235,10 +251,13 @@ export function DemoModeBar() {
   const ActiveIcon = PERSONA_ICONS[demo.persona];
   const doneCount = doneSteps.length;
   const allDone = doneCount === DEMO_CHECKLIST_STEPS.length;
-  const openStep = (step: (typeof DEMO_CHECKLIST_STEPS)[number]) => {
+  const openStep = (step: DemoChecklistStep) => {
+    setActiveDemoChecklistStep(step.id);
     if (step.persona === demo.persona) window.location.assign(step.path);
     else void switchPersona(step.persona, step.path);
   };
+  openStepRef.current = openStep;
+  const guide = activeStep ? DEMO_CHECKLIST_STEPS.find((step) => step.id === activeStep) ?? null : null;
 
   return (
     <>
@@ -319,7 +338,12 @@ export function DemoModeBar() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="z-[2100] w-[min(20rem,calc(100vw-1.5rem))]">
-                    <DropdownMenuLabel>À essayer dans la démo</DropdownMenuLabel>
+                    <DropdownMenuLabel className="space-y-0.5">
+                      <span className="block">À essayer dans la démo</span>
+                      <span className="block text-xs font-normal text-muted-foreground">
+                        4 gestes pour voir TutelLiv côté entreprise, client et livreur. Chacun se coche tout seul quand vous le faites.
+                      </span>
+                    </DropdownMenuLabel>
                     {DEMO_CHECKLIST_STEPS.map((step) => {
                       const done = doneSteps.includes(step.id);
                       const StepIcon = done ? CheckCircle2 : Circle;
@@ -333,8 +357,11 @@ export function DemoModeBar() {
                             className={done ? "mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" : "mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"}
                             aria-hidden
                           />
-                          <span className="flex min-w-0 flex-col">
-                            <span className={done ? "text-muted-foreground line-through" : undefined}>{step.label}</span>
+                          <span className="flex min-w-0 flex-col gap-0.5">
+                            <span className={done ? "text-muted-foreground line-through" : "font-medium"}>
+                              {demoChecklistStepNumber(step.id)}. {step.label}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{step.how}</span>
                             <span className="text-xs text-muted-foreground">
                               Vue {DEMO_PERSONA_LABELS[step.persona]}
                               {done ? " · fait" : ""}
@@ -381,6 +408,30 @@ export function DemoModeBar() {
                 </Button>
               </div>
             </div>
+            {guide ? (
+              <div
+                className="mx-auto mt-2 flex max-w-7xl items-start gap-2 rounded-lg border border-amber-300 bg-white/90 px-3 py-2 text-sm text-amber-950 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100"
+                role="status"
+                data-testid="demo-checklist-guide"
+              >
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
+                <p className="min-w-0 flex-1">
+                  <span className="font-medium">
+                    Étape {demoChecklistStepNumber(guide.id)}/{DEMO_CHECKLIST_STEPS.length} : {guide.label.toLowerCase()}.
+                  </span>{" "}
+                  {guide.how} <span className="text-amber-800 dark:text-amber-200">Elle se cochera toute seule.</span>
+                </p>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 shrink-0 px-2 text-amber-900 hover:bg-amber-100 max-md:min-h-11 dark:text-amber-100 dark:hover:bg-amber-900"
+                  onClick={() => setActiveDemoChecklistStep(null)}
+                >
+                  Masquer
+                </Button>
+              </div>
+            ) : null}
           </div>
           <div className="shrink-0" style={{ height: "var(--demo-banner-height, 0px)" }} aria-hidden />
         </>

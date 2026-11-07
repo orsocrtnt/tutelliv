@@ -4,12 +4,13 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**108 tâches terminées sur 138 — 78 %**
+**108 tâches terminées sur 139 — 78 %**
 
-`████████████████░░░░` · 30 tâches restantes
+`████████████████░░░░` · 31 tâches restantes
 
 **À faire par Claude**
 
+- DEMO-ESSAYER-2 — Liste « À essayer » plus explicative, qui se coche toute seule partout
 - AUDIT-0411 — Corriger ce que les pilotes remarqueraient (audit de bout en bout du 4 novembre 2026)
 - V1-GO — Valider la V1 prête à être essayée (après les essais téléphone et la vérification de conformité)
 - DATA-02 — Prévoir sortie, export et conservation des données (après la vérification de conformité)
@@ -102,6 +103,14 @@ Mise à jour : 29 octobre 2026, en fin de journée (revue de cohérence : matric
 ## Tâches ouvertes
 
 _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
+
+- [ ] **DEMO-ESSAYER-2 — Liste « À essayer » plus explicative, qui se coche toute seule partout.** Demande du propriétaire le 6 novembre 2026 : « ça doit être plus explicatif et une fois la tâche faite ça se valide seul ». Choix en questionnaire : consignes dans la liste et bande « étape en cours ».
+
+  **Qui : Claude.**
+
+  Fait le 6 novembre 2026 : chaque étape a une consigne concrète (`how` dans `src/lib/demo/demo-checklist.ts`) et un numéro ; en-tête de la liste « 4 gestes… Chacun se coche tout seul quand vous le faites ». Cliquer une étape ouvre la bonne vue et affiche sous la barre de démo une bande « Étape n/4 : … Elle se cochera toute seule. » (bouton « Masquer »), qui disparaît quand l'étape est faite. Annonce « Étape n/4 faite » avec l'étape suivante et un bouton « Y aller ». Cause relevée : une étape ne se cochait que dans « sa » vue (une facture ouverte en vue Administrateur ne comptait pas) ; elle se coche maintenant dans toutes les vues. Étape 2 : arriver sur la carte client ne coche plus rien (la consigne restait invisible), le clic sur une livraison de la liste de la carte la coche (aussi : détail d'une livraison client, carte en direct de l'administrateur).
+  Vérifications : `tests/demo-checklist.test.ts` (7 tests : consignes, cochage dans toute vue, étape en cours puis suivante, pages, déclencheurs branchés dont la carte) ; `npm run check` vert (1 725 tests, types et lint).
+  Non vérifié : parcours cliqué en ligne (après le push).
 
 - [ ] **ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire.**
 

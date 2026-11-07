@@ -7,6 +7,7 @@ import { mapGlassButtonStyle, mapGlassCardStyle } from "@/components/maps/map-gl
 import { PageLoader } from "@/components/ui/loader";
 import { PortalDeliveriesMapPanel } from "@/features/client-portal/portal-deliveries-map-panel";
 import { usePortalDeliveriesMap } from "@/features/client-portal/hooks";
+import { markDemoChecklistStep } from "@/features/demo/demo-checklist";
 import { DeliveryMapStatusBar } from "@/components/maps/delivery-map-status-bar";
 import { cn } from "@/lib/utils";
 
@@ -104,7 +105,11 @@ export function PortalDeliveriesMap({ fullscreen = true, height = 480 }: PortalD
             activeDeliveries={activeDeliveries}
             historyDeliveries={historyDeliveries}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={(id) => {
+              setSelectedId(id);
+              // Démo : ouvrir une livraison sur la carte fait l'étape « Suivre le livreur en direct ».
+              markDemoChecklistStep("track");
+            }}
           />
         </div>
       </div>
