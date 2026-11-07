@@ -57,6 +57,31 @@ test("PDF avec signature, photo et logo : trois images intégrées en plus du lo
   assert.ok(!text.includes("Non recueillie"));
 });
 
+test("PDF : le titre « PHOTO » reste sur la même page que la photo (jamais seul en bas de page)", async () => {
+  const signature = await sharp({ create: { width: 600, height: 240, channels: 3, background: "#ffffff" } }).png().toBuffer();
+  const photo = await sharp({ create: { width: 1200, height: 900, channels: 3, background: "#336699" } }).jpeg().toBuffer();
+  // Cas réel des preuves de la démo : livraison complète, signature et note, photo 1 200 × 900.
+  const doc = await PDFDocument.load(await buildProofPdf({ ...base, signaturePng: signature, photo, note: "Colis remis en main propre à l'accueil." }));
+  const photoTitle = Buffer.from("PHOTO", "latin1").toString("hex").toUpperCase();
+  const pages = doc.getPages().map((page) => {
+    const contents = page.node.Contents();
+    const streams = contents instanceof pdfLib.PDFArray ? contents.asArray().map((ref) => doc.context.lookup(ref)) : [contents];
+    const content = streams
+      .filter((stream): stream is PDFRawStream => stream instanceof PDFRawStream)
+      .map((stream) => Buffer.from(decodePDFRawStream(stream).decode()).toString("latin1"))
+      .join("\n");
+    const xObjects = page.node.Resources()?.lookupMaybe(PDFName.of("XObject"), pdfLib.PDFDict);
+    const hasJpeg = (xObjects?.values() ?? []).some((ref) => {
+      const image = doc.context.lookup(ref);
+      return image instanceof PDFRawStream && image.dict.get(PDFName.of("Filter"))?.toString() === "/DCTDecode";
+    });
+    return { hasTitle: content.toUpperCase().includes(`<${photoTitle}>`), hasJpeg };
+  });
+  const titlePage = pages.findIndex((page) => page.hasTitle);
+  assert.ok(titlePage >= 0, "titre PHOTO absent");
+  assert.equal(pages[titlePage]!.hasJpeg, true, `titre PHOTO en page ${titlePage + 1} sans la photo`);
+});
+
 test("PDF refus de signer : motif présent ; échec : motif d'échec et pas de bloc de réception", async () => {
   const refused = await pdfText(await buildProofPdf({ ...base, signatureRefusedReason: "Refus du destinataire" }));
   assert.ok(refused.text.includes("Refus du destinataire"));

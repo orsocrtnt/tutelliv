@@ -12,6 +12,7 @@ import { plainClientName, TableDriverDayCell } from "@/features/back-office/tabl
 import { formatPlace } from "@/lib/format/place";
 import { Truck } from "lucide-react";
 import type { DeliveryStatus } from "@prisma/client";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 interface DriverDetail {
   driver: {
@@ -86,7 +87,7 @@ export default function CompanyDriverDetailPage() {
               day={{ delivered: stats.deliveredToday, inTransit: stats.inTransit, toDo: stats.assigned }}
             />
             <dl className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
-              <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Téléphone</dt><dd>{driver.phone ?? "Non renseigné"}</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Téléphone</dt><dd>{driver.phone ? formatPhoneDisplay(driver.phone) : "Non renseigné"}</dd></div>
               <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Dans l&apos;équipe depuis</dt><dd><RelativeTime date={driver.createdAt} withTime={false} /></dd></div>
               <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Dernière connexion</dt><dd>{driver.lastLoginAt ? <RelativeTime date={driver.lastLoginAt} /> : "Jamais"}</dd></div>
             </dl>

@@ -19,6 +19,7 @@ import { formatLateness } from "@/lib/format/lateness";
 import { formatClientFromParts } from "@/lib/format/person-labels";
 import { isInitialQueryLoading } from "@/lib/query/is-initial-loading";
 import { formatDate, formatDateTime } from "@/lib/utils";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 /**
  * Fiche canonique d'une livraison pour l'équipe (UX-03) : la référence de livraison est le
@@ -171,7 +172,7 @@ export default function CompanyDeliveryDetailPage() {
           <CardContent className="space-y-1 text-sm">
             <p className="font-medium">{formatClientFromParts(customer, order.customerEmail)}</p>
             <p>{customer.email}</p>
-            {customer.phone && <p>{customer.phone}</p>}
+            {customer.phone && <p>{formatPhoneDisplay(customer.phone)}</p>}
             <Link href={`/dashboard/clients/${customer.id}`} className="text-brand underline underline-offset-2 hover:decoration-2">
               Voir le profil client complet →
             </Link>

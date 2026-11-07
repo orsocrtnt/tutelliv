@@ -16,6 +16,7 @@ import { campaignLabel } from "@/features/admin/waitlist/waitlist-labels";
 import { isInitialQueryLoading } from "@/lib/query/is-initial-loading";
 import { cn } from "@/lib/utils";
 import type { WaitlistContactedFilter, WaitlistEntry } from "@/domains/growth/waitlist.service";
+import { formatPhoneDisplay, phoneHref } from "@/lib/format/phone";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Paris" });
 const shortDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
@@ -252,7 +253,7 @@ export function WaitlistList() {
                       <a className="break-all text-brand hover:underline" href={`mailto:${entry.email}`}>{entry.email}</a>
                       {entry.phone && (
                         <p>
-                          <a className="text-muted-foreground hover:underline" href={`tel:${entry.phone.replace(/[^0-9+]/g, "")}`}>{entry.phone}</a>
+                          <a className="text-muted-foreground hover:underline" href={phoneHref(entry.phone)}>{formatPhoneDisplay(entry.phone)}</a>
                         </p>
                       )}
                     </td>
@@ -286,7 +287,7 @@ export function WaitlistList() {
                 </p>
                 {entry.phone && (
                   <p className="text-sm">
-                    <a className="text-muted-foreground hover:underline" href={`tel:${entry.phone.replace(/[^0-9+]/g, "")}`}>{entry.phone}</a>
+                    <a className="text-muted-foreground hover:underline" href={phoneHref(entry.phone)}>{formatPhoneDisplay(entry.phone)}</a>
                   </p>
                 )}
                 <p className="mt-1 text-xs text-muted-foreground">Campagne : {campaignLabel(entry.campaignCode)}</p>

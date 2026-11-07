@@ -28,6 +28,7 @@ import { getCourierPickupStops } from "@/lib/order/courier-pickups";
 import { ArrowLeft, Package } from "lucide-react";
 
 import { usePermissions } from "@/hooks/use-permissions";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 export default function CompanyOrderDetailPage() {
   const { can } = usePermissions();
@@ -237,7 +238,7 @@ export default function CompanyOrderDetailPage() {
               {formatClientFromParts(order.customer, order.customerEmail)}
             </p>
             <p>{order.customer.email}</p>
-            {order.customer.phone && <p>{order.customer.phone}</p>}
+            {order.customer.phone && <p>{formatPhoneDisplay(order.customer.phone)}</p>}
             {order.customer.id && (
               <Link href={`/dashboard/clients/${order.customer.id}`} className="text-brand underline underline-offset-2 hover:decoration-2">
                 Voir le profil client complet →
@@ -254,7 +255,7 @@ export default function CompanyOrderDetailPage() {
           <CardContent className="text-sm space-y-1">
             <p className="font-medium">{order.companyCustomer.name || order.companyCustomer.email}</p>
             <p>{order.companyCustomer.email}</p>
-            {order.companyCustomer.phone && <p>{order.companyCustomer.phone}</p>}
+            {order.companyCustomer.phone && <p>{formatPhoneDisplay(order.companyCustomer.phone)}</p>}
             <p className="text-muted-foreground">Client sans accès à l&apos;espace client (fiche créée depuis une commande reçue).</p>
           </CardContent>
         </Card>

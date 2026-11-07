@@ -23,6 +23,7 @@ import { createSupportTicketSchema, type CreateSupportTicketInput } from "@/lib/
 import { HeadphonesIcon, MessageSquare, Phone, Mail, User } from "lucide-react";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
+import { formatPhoneDisplay, phoneHref } from "@/lib/format/phone";
 
 export default function ClientSupportPage() {
   const { data: tickets, isLoading, error, refetch } = usePortalSupportTickets();
@@ -91,7 +92,7 @@ export default function ClientSupportPage() {
                 </a>
               )}
               {contacts?.admin.phone && (
-                <p className="text-sm text-muted-foreground">{contacts.admin.phone}</p>
+                <p className="text-sm text-muted-foreground">{formatPhoneDisplay(contacts.admin.phone)}</p>
               )}
             </div>
           </CardContent>
@@ -112,8 +113,8 @@ export default function ClientSupportPage() {
                   Disponible si livraison en cours ou livrée depuis moins de 24h
                 </p>
                 {contacts.driver.phone ? (
-                  <a href={`tel:${contacts.driver.phone}`} className="text-sm text-brand hover:underline max-md:inline-flex max-md:min-h-11 max-md:items-center">
-                    {contacts.driver.phone}
+                  <a href={phoneHref(contacts.driver.phone)} className="text-sm text-brand hover:underline max-md:inline-flex max-md:min-h-11 max-md:items-center">
+                    {formatPhoneDisplay(contacts.driver.phone)}
                   </a>
                 ) : (
                   <p className="text-sm text-muted-foreground">Téléphone non renseigné</p>
@@ -203,7 +204,7 @@ export default function ClientSupportPage() {
                 )}
                 {"phone" in activeContact && activeContact.phone && (
                   <p className="flex items-center gap-1 text-muted-foreground">
-                    <Phone className="h-3 w-3" /> {activeContact.phone}
+                    <Phone className="h-3 w-3" /> {formatPhoneDisplay(activeContact.phone)}
                   </p>
                 )}
               </div>

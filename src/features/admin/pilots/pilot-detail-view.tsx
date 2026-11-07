@@ -22,6 +22,7 @@ import { PILOT_STAGE_HINTS, PILOT_STAGE_LABELS, PILOT_STAGES } from "@/domains/a
 import { cn } from "@/lib/utils";
 import type { PilotStage } from "@prisma/client";
 import type { PilotDetail } from "@/domains/admin/pilots.service";
+import { formatPhoneDisplay, phoneHref } from "@/lib/format/phone";
 
 const LINES: ReadonlyArray<DailyLine<"orders" | "delivered">> = [
   { key: "orders", label: "Commandes créées", short: "Commandes", ...CHART_COLORS.blue },
@@ -172,7 +173,7 @@ function InfoBlock({ pilot }: { pilot: PilotDetail }) {
         </Field>
         <Field label="Téléphone">
           {pilot.contactPhone ? (
-            <a className="inline-flex min-h-11 items-center text-brand hover:underline" href={`tel:${pilot.contactPhone.replace(/[^0-9+]/g, "")}`}>{pilot.contactPhone}</a>
+            <a className="inline-flex min-h-11 items-center text-brand hover:underline" href={phoneHref(pilot.contactPhone)}>{formatPhoneDisplay(pilot.contactPhone)}</a>
           ) : (
             "—"
           )}

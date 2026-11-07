@@ -1,4 +1,5 @@
 import { Phone, Truck } from "lucide-react";
+import { formatPhoneDisplay, phoneHref } from "@/lib/format/phone";
 
 /**
  * Livreur affecté vu par le client : prénom et téléphone (seulement si l'entreprise ne l'a pas masqué).
@@ -13,8 +14,8 @@ export function ClientDriverInfo({ driver }: { driver?: { firstName: string; pho
         <span>Livreur : {driver.firstName}</span>
       </div>
       {driver.phone ? (
-        <a href={`tel:${driver.phone}`} className="ml-7 flex items-center gap-1 text-sm text-brand hover:underline">
-          <Phone className="h-3 w-3" /> {driver.phone}
+        <a href={phoneHref(driver.phone)} className="ml-7 flex items-center gap-1 text-sm text-brand hover:underline">
+          <Phone className="h-3 w-3" /> {formatPhoneDisplay(driver.phone)}
         </a>
       ) : null}
     </div>

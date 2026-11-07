@@ -17,6 +17,7 @@ import type { CompanySupportTicket } from "@/features/back-office/types";
 import { cn } from "@/lib/utils";
 import { fullDateLabel, inlineDayLabel, relativeDayLabel } from "@/lib/format/relative-day";
 import { toast } from "sonner";
+import { formatPhoneDisplay, phoneHref } from "@/lib/format/phone";
 
 type Filter = "ACTIVE" | "ALL" | CompanySupportTicket["status"];
 
@@ -76,8 +77,8 @@ function SupportTicketCard({ ticket }: { ticket: CompanySupportTicket }) {
             <Mail className="h-3.5 w-3.5" aria-hidden="true" /> {ticket.customer.email}
           </a>
           {ticket.customer.phone ? (
-            <a className="inline-flex items-center gap-1 hover:text-foreground max-md:min-h-11" href={`tel:${ticket.customer.phone}`}>
-              <Phone className="h-3.5 w-3.5" aria-hidden="true" /> {ticket.customer.phone}
+            <a className="inline-flex items-center gap-1 hover:text-foreground max-md:min-h-11" href={phoneHref(ticket.customer.phone)}>
+              <Phone className="h-3.5 w-3.5" aria-hidden="true" /> {formatPhoneDisplay(ticket.customer.phone)}
             </a>
           ) : null}
           {ticket.relatedOrder ? (

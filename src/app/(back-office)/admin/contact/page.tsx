@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useContactMessages } from "@/features/admin/contact-messages";
 import { markContactVisited } from "@/features/admin/contact-last-visit";
 import { isInitialQueryLoading } from "@/lib/query/is-initial-loading";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Paris" });
 
@@ -53,7 +54,7 @@ export default function AdminContactMessagesPage() {
               </div>
               <p className="mt-1 break-all text-sm">
                 <a className="text-brand hover:underline" href={`mailto:${row.email}`}>{row.email}</a>
-                {row.phone && <span className="text-muted-foreground"> · {row.phone}</span>}
+                {row.phone && <span className="text-muted-foreground"> · {formatPhoneDisplay(row.phone)}</span>}
               </p>
               <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6">{row.message}</p>
             </li>

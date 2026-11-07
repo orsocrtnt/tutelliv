@@ -11,7 +11,6 @@
 **À faire par Claude**
 
 - AUDIT-0411 — Corriger ce que les pilotes remarqueraient (audit de bout en bout du 4 novembre 2026)
-- DEMO-REFONTE — Rendre la démonstration claire (une journée lisible, remise à l'heure, liste « À essayer »)
 - V1-GO — Valider la V1 prête à être essayée (après les essais téléphone et la vérification de conformité)
 - DATA-02 — Prévoir sortie, export et conservation des données (après la vérification de conformité)
 - PROD-04 — Définir les mesures de valeur (après les pilotes)
@@ -35,6 +34,7 @@
 - AUDIT-0111 — Corrections de l'audit complet du 1er novembre 2026 avant le premier pilote
 - PROPRIO-2810 — Actions du propriétaire avant mise en ligne
 - ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire (brancher le fichier Google (`docs/operations/prospection/SHEET.md`), puis Claude vérifie la lecture réelle ; campagnes : l'autre session les fusionne)
+- DEMO-REFONTE — Rendre la démonstration claire (une journée lisible, remise à l'heure, liste « À essayer ») (lancer le script de ménage ; ensuite Claude ferme la tâche)
 - ONBOARD-1 — Guider jusqu’à la première livraison (pendant les pilotes)
 - OPS-FIAB — Fiabiliser les tâches de fond et l'exploitation (une commande, puis Claude)
 - LEGAL-1 — Vérifier le respect des exigences applicables et préparer les documents (fournir les pièces et décider, puis Claude)
@@ -53,6 +53,7 @@ _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
+- **DEMO-REFONTE, ménage de l'espace de base (validé par toi le 6 novembre, suppression refusée à Claude par l'outil de sécurité)** : ouvrir Supabase > projet `tutelliv-preproduction` > SQL Editor, coller le contenu de `outputs/demo-refonte/menage-espace-base.sql`, cliquer « Run » ; la dernière ligne doit afficher 0 commande, 0 livraison, 0 fiche client. Puis dire « fait » à Claude, qui vérifie et ferme la tâche.
 - Démo, preuves (6 novembre, DEMO-REFONTE, en ligne et vérifiée) : les livraisons livrées du jour ont maintenant une photo (colis devant une porte) et une signature, à l'écran et dans le PDF. Rien à faire.
 - Démo, liste « À essayer » (6 novembre, DEMO-REFONTE, en ligne et vérifiée) : bouton « À essayer 0/4 » dans la barre de démo ; chaque ligne ouvre la bonne vue et se coche quand on fait vraiment l'action (affecter, carte, livrer avec preuve, facture) ; à 4/4, « Demander un pilote ». À regarder en ouvrant une démo neuve. Rien à faire.
 - Démo expirée (6 novembre, DEMO-REFONTE / AUDIT-0411) : un vieil onglet de démo ne montre plus l'espace de base (tes deux courses) ; il affiche « Votre démonstration précédente a expiré. » et ouvre une démo neuve. Rien à faire.
@@ -91,7 +92,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Si tu relances un jour l'ancien projet Supabase `wlomrzil…` (en pause, plus utilisé) : change d'abord son mot de passe, exposé le 26 octobre.
 
 **2. Claude — peut le faire seul, dans cet ordre**
-- DEMO-REFONTE : photo et signature sur les preuves du jour, en ligne et vérifiées le 6 novembre. Ensuite : titre « PHOTO » seul en bas de page dans le PDF de preuve, puis ménage de l'espace de base (liste à te montrer avant suppression).
+- DEMO-REFONTE : dès ton script de ménage lancé, recompter l'espace de base et fermer la tâche (PDF de preuve et téléphones lisibles faits le 6 novembre).
 - AUDIT-0411 : corrections en ligne depuis le 5 novembre, vérifiées dans Chrome sur tutelliv.fr ; session de démo expirée corrigée le 6 novembre. Suite : date prévue vide côté client, puis le reste de la liste (statuts uniformes, téléphone du livreur, recherche du client, données de démo, console interne, mineurs).
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - OPS-FIAB : dès tes trois commandes lancées, déclencher une panne fictive et vérifier l'e-mail d'alerte dans Gmail, puis l'alerte d'une tâche de fond en retard.
@@ -175,7 +176,7 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
 - [ ] **DEMO-REFONTE — Rendre la démonstration claire (une journée lisible, remise à l'heure, liste « À essayer »).** Demande du propriétaire le 5 novembre 2026 : « les démos sont trop chargées », refonte en gardant la base.
 
-  **Qui : Claude.**
+  **Qui : Toi — lancer le script de ménage ; ensuite Claude ferme la tâche.**
 
   **Modèle conseillé : GPT‑6 Astra · effort élevé (données de démo, pool partagé, dates).**
 
@@ -214,8 +215,11 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Photo et signature sur les preuves, 6 novembre 2026 : nouveau `src/domains/demo/demo-proof-files.service.ts`. À chaque remise à neuf (préparation, recyclage, « Réinitialiser la démo »), les 4 livraisons livrées du jour reçoivent une photo (colis devant une porte, 4 variantes dessinées en SVG et rendues par sharp, sans police) et une signature manuscrite (tracés aux initiales des réceptionnaires : Marie Dubois, cabinet, Léa Martin, Hugo Lambert), déposées par les mêmes fonctions que l'application livreur (`uploadPodPhoto`, `uploadPodSignature` : mêmes chemins, contrôles et nettoyage des métadonnées). Réservé aux espaces du stock de démo : le dossier de preuves de l'espace est vidé juste avant (photos laissées par le visiteur précédent), l'espace de base et les anciennes sessions n'en reçoivent pas (leur ménage refuse un espace qui contient des fichiers). Une panne du stockage n'empêche pas la démo (journalisée, preuves sans fichiers comme avant). Les 21 livraisons de l'historique gardent nom, heure et position seulement. `DEMO_SCENARIO_VERSION` = `2026-11-06-preuves` : les espaces libres sont recréés à la prochaine maintenance.
   Vérifications : `tests/demo-proof-files.test.ts` (5 tests : images acceptées par les contrôles d'une vraie preuve, 1 200 × 900 et moins de 300 Ko ; purge puis dépôt pour les 4 ; rien hors stock de démo ; panne sans exception ; branchement dans `resetDemoScenario`) ; rendu relu en capture (photo et signatures) ; `npm run check` vert (1 721 tests, types et lint).
   Vérifié en ligne après le déploiement `6fc4f28` (Playwright sur tutelliv.fr, 6 novembre ; script `outputs/recette-agents/preuves/recette.mjs`, captures et PDF dans le même dossier) : démo neuve (espace recréé avec la nouvelle version), vue Client : la livraison du jour de Pharmacie du Marais (« Marie Dubois ») a sa photo et sa signature ; « Réinitialiser la démo » (200 en 2,7 à 4 s) les recrée ; photo 200 `image/jpeg` 25 Ko, signature 200 `image/png` 11 Ko, PDF 200 avec signature et photo ; page de détail client : signature puis photo du colis au-dessus de « Télécharger la preuve (PDF) » ; déconnexion 204.
-  Relevé, non corrigé (touche aussi les vraies preuves) : dans le PDF, le titre « PHOTO » reste seul en bas de la page 1 et la photo part en page 2.
-  Suite : titre « PHOTO » du PDF gardé avec sa photo (petit correctif de mise en page), ménage de l'espace de base (liste à montrer au propriétaire avant suppression) ; téléphones au format lisible si souhaité.
+  PDF de preuve corrigé le 6 novembre 2026 (touche aussi les vraies preuves) : le titre « PHOTO » restait seul en bas de la page 1, la photo partait en page 2. `proof-pdf.ts` réserve maintenant la place du titre et de la photo ensemble avant d'écrire le titre. Test ajouté dans `tests/pod-proof-pdf.test.ts` (titre et photo JPEG sur la même page, cas réel signature + note + photo 1 200 × 900) : rouge avant le correctif, vert après ; rendu relu (PDF de démo généré avec les vraies images : titre et photo ensemble en page 2).
+  Téléphones lisibles le 6 novembre 2026 (choisi en questionnaire) : nouveau `src/lib/format/phone.ts` (`formatPhoneDisplay` : « 06 12 34 56 78 » ou « +33 6 12 34 56 78 », autre format affiché tel quel ; `phoneHref` : lien d'appel chiffres et « + » seulement). Appliqué aux fiches client et livreur, détails commande et livraison, support (back-office et portail client), livreur côté client, contacts, pilotes et liste d'attente. Le numéro stocké ne change pas. Test `tests/phone-format.test.ts` (2 tests).
+  Vérifications : `npm run check` vert (1 724 tests, types et lint).
+  Ménage de l'espace de base (`logiexpress-demo`, base de tutelliv.fr), inventaire lu par Claude le 6 novembre : 14 commandes et 14 livraisons (8 de l'ancien scénario du 20 octobre, 4 essais du 2 novembre, 2 courses du 4 novembre à l'adresse du propriétaire), fiche client « Orso Carotenuto », 4 e-mails de commande reçus, 2 factures et 1 relance, 1 ticket, 2 commandes récurrentes, 24 tâches de fond terminées ; aucun fichier stocké ; aucune clé étrangère bloquante. Gardés : l'entreprise, ses 8 comptes de démo, l'abonnement, les compteurs. Liste validée par le propriétaire en questionnaire ; la suppression (même périmètre que `purgeDemoTransactionalData`, plus la fiche client) a été refusée à Claude par l'outil de sécurité. Script prêt : `outputs/demo-refonte/menage-espace-base.sql` (une transaction, contrôle final à 0).
+  Suite : après le script du propriétaire, recompter l'espace de base, puis cocher et archiver la tâche.
 
 - [ ] **SEC-AUDIT — Durcissement du 28 octobre et correctifs de l'audit Codex.**
 

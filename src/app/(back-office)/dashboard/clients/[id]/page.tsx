@@ -14,6 +14,7 @@ import { formatCurrency } from "@/features/client-portal/utils";
 import { withoutRolePrefix } from "@/lib/format/person-labels";
 import { User } from "lucide-react";
 import type { OrderStatus, DeliveryStatus, DeliveryCategory, SupportTicketStatus } from "@prisma/client";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 interface ClientDetail {
   client: {
@@ -97,7 +98,7 @@ export default function CompanyClientDetailPage() {
           <CardHeader><CardTitle className="text-base">Contact</CardTitle></CardHeader>
           <CardContent>
             <dl className="space-y-2 text-sm">
-              <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Téléphone</dt><dd>{client.phone ?? "Non renseigné"}</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Téléphone</dt><dd>{client.phone ? formatPhoneDisplay(client.phone) : "Non renseigné"}</dd></div>
               <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Client depuis</dt><dd><RelativeTime date={client.createdAt} withTime={false} /></dd></div>
               <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Dernière connexion</dt><dd>{client.lastLoginAt ? <RelativeTime date={client.lastLoginAt} /> : "Jamais"}</dd></div>
             </dl>

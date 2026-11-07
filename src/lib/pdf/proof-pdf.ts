@@ -200,11 +200,12 @@ export async function buildProofPdf(data: ProofPdfData): Promise<Uint8Array> {
 
   const photo = data.photo ? await embedImage(doc, data.photo) : null;
   if (photo) {
-    section("Photo");
     const scale = Math.min(1, WIDTH / photo.width, 300 / photo.height);
     const width = photo.width * scale;
     const height = photo.height * scale;
-    ensure(height + 12);
+    // Titre et photo réservés ensemble : le titre ne reste jamais seul en bas de page.
+    ensure(40 + height + 6);
+    section("Photo");
     y -= height + 6;
     page.drawImage(photo, { x: MARGIN, y, width, height });
   }
