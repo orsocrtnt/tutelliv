@@ -91,7 +91,7 @@ export function ClientPicker({ id, clients, value, onChange, invalid, inputRef }
         aria-invalid={invalid}
         autoComplete="off"
         spellCheck={false}
-        placeholder="Rechercher un client : nom, téléphone ou e-mail"
+        placeholder="Nom, téléphone ou e-mail"
         value={query}
         onChange={(event) => {
           setQuery(event.target.value);
