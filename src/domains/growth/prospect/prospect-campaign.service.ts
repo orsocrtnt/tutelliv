@@ -402,6 +402,26 @@ export async function deleteProspectCampaign(
   return deleted.count > 0 ? "deleted" : "not_found";
 }
 
+/**
+ * DATA-02, durées validées par le propriétaire le 9 novembre 2026 et publiées sur la page Confidentialité :
+ * une adresse de prospection part trois ans après le dernier échange (ajout à la campagne, ou envoi s'il est
+ * plus récent). Les adresses STOP restent : elles sont l'opposition à respecter. Un envoi en cours n'est pas touché.
+ */
+export const PROSPECT_RETENTION_YEARS = 3;
+
+export async function purgeExpiredProspectRecipients(now = new Date()): Promise<number> {
+  const cutoff = new Date(now);
+  cutoff.setUTCFullYear(cutoff.getUTCFullYear() - PROSPECT_RETENTION_YEARS);
+  const { count } = await prisma.prospectCampaignRecipient.deleteMany({
+    where: {
+      createdAt: { lt: cutoff },
+      status: { not: "SENDING" },
+      OR: [{ sentAt: null }, { sentAt: { lt: cutoff } }],
+    },
+  });
+  return count;
+}
+
 /* ---------- Envoi ---------- */
 
 export type ClaimedRecipient = { id: string; email: string };

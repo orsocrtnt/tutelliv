@@ -71,12 +71,20 @@ Cette recette ne lit pas le contenu des anciennes entreprises. Elle lit les rôl
 ## Décisions et validations restantes
 
 - pays et obligations applicables ;
-- durées par catégorie : compte, commandes, factures, GPS, photos, support, journaux et sauvegardes ;
+- durées par catégorie : celles de [RETENTION_POLICY_DRAFT.md](RETENTION_POLICY_DRAFT.md) sont validées par le propriétaire le 9 novembre 2026 (sans avis d'un juriste) ; restent à fixer support, journaux et sauvegardes ;
 - distinction entre résiliation, suspension, anonymisation et suppression ;
 - suppression ou anonymisation réelle dans Supabase Auth et Storage selon la politique validée (seule la suppression des objets de fixtures est testée) ;
 - propagation vers les sauvegardes selon leur rétention ;
 - test de restauration de l'export vers une cible isolée ;
 - traitement complet et planifié des sessions de démonstration expirées (première tranche sans assets décrite ci-dessous).
+
+## Purges automatiques en place
+
+Lancées par la tâche planifiée `/api/cron/operations` (toutes les 5 minutes) ; un échec est journalisé sans bloquer les autres traitements.
+
+- Messages Contact et liste d'attente : effacés trois ans après leur réception (`purgeExpiredContactMessages`).
+- Adresses de prospection : effacées trois ans après le dernier échange, ajout ou envoi (`purgeExpiredProspectRecipients`, 9 novembre 2026). Les adresses STOP restent, un envoi en cours n'est pas touché.
+- File hors ligne du livreur : actions effacées de l'appareil sept jours après leur création.
 
 Ces points dépendent de LEGAL-1 et des accès ENV-1/OPS-03A. Aucune durée de données réelles n'est activée dans le code en attendant. La durée de huit heures déjà utilisée pour les démos est désormais explicite pour les nouvelles sessions.
 

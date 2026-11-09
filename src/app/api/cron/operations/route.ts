@@ -48,6 +48,10 @@ export async function GET(request: Request) {
   await import("@/domains/growth/contact.service")
     .then(({ purgeExpiredContactMessages }) => purgeExpiredContactMessages())
     .catch((error) => console.warn("[cron.contact-retention]", error instanceof Error ? error.message : "FAILED"));
+  // DATA-02 : adresses de prospection effacées trois ans après le dernier échange ; même règle d'échec.
+  await import("@/domains/growth/prospect/prospect-campaign.service")
+    .then(({ purgeExpiredProspectRecipients }) => purgeExpiredProspectRecipients())
+    .catch((error) => console.warn("[cron.prospect-retention]", error instanceof Error ? error.message : "FAILED"));
   try {
     const { details, ...counts } = await processDueOperationJobs();
     // Compteurs seuls pour les alertes ; le détail par tâche (identifiant interne, type, nature, code

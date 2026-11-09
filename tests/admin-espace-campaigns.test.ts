@@ -22,6 +22,7 @@ import {
   prospectRepliesSchema,
   prospectReleaseSchema,
   prospectSendSchema,
+  purgeExpiredProspectRecipients,
   sendNextProspectEmail,
   sendProspectTestEmail,
   type ProspectSendRepository,
@@ -30,6 +31,7 @@ import { PROSPECT_PREHEADER, prospectLinks, renderProspectEmail } from "../src/d
 import { PROSPECT_LOGO_CID, PROSPECT_LOGO_PNG_BASE64 } from "../src/domains/growth/prospect/prospect-logo";
 import { describeMailerError, readProspectMailerConfig, type ProspectMailer } from "../src/domains/growth/prospect/prospect-mailer";
 import { isProtectedPagePath } from "../src/lib/permissions/page-access";
+import { prisma } from "../src/services/prisma/client";
 import { adminNavItems } from "../src/features/navigation/nav-config";
 
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
@@ -380,4 +382,24 @@ test("lot 5 : suppression d'une campagne par le super-admin, STOP conservés, re
   const screen = readFileSync("src/features/admin/campaigns/campaign-detail.tsx", "utf8");
   assert.match(screen, /Oui, supprimer/);
   assert.doesNotMatch(screen, /window\.confirm|confirm\(/, "confirmation dans la page, pas de fenêtre du navigateur");
+});
+
+test("DATA-02 : adresses de prospection effacées trois ans après le dernier échange, STOP et envois en cours gardés", async (t) => {
+  const calls: unknown[] = [];
+  Object.defineProperty(prisma, "prospectCampaignRecipient", {
+    configurable: true,
+    value: { deleteMany: async (args: unknown) => { calls.push(args); return { count: 3 }; } },
+  });
+  t.after(() => { Reflect.deleteProperty(prisma, "prospectCampaignRecipient"); });
+  const removed = await purgeExpiredProspectRecipients(new Date("2026-11-09T12:00:00.000Z"));
+  assert.equal(removed, 3);
+  const cutoff = new Date("2023-11-09T12:00:00.000Z");
+  assert.deepEqual(calls, [{
+    where: { createdAt: { lt: cutoff }, status: { not: "SENDING" }, OR: [{ sentAt: null }, { sentAt: { lt: cutoff } }] },
+  }]);
+  const service = readFileSync("src/domains/growth/prospect/prospect-campaign.service.ts", "utf8");
+  const purge = service.slice(service.indexOf("export async function purgeExpiredProspectRecipients"));
+  assert.doesNotMatch(purge.slice(0, purge.indexOf("\n}\n")), /prospectOptOut/, "les adresses STOP ne sont jamais purgées");
+  const cron = readFileSync("src/app/api/cron/operations/route.ts", "utf8");
+  assert.match(cron, /purgeExpiredProspectRecipients\(\)/, "branchée sur la tâche planifiée");
 });

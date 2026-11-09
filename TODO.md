@@ -51,6 +51,7 @@ _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
+- **À lancer toi-même (refusé à Claude le 9 novembre par la sécurité de Claude Code) :** 1) dans le terminal du dépôt, `sh scripts/ops03b/copy-alert-email.sh` (doit afficher `"stored":true`) ; 2) sur Vercel, projet `tutelliv-v2`, Settings → Environment Variables, `NEXT_PUBLIC_APP_URL` (Preview, branche `preproduction`) = `https://tutelliv.fr`, puis Redeploy du dernier déploiement `preproduction` ; 3) brancher le fichier Google (`docs/operations/prospection/SHEET.md`). Dis ensuite à Claude « vérifie » : il teste l'alerte, les liens des e-mails et `/admin/prospection`. Pour ne plus avoir ce refus, tu peux ajouter une règle de permission dans Claude Code.
 - Démo, liste « À essayer » (DEMO-ESSAYER-2, close le 6 novembre, vérifiée en ligne) : chaque étape dit quoi faire, une bande sous la barre de démo guide l'étape en cours, chaque étape se coche toute seule dans n'importe quelle vue, puis l'annonce propose « Y aller » vers la suivante. Au passage : /dispatch ne plante plus à l'affectation d'un livreur (environ 1 fois sur 3 avant). Rien à faire.
 - Démo refondue (DEMO-REFONTE close le 6 novembre, tout vérifié en ligne) : journée claire remise à l'heure à l'ouverture (1 seul retard), clients entreprises, liste « À essayer 0/4 », démo expirée renvoyée vers une neuve, espaces abandonnés repris après 30 min, preuves du jour avec photo et signature (PDF : titre « PHOTO » gardé avec sa photo), téléphones « 06 12 34 56 78 », espace de base vidé (ton script). À regarder en ouvrant une démo neuve. Rien à faire.
 - Mini-démo de l'accueil (6 novembre, MINI-DEMO-FLECHES, terminé) : flèches « précédent / suivant » et adresses de démo courtes, vérifiées en ligne sur tutelliv.fr. Rien à faire.
@@ -87,7 +88,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - E-mails « Run failed » de GitHub (7 novembre, CI-POLICES, fait) : la cause était le téléchargement des polices chez Google pendant le build ; les polices sont maintenant dans le dépôt. Revérifié le 8 novembre : tout vert ; les runs « cancelled » ne sont pas des erreurs (deux envois rapprochés). Rien à faire.
 
 **2. Claude — peut le faire seul, dans cet ordre**
-- DATA-02 : durées validées le 9 novembre ; écrire la purge automatique et l'export, testés sur des données fictives.
+- DATA-02 : purge des prospects faite le 9 novembre ; reste la fin de pilote (export remis puis effacement à 30 jours), à cadrer avec toi au premier pilote.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - OPS-FIAB : dès tes trois commandes lancées, déclencher une panne fictive et vérifier l'e-mail d'alerte dans Gmail, puis l'alerte d'une tâche de fond en retard.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
@@ -229,6 +230,8 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   **Qui : Claude.**
 
   9 novembre 2026 : durées de `docs/operations/data02/RETENTION_POLICY_DRAFT.md` validées par le propriétaire (GPS détaillé 60 jours, commandes archivées 5 ans, factures 10 ans, prospects 3 ans après le dernier contact, pilote effacé 30 jours après l'export), sans avis d'un juriste. Suite : purge automatique et export, testés sur données fictives.
+
+  9 novembre 2026, première purge ajoutée : les adresses de prospection sont effacées trois ans après le dernier échange (ajout ou envoi), comme le promet déjà la page Confidentialité ; adresses STOP gardées, envoi en cours non touché (`purgeExpiredProspectRecipients` dans `prospect-campaign.service.ts`, lancée par `/api/cron/operations`). La purge Contact existait déjà (3 ans après réception, texte publié). Test ajouté dans `tests/admin-espace-campaigns.test.ts` (17/17) ; `npm run check` 1 740/1 740. Non vérifié en ligne : aucune donnée de plus de trois ans, la purge n'efface rien aujourd'hui. Reste : fin de pilote (effacement 30 jours après l'export, qui attend un canal de remise chiffré de l'export), effacement des comptes Supabase Auth et des photos Storage, sauvegardes.
 
   Terminé quand : Export exploitable et test de suppression sur fixtures ; aucun effet sur une autre entreprise ; politique appliquée au stockage et sauvegardes.
 
