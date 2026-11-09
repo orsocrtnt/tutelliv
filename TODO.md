@@ -4,9 +4,9 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**110 tâches terminées sur 141 — 78 %**
+**110 tâches terminées sur 140 — 79 %**
 
-`████████████████░░░░` · 31 tâches restantes
+`████████████████░░░░` · 30 tâches restantes
 
 **À faire par Claude**
 
@@ -33,7 +33,6 @@
 - INTAKE-1 — Commande par message IA (coller un message)
 - AUDIT-0111 — Corrections de l'audit complet du 1er novembre 2026 avant le premier pilote
 - PROPRIO-2810 — Actions du propriétaire avant mise en ligne
-- RENOMMER-DOSSIER — Ne plus afficher « TutelLiv-GPT », seulement « TutelLiv » (lancer le script de renommage, Cursor fermé ; puis Claude vérifie)
 - ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire (brancher le fichier Google (`docs/operations/prospection/SHEET.md`), puis Claude vérifie la lecture réelle ; campagnes : l'autre session les fusionne)
 - ONBOARD-1 — Guider jusqu’à la première livraison (pendant les pilotes)
 - OPS-FIAB — Fiabiliser les tâches de fond et l'exploitation (une commande, puis Claude)
@@ -87,7 +86,6 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Si tu relances un jour l'ancien projet Supabase `wlomrzil…` (en pause, plus utilisé) : change d'abord son mot de passe, exposé le 26 octobre.
 
 - E-mails « Run failed » de GitHub (7 novembre, CI-POLICES, fait) : la cause était le téléchargement des polices chez Google pendant le build ; les polices sont maintenant dans le dépôt. Revérifié le 8 novembre : tout vert ; les runs « cancelled » ne sont pas des erreurs (deux envois rapprochés). Rien à faire.
-- Nom « TutelLiv-GPT » (RENOMMER-DOSSIER, 8 novembre) : textes du dépôt et mémoire de Claude passés à « TutelLiv ». Reste le nom du dossier : quitter Cursor (Cmd+Q), ouvrir l'app Terminal et lancer le script donné par Claude le 8 novembre (si perdu : le redemander).
 
 **2. Claude — peut le faire seul, dans cet ordre**
 - AUDIT-0411 : corrections en ligne depuis le 5 novembre, vérifiées dans Chrome sur tutelliv.fr ; session de démo expirée corrigée le 6 novembre ; date prévue et « Prochaine livraison » côté client corrigées et vérifiées en ligne le 7 novembre ; écran du livreur sur téléphone allégé le 7 novembre (mission et boutons plus haut) ; pool de démo vérifié (aucune quarantaine) et recherche du client dans la nouvelle commande de l'administrateur le 7 novembre. Suite : statuts uniformes, console interne, mineurs.
@@ -107,16 +105,6 @@ Mise à jour : 29 octobre 2026, en fin de journée (revue de cohérence : matric
 ## Tâches ouvertes
 
 _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
-
-- [ ] **RENOMMER-DOSSIER — Ne plus afficher « TutelLiv-GPT », seulement « TutelLiv ».**
-
-  **Qui : Toi — lancer le script de renommage, Cursor fermé ; puis Claude vérifie.**
-
-  **Modèle conseillé : Claude Sonnet · effort faible.**
-
-  Fait le 8 novembre 2026 : chemins `~/Developer/TutelLiv-GPT` remplacés par `~/Developer/TutelLiv` dans les skills `tutelliv-orchestre` et `tutelliv-recette` et dans `docs/rapports/CLAUDE_STABILISATION_HANDOFF.md` ; capture de `tests/e2e/dispatch-incidents.spec.ts` écrite dans `test-results/` au lieu d'un dossier temporaire d'une ancienne session ; mémoire de Claude mise à jour. `git grep -i tutelliv-gpt` : 0 résultat. Le nom affiché par Cursor vient du dossier lui-même : un script (Cursor fermé) renomme le dossier, répare les worktrees Git (`git worktree repair`), déplace la mémoire de Claude, met à jour `~/.claude.json` (copie de sécurité gardée) et vide `.next`. Le dépôt GitHub s'appelle maintenant `orsocrtnt/tutelliv` (GitHub redirige l'ancienne adresse) ; le script met aussi à jour l'adresse locale `origin` (changement refusé à l'agent).
-
-  Terminé quand : le dossier s'appelle `~/Developer/TutelLiv`, Cursor l'ouvre sous ce nom, Claude retrouve sa mémoire, `git worktree list` est propre.
 
 - [ ] **ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire.**
 

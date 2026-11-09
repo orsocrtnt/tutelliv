@@ -4,7 +4,7 @@ Mis à jour : 26 octobre 2026. Plan validé : `~/.claude/plans/sprightly-petting
 
 ## Git au démarrage
 - Dossier d'origine : `~/Desktop/03 — Projets/TutelLiv/TutelLiv GPT` (Bureau synchronisé iCloud), **non modifié**.
-- Copie de travail : `~/Developer/TutelLiv`, branche `preproduction` à `dc99755`.
+- Copie de travail : `~/Developer/TutelLiv-GPT`, branche `preproduction` à `dc99755`.
 - 80 fichiers modifiés et 116 non suivis au démarrage, jamais commités (ADMIN-01, SaaS, Growth, migration `platform_access_events`…).
 - `origin/preproduction` a 8 commits de documentation en plus (conflit possible uniquement sur `docs/README.md`). Rien n'a été poussé.
 - Sauvegarde : `~/Developer/TutelLiv-backups/2026-10-26/` (`repo.bundle`, `worktree.patch`, `untracked.tgz`, `changed.sha256` avec 248 fichiers, `refonte-restore.patch`, `refonte-tests.tgz`).

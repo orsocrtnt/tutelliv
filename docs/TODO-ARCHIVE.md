@@ -2773,3 +2773,5 @@ Les tests distants d’augmentation des privilèges n’ont pas été autorisés
   Correction : les trois polices (WOFF2 variables, sous-ensemble latin, licence OFL) sont dans `src/fonts/` et chargées par `next/font/local` (`src/app/layout.tsx`, `src/app/(client-portal)/portal-font.ts`, `src/features/landing/growth-font.ts`) ; le build ne fait plus aucun appel réseau pour les polices. Garde-fou : test « polices hébergées dans le dépôt » (`tests/theme-tokens.test.ts`) qui échoue si un `next/font/google` revient dans `src/`.
 
   Vérifié : `npm run build` vert dans un worktree isolé avec les variables de la CI (aucune adresse Google dans le journal, 3 polices émises dans `.next/static/media`) ; `npm run check` vert (1 728 tests) ; `npm run docs:verify` vert. Rendu visuel : mêmes fichiers que ceux servis par Google (mêmes versions), non regardé dans le navigateur.
+
+- 9 novembre 2026 — RENOMMER-DOSSIER retirée à la demande du propriétaire (le nom du dossier lui est égal) : le dossier reste `~/Developer/TutelLiv-GPT` ; chemins des skills `tutelliv-orchestre` et `tutelliv-recette` et de `docs/rapports/CLAUDE_STABILISATION_HANDOFF.md` remis sur ce dossier.

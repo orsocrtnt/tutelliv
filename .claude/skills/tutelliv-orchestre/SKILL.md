@@ -151,7 +151,7 @@ Bloqué par le propriétaire ou par l'extérieur :
   - **après un compactage** (automatique dans le cloud) ou une reprise, il relit d'abord son rapport et `git log`, avant de continuer ;
   - **contexte léger** : sorties limitées (`| tail -40`, `grep -m`) ; gros fichiers et longs journaux délégués à un sous-agent `explorateur` ; `/compact` de lui-même entre deux grandes étapes (fin d'implémentation, avant le pré-vol) ;
   - **commandes longues** (`npm run check`, build) en arrière-plan avec attente, jamais coupées par le délai de 2 minutes.
-- **Agent local (repli)** : worktree imposé, pas de push ; environnement via `npx dotenv -e /Users/orso/Developer/TutelLiv/.env.local --` ; commandes lourdes via `outputs/suivi-agents/lourd.sh` ; Node 22.
+- **Agent local (repli)** : worktree imposé, pas de push ; environnement via `npx dotenv -e /Users/orso/Developer/TutelLiv-GPT/.env.local --` ; commandes lourdes via `outputs/suivi-agents/lourd.sh` ; Node 22.
 - Base tutelliv-dev uniquement ; ne jamais lire ni afficher de secret ; données préfixées `E2E`, nettoyées à la fin.
 - **Pré-vol adverse obligatoire** avant le rapport : un sous-agent tente de casser le travail sur les classes de défauts que Codex a trouvées tard :
   - entrelacements concurrents ;
@@ -216,7 +216,7 @@ Règles :
 | Contre-revue d'un agent arrivée après sa remise : verdict orphelin. | L'agent attend son pré-vol. |
 | Après une fusion : client Prisma périmé (erreurs de types) et dépendance manquante (`@anthropic-ai/sdk`). | Après chaque fusion : `npx prisma generate` ; `npm ci` si `package-lock.json` a changé, dans l'intégration **et** dans le dossier principal après l'avance rapide. |
 | `prisma format` a reformaté tout le schéma pendant la résolution d'un conflit. | Résoudre les conflits de schéma à la main ; jamais `prisma format` sur un fichier en conflit. |
-| `npm run build` a échoué sans environnement. | `npx dotenv -e /Users/orso/Developer/TutelLiv/.env.local -- npm run build`. |
+| `npm run build` a échoué sans environnement. | `npx dotenv -e /Users/orso/Developer/TutelLiv-GPT/.env.local -- npm run build`. |
 | Fichiers non suivis identiques qui bloquaient l'avance rapide du dossier principal. | Les comparer (`cmp`), les retirer s'ils sont identiques, puis `git merge --ff-only`. |
 | Node 20 en local alors que le projet exige Node 22. | `node -v` à l'étape 0 ; sinon préfixe `PATH=/opt/homebrew/opt/node@22/bin:$PATH` pour tous les agents. |
 | Le sandbox Codex interdit l'écoute réseau et Chrome : le test PERF-02 échoue en EPERM, et la recette navigateur est impossible. | Codex en lecture et en API seulement ; l'échec EPERM n'est pas un défaut du code. |
@@ -367,7 +367,7 @@ Constat chiffré : la suite de tests ne prend que **30 secondes**. Le temps part
 - la réflexion des agents entre deux commandes.
 
 Règles :
-1. **Pas de `npm ci` dans un worktree** si `package-lock.json` est identique à celui du dossier principal (`cmp`). Copier plutôt `node_modules` par clonage APFS, quasi instantané et sans espace disque en plus : `cp -c -R /Users/orso/Developer/TutelLiv/node_modules <worktree>/`, puis `npx prisma generate`. Même chose pour `.next/cache` avant un build.
+1. **Pas de `npm ci` dans un worktree** si `package-lock.json` est identique à celui du dossier principal (`cmp`). Copier plutôt `node_modules` par clonage APFS, quasi instantané et sans espace disque en plus : `cp -c -R /Users/orso/Developer/TutelLiv-GPT/node_modules <worktree>/`, puis `npx prisma generate`. Même chose pour `.next/cache` avant un build.
 2. **Vérification finale allégée** : chaque lot a déjà été relu, recetté et testé. À la fin, on vérifie seulement :
    - ce que la fusion a pu casser : check et build du résultat ;
    - un E2E de fumée, avec la non-régression minimale et les refus par rôle ;
