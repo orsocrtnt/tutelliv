@@ -43,10 +43,11 @@
 
 ## Vérifications
 - `npm run check` : types, lint sans cache et tests locaux sans accès aux services externes.
+- Changement mineur (texte, couleur, espacement, doc ; aucune logique ni donnée) : ne pas lancer `npm run check`, seulement les tests qui citent le fichier touché (décision du propriétaire du 9 novembre 2026 ; détail dans `.cursor/rules/tutelliv-quality-gate.mdc`).
 - `npm run build` : validation du build ; ne pas lancer en parallèle du serveur dev (cache `.next` partagé).
 - Le serveur n'est lancé que lorsque la demande inclut un lancement ou une validation locale. Ne pas arrêter un processus utilisateur.
 - Tester les parcours authentifiés uniquement avec un environnement et des comptes de développement identifiés.
-- Ne jamais valider une étape, cocher une case ou demander un push tant que la série n'est pas passée : cas demandés + états voisins (reprise, compte déjà confirmé, retour arrière), tests ciblés, `npm run check`, et clic réel navigateur si l'UI change. Allonger le travail plutôt que faire revenir le propriétaire. Détail : `.cursor/rules/tutelliv-quality-gate.mdc`.
+- Hors changement mineur, ne jamais valider une étape, cocher une case ou demander un push tant que la série n'est pas passée : cas demandés + états voisins (reprise, compte déjà confirmé, retour arrière), tests ciblés, `npm run check`, et clic réel navigateur si l'UI change. Allonger le travail plutôt que faire revenir le propriétaire. Détail : `.cursor/rules/tutelliv-quality-gate.mdc`.
 
 ## Données et publication
 - Ne pas afficher, versionner ou copier les secrets de `.env.local` dans les rapports/tests.

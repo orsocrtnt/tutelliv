@@ -11,7 +11,7 @@ Avant de dire qu'une étape est faite, allonger le travail plutôt que livrer un
 
 - Annoncer « c'est bon » après seulement un changement de code ou un test unitaire trop étroit.
 - Laisser l'utilisateur découvrir un cas évident (e-mail déjà confirmé, retour arrière, rechargement, double clic).
-- Cocher une tâche TODO ou demander un push si `npm run check` n'a pas passé, ou si le parcours demandé n'a pas été exercé.
+- Cocher une tâche TODO ou demander un push si `npm run check` n'a pas passé, ou si le parcours demandé n'a pas été exercé (sauf changement mineur, voir plus bas).
 
 ## Série obligatoire avant validation
 
@@ -20,6 +20,18 @@ Avant de dire qu'une étape est faite, allonger le travail plutôt que livrer un
 3. Lancer `npm run check` (types, lint, tests locaux). Relancer après chaque correction.
 4. Si l'écran ou le flux change : vérifier dans le navigateur Preview/local le clic réel, le retour arrière et le rechargement. Une lecture du JSX ne compte pas.
 5. Si le navigateur n'est pas disponible, le dire clairement et ne pas prétendre que l'UI est recettée.
+
+## Changement mineur : pas de test de tout le logiciel
+
+Décidé par le propriétaire le 9 novembre 2026. **Mineur** = seulement du texte (libellé, phrase, signature), une couleur, un espacement, un ordre d'affichage, ou de la documentation. Aucune condition, aucun calcul, aucune donnée, rien sur la connexion, les droits ou la sécurité.
+
+Pour un changement mineur, ne pas lancer `npm run check` ni la suite complète :
+1. Lancer seulement les tests qui citent le fichier touché : `node --import tsx --test $(grep -l "<nom-du-fichier>" tests/*.test.ts)` (aucun test trouvé : rien à lancer).
+2. Si un écran change : un seul coup d'œil navigateur, pas de série multi-navigateurs.
+3. Pour de la doc seule : `npm run docs:verify`.
+4. Commit et push ensuite ; le build de la CI et de Vercel vérifie encore les types au push.
+
+Dès qu'il y a un doute sur « mineur », ce n'est pas mineur : série complète ci-dessus.
 
 ## Compte rendu
 
