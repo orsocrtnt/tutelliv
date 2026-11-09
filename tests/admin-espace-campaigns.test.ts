@@ -20,9 +20,13 @@ import {
   prospectCampaignCode,
   prospectLinkBaseUrl,
   prospectRepliesSchema,
+  PROSPECT_REMOVABLE_STATUSES,
+  previewProspectEmail,
   prospectReleaseSchema,
+  prospectRemoveRecipientSchema,
   prospectSendSchema,
   purgeExpiredProspectRecipients,
+  removeProspectRecipient,
   sendNextProspectEmail,
   sendProspectTestEmail,
   type ProspectSendRepository,
@@ -205,6 +209,66 @@ test("lot 5 : essai envoyé à l'admin, liens au code « test », campagne incha
   assert.equal(sent[0]!.html.includes("il-en-est-ou-paris"), false);
   assert.equal(state.queue.length, 1);
   assert.deepEqual(state.finished, []);
+});
+
+test("aperçu : le mail de la campagne, logo intégré, liens d'essai ouverts dans un nouvel onglet", async () => {
+  const state: FakeState = { queue: [{ id: "r1", email: "a@exemple.fr" }], optOuts: new Set(), finished: [] };
+  const preview = await previewProspectEmail("c1", "https://tutelliv.fr", { repository: fakeRepository(state) });
+  assert.ok(preview);
+  assert.equal(preview.from, "Orso — TutelLiv <orso@tutelliv.fr>");
+  assert.equal(preview.subject, "Il en est où ?");
+  assert.equal(preview.preheader, PROSPECT_PREHEADER);
+  assert.ok(preview.html.includes("coursiers de Paris"));
+  assert.ok(preview.html.includes("Adresse trouvée sur Google Maps"));
+  assert.ok(preview.html.includes(`data:image/png;base64,${PROSPECT_LOGO_PNG_BASE64}`));
+  assert.equal(preview.html.includes("cid:"), false);
+  assert.ok(preview.html.includes('<base target="_blank">'));
+  assert.ok(preview.html.includes(`/go/${PROSPECT_TEST_CODE}/rejoindre`));
+  assert.equal(preview.html.includes("il-en-est-ou-paris"), false);
+  assert.equal(preview.html.includes("<script"), false);
+  assert.equal(state.queue.length, 1);
+  assert.equal(await previewProspectEmail("inconnue", "https://tutelliv.fr", { repository: fakeRepository(state) }), null);
+  // Le mail réellement envoyé garde le logo en pièce jointe.
+  const sentHtml = renderProspectEmail({ city: "Paris", linkCode: "x", addressSource: "Google Maps", baseUrl: "https://tutelliv.fr" }).html;
+  assert.ok(sentHtml.includes(`cid:${PROSPECT_LOGO_CID}`));
+});
+
+test("retrait d'une adresse : seulement si le mail n'est pas parti ; envoyé ou en cours = refusé", async () => {
+  type Row = { id: string; campaignId: string; status: string };
+  const rows: Row[] = [
+    { id: "p", campaignId: "c1", status: "PENDING" },
+    { id: "f", campaignId: "c1", status: "FAILED" },
+    { id: "k", campaignId: "c1", status: "SKIPPED" },
+    { id: "s", campaignId: "c1", status: "SENT" },
+    { id: "e", campaignId: "c1", status: "SENDING" },
+    { id: "autre", campaignId: "c2", status: "PENDING" },
+  ];
+  type Where = { id: string; campaignId: string; status?: { in: string[] } };
+  const match = (row: Row, where: Where) =>
+    row.id === where.id && row.campaignId === where.campaignId && (!where.status || where.status.in.includes(row.status));
+  const db = {
+    prospectCampaignRecipient: {
+      deleteMany: async ({ where }: { where: Where }) => {
+        const before = rows.length;
+        for (let i = rows.length - 1; i >= 0; i -= 1) if (match(rows[i]!, where)) rows.splice(i, 1);
+        return { count: before - rows.length };
+      },
+      findFirst: async ({ where }: { where: Where }) => rows.find((row) => match(row, where)) ?? null,
+    },
+  } as never;
+  assert.deepEqual([...PROSPECT_REMOVABLE_STATUSES].sort(), ["FAILED", "PENDING", "SKIPPED"]);
+  assert.equal(await removeProspectRecipient("c1", "p", db), "removed");
+  assert.equal(await removeProspectRecipient("c1", "f", db), "removed");
+  assert.equal(await removeProspectRecipient("c1", "k", db), "removed");
+  assert.equal(await removeProspectRecipient("c1", "s", db), "locked");
+  assert.equal(await removeProspectRecipient("c1", "e", db), "locked");
+  assert.equal(await removeProspectRecipient("c1", "p", db), "not_found");
+  // Une adresse d'une autre campagne n'est jamais touchée.
+  assert.equal(await removeProspectRecipient("c1", "autre", db), "not_found");
+  assert.deepEqual(rows.map((row) => row.id), ["s", "e", "autre"]);
+  assert.equal(prospectRemoveRecipientSchema.safeParse({ recipientId: "p" }).success, true);
+  assert.equal(prospectRemoveRecipientSchema.safeParse({ recipientId: "" }).success, false);
+  assert.equal(prospectRemoveRecipientSchema.safeParse({ recipientId: "p", extra: 1 }).success, false);
 });
 
 test("lot 5 : clics des mails comptés par la page d'arrivée, hors robots, sans code ou au-delà du plafond", async () => {

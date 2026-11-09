@@ -58,7 +58,7 @@ const PLATFORM_WRITES: Record<string, string[]> = {
   // ADMIN-ESPACE lot 5 : campagnes de prospection du propriétaire (données de la plateforme).
   "src/app/api/admin/campaigns/route.ts": ["GET", "POST"],
   "src/app/api/admin/campaigns/[id]/route.ts": ["GET", "PATCH", "DELETE"],
-  "src/app/api/admin/campaigns/[id]/recipients/route.ts": ["POST", "PATCH"],
+  "src/app/api/admin/campaigns/[id]/recipients/route.ts": ["POST", "PATCH", "DELETE"],
   "src/app/api/admin/campaigns/[id]/send/route.ts": ["POST"],
   "src/app/api/admin/campaigns/opt-outs/route.ts": ["POST"],
 };
@@ -67,6 +67,7 @@ test("ADMIN-1 impersonation : les routes plateforme n'exportent que GET, hors co
   const routes = filesUnder("src/app/api/admin").filter((file) => file.endsWith("route.ts"));
   assert.deepEqual(routes, [
     "src/app/api/admin/access-events/route.ts",
+    "src/app/api/admin/campaigns/[id]/preview/route.ts",
     "src/app/api/admin/campaigns/[id]/recipients/route.ts",
     "src/app/api/admin/campaigns/[id]/route.ts",
     "src/app/api/admin/campaigns/[id]/send/route.ts",

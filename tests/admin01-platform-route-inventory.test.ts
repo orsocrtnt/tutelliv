@@ -5,6 +5,7 @@ import test from "node:test";
 
 const expected = [
   "access-events/route.ts",
+  "campaigns/[id]/preview/route.ts",
   "campaigns/[id]/recipients/route.ts",
   "campaigns/[id]/route.ts",
   "campaigns/[id]/send/route.ts",

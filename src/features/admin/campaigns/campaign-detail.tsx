@@ -2,10 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Pause, Play, Send, Trash2, Undo2 } from "lucide-react";
+import { AlertTriangle, Pause, Play, Send, Trash2, Undo2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { addAdminCampaignAddresses, deleteAdminCampaign, releaseAdminCampaignSetAside, sendAdminCampaignNext, sendAdminCampaignTest } from "@/features/admin/api";
-import { useAdminCampaign } from "@/features/admin/hooks";
+import {
+  addAdminCampaignAddresses,
+  deleteAdminCampaign,
+  releaseAdminCampaignSetAside,
+  removeAdminCampaignRecipient,
+  sendAdminCampaignNext,
+  sendAdminCampaignTest,
+} from "@/features/admin/api";
+import { useAdminCampaign, useAdminCampaignPreview } from "@/features/admin/hooks";
 import { HomeCard } from "@/features/admin/home/home-card";
 import { RECIPIENT_STATUS_LABELS, formatCampaignRate } from "@/features/admin/campaigns/campaign-labels";
 import { cn } from "@/lib/utils";
@@ -97,6 +104,78 @@ function AddAddresses({ id }: { id: string }) {
         {mutation.isError && <p role="alert" className="text-sm text-destructive">{mutation.error.message}</p>}
       </div>
     </form>
+  );
+}
+
+/** Le mail tel qu'il partira (ville et provenance de la campagne), affiché dans la page avant l'envoi. */
+function EmailPreview({ id }: { id: string }) {
+  const { data, error } = useAdminCampaignPreview(id);
+  const [height, setHeight] = useState(900);
+  return (
+    <details open className="rounded-2xl border border-border bg-background">
+      <summary className="cursor-pointer select-none p-4 font-semibold text-foreground">Aperçu du mail</summary>
+      <div className="space-y-3 px-4 pb-4">
+        {error && <p role="alert" className="text-sm text-destructive">{error.message}</p>}
+        {!data && !error && <p className="text-sm text-muted-foreground" aria-busy="true">Chargement de l&apos;aperçu…</p>}
+        {data && (
+          <>
+            <dl className="grid gap-1 rounded-xl border border-border bg-card p-3 text-sm">
+              <div className="flex gap-2">
+                <dt className="w-16 shrink-0 text-muted-foreground">De</dt>
+                <dd className="min-w-0 break-all text-foreground">{data.from}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="w-16 shrink-0 text-muted-foreground">Objet</dt>
+                <dd className="min-w-0 font-semibold text-foreground">{data.subject}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="w-16 shrink-0 text-muted-foreground">Aperçu</dt>
+                <dd className="min-w-0 text-muted-foreground">{data.preheader}</dd>
+              </div>
+            </dl>
+            <iframe
+              title="Aperçu du mail"
+              srcDoc={data.html}
+              sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+              className="w-full rounded-xl border border-border"
+              style={{ height }}
+              onLoad={(event) => {
+                const doc = event.currentTarget.contentDocument;
+                if (doc) setHeight(doc.documentElement.scrollHeight + 2);
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              Liens d&apos;essai : un clic ici n&apos;est pas compté. Le rendu peut varier un peu selon la messagerie.
+            </p>
+          </>
+        )}
+      </div>
+    </details>
+  );
+}
+
+/** Retire une adresse avant son envoi ; le serveur refuse si le mail est déjà parti ou en cours. */
+function RemoveRecipient({ campaignId, recipientId, email }: { campaignId: string; recipientId: string; email: string }) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: () => removeAdminCampaignRecipient(campaignId, recipientId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "campaigns"] }),
+  });
+  return (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        aria-label={`Retirer ${email}`}
+        disabled={mutation.isPending}
+        aria-busy={mutation.isPending}
+        onClick={() => mutation.mutate()}
+      >
+        <X /> Retirer
+      </Button>
+      {mutation.isError && <p role="alert" className="mt-1 text-xs text-destructive">{mutation.error.message}</p>}
+    </>
   );
 }
 
@@ -250,6 +329,8 @@ export function CampaignDetail({
 
       <Stats campaign={campaign} />
 
+      <EmailPreview id={id} />
+
       <div className="space-y-3 rounded-2xl border border-border bg-background p-4">
         <h3 className="font-semibold text-foreground">Envoyer</h3>
         <p className="text-sm text-muted-foreground">
@@ -315,6 +396,7 @@ export function CampaignDetail({
                   <th className="px-3 py-2 font-semibold">Adresse</th>
                   <th className="px-3 py-2 font-semibold">État</th>
                   <th className="px-3 py-2 font-semibold">Envoyé le</th>
+                  <th className="px-3 py-2 font-semibold"><span className="sr-only">Retirer</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -343,6 +425,11 @@ export function CampaignDetail({
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {recipient.sentAt ? timeFormat.format(new Date(recipient.sentAt)) : "—"}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {recipient.status !== "SENT" && recipient.status !== "SENDING" && (
+                        <RemoveRecipient campaignId={id} recipientId={recipient.id} email={recipient.email} />
+                      )}
                     </td>
                   </tr>
                   );

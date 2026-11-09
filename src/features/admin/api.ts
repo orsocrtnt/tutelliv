@@ -20,6 +20,7 @@ import type {
   AddAddressesResult,
   ProspectCampaignDetail,
   ProspectCampaignList,
+  ProspectEmailPreview,
   ProspectSendResult,
 } from "@/domains/growth/prospect/prospect-campaign.service";
 
@@ -378,7 +379,7 @@ export function addAdminPilotNote(id: string, body: string) {
 
 /* ---------- Campagnes de prospection (ADMIN-ESPACE lot 5) ---------- */
 
-async function sendJson<T>(url: string, method: "POST" | "PATCH", body: unknown): Promise<T> {
+async function sendJson<T>(url: string, method: "POST" | "PATCH" | "DELETE", body: unknown): Promise<T> {
   const res = await fetch(url, {
     method,
     cache: "no-store",
@@ -404,6 +405,15 @@ export function createAdminCampaign(input: { name: string; city: string; address
 
 export function addAdminCampaignAddresses(id: string, addresses: string) {
   return sendJson<AddAddressesResult>(`/api/admin/campaigns/${encodeURIComponent(id)}/recipients`, "POST", { addresses });
+}
+
+export async function fetchAdminCampaignPreview(id: string): Promise<ProspectEmailPreview> {
+  const res = await fetch(`/api/admin/campaigns/${encodeURIComponent(id)}/preview`, { cache: "no-store" });
+  return readJson<ProspectEmailPreview>(res);
+}
+
+export function removeAdminCampaignRecipient(id: string, recipientId: string) {
+  return sendJson<{ removed: true }>(`/api/admin/campaigns/${encodeURIComponent(id)}/recipients`, "DELETE", { recipientId });
 }
 
 export function releaseAdminCampaignSetAside(id: string) {

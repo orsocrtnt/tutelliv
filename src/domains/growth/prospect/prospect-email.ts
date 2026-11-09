@@ -61,6 +61,18 @@ function stepRow(step: (typeof STEPS)[number], index: number) {
   return `<tr><td style="padding:${padding}"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0${border}"><tr><td width="48" style="padding:14px 0;vertical-align:middle"><span style="display:inline-block;background:#ffffff;border:1px solid #dfe8e1;border-radius:12px;width:36px;line-height:36px;text-align:center;font-size:17px">${step.icon}</span></td><td style="padding:14px 0;font:600 15px Arial;color:#0e1310">${step.title}<br><span style="display:inline-block;padding-top:4px;font:13px Arial;color:#68726b">${escapeHtml(step.detail)}</span></td></tr></table></td></tr>`;
 }
 
+/**
+ * Aperçu dans la page Campagnes : le logo joint (`cid:`) devient une image intégrée et les liens s'ouvrent
+ * dans un nouvel onglet. Le mail envoyé, lui, garde le logo en pièce jointe.
+ */
+export function prospectEmailPreviewHtml(email: Pick<ProspectEmail, "html" | "attachments">): string {
+  let html = email.html;
+  for (const attachment of email.attachments) {
+    html = html.split(`cid:${attachment.cid}`).join(`data:${attachment.contentType};base64,${attachment.content.toString("base64")}`);
+  }
+  return html.replace("<head>", '<head>\n<base target="_blank">');
+}
+
 export function renderProspectEmail(input: ProspectEmailInput): ProspectEmail {
   const city = escapeHtml(input.city);
   const source = escapeHtml(input.addressSource);

@@ -16,6 +16,7 @@ import {
   fetchAdminHome,
   fetchAdminHomeBadges,
   fetchAdminCampaign,
+  fetchAdminCampaignPreview,
   fetchAdminCampaigns,
   fetchAdminWaitlist,
   fetchAdminWaitlistFunnel,
@@ -213,6 +214,15 @@ export function useAdminCampaign(id: string | null) {
     queryKey: ["admin", "campaigns", id],
     queryFn: () => fetchAdminCampaign(id!),
     enabled: Boolean(id),
+    staleTime: QUERY_STALE_MS,
+  });
+}
+
+/** Aperçu du mail d'une campagne ; clé hors ["admin", "campaigns"] pour ne pas le recharger à chaque envoi. */
+export function useAdminCampaignPreview(id: string) {
+  return useQuery({
+    queryKey: ["admin", "campaign-preview", id],
+    queryFn: () => fetchAdminCampaignPreview(id),
     staleTime: QUERY_STALE_MS,
   });
 }

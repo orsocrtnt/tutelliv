@@ -2,7 +2,13 @@ import { resolveMx } from "node:dns/promises";
 import { z } from "zod";
 import { prisma } from "@/services/prisma/client";
 import { FUNNEL_CAMPAIGN_PATTERN, funnelRate } from "@/domains/growth/waitlist-funnel.service";
-import { renderProspectEmail } from "@/domains/growth/prospect/prospect-email";
+import {
+  PROSPECT_PREHEADER,
+  PROSPECT_SENDER_ADDRESS,
+  PROSPECT_SENDER_NAME,
+  prospectEmailPreviewHtml,
+  renderProspectEmail,
+} from "@/domains/growth/prospect/prospect-email";
 import {
   PROSPECT_SET_ASIDE_PREFIX,
   findStrictProviders,
@@ -47,6 +53,7 @@ export const prospectAddressesSchema = z.object({ addresses: z.string().max(60_0
 export const prospectRepliesSchema = z.object({ delta: z.union([z.literal(1), z.literal(-1)]) }).strict();
 export const prospectSendSchema = z.object({ mode: z.enum(["next", "test"]) }).strict();
 export const prospectReleaseSchema = z.object({ action: z.literal("release_set_aside") }).strict();
+export const prospectRemoveRecipientSchema = z.object({ recipientId: z.string().min(1).max(64) }).strict();
 
 /* ---------- Fonctions pures ---------- */
 
@@ -351,6 +358,26 @@ export async function releaseSetAsideRecipients(campaignId: string): Promise<{ s
   return { status: "ok", released: released.count };
 }
 
+/** Adresses qu'on peut retirer d'une campagne : jamais parties. Un mail envoyé reste (chiffres), un envoi en cours aussi. */
+export const PROSPECT_REMOVABLE_STATUSES: readonly ProspectRecipientStatus[] = ["PENDING", "FAILED", "SKIPPED"];
+
+/**
+ * Retire une adresse avant l'envoi. La condition de statut est dans la suppression elle-même : si l'envoi
+ * vient de la réserver, rien n'est supprimé et la réponse est « locked ». Les adresses STOP restent bloquées.
+ */
+export async function removeProspectRecipient(
+  campaignId: string,
+  recipientId: string,
+  db: Pick<typeof prisma, "prospectCampaignRecipient"> = prisma
+): Promise<"removed" | "not_found" | "locked"> {
+  const deleted = await db.prospectCampaignRecipient.deleteMany({
+    where: { id: recipientId, campaignId, status: { in: [...PROSPECT_REMOVABLE_STATUSES] } },
+  });
+  if (deleted.count > 0) return "removed";
+  const existing = await db.prospectCampaignRecipient.findFirst({ where: { id: recipientId, campaignId }, select: { id: true } });
+  return existing ? "locked" : "not_found";
+}
+
 /** Adresses STOP : enregistrées pour toujours ; leurs envois encore en attente sont annulés. */
 export async function addProspectOptOuts(
   text: string,
@@ -545,6 +572,26 @@ export async function sendProspectTestEmail(
   } catch (error) {
     return { status: "failed", detail: describeMailerError(error) };
   }
+}
+
+export type ProspectEmailPreview = { from: string; subject: string; preheader: string; html: string };
+
+/** Aperçu du mail tel qu'il partira pour cette campagne (ville, provenance) ; liens au code « test », rien n'est compté. */
+export async function previewProspectEmail(
+  campaignId: string,
+  baseUrl: string,
+  deps: { repository?: Pick<ProspectSendRepository, "findCampaign"> } = {}
+): Promise<ProspectEmailPreview | null> {
+  const repository = deps.repository ?? createPrismaProspectSendRepository();
+  const campaign = await repository.findCampaign(campaignId);
+  if (!campaign) return null;
+  const email = renderProspectEmail({ city: campaign.city, linkCode: PROSPECT_TEST_CODE, addressSource: campaign.addressSource, baseUrl });
+  return {
+    from: `${PROSPECT_SENDER_NAME} <${PROSPECT_SENDER_ADDRESS}>`,
+    subject: email.subject,
+    preheader: PROSPECT_PREHEADER,
+    html: prospectEmailPreviewHtml(email),
+  };
 }
 
 /** Origine des liens : `PROSPECT_LINK_BASE_URL` si défini, sinon l'adresse par laquelle le super-admin travaille. */
