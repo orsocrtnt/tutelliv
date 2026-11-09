@@ -78,7 +78,7 @@ test("lot 5 : mail fidèle au modèle validé, liens comptés, logo joint, pas d
   assert.ok(email.html.includes("https://tutelliv.fr/go/il-en-est-ou-paris/site"));
   assert.ok(email.html.includes(`src="cid:${PROSPECT_LOGO_CID}"`));
   assert.ok(email.html.includes("BIENTÔT À PARIS"));
-  assert.ok(email.html.includes("Carotenuto-Marchetti Orso"));
+  assert.ok(email.html.includes("Orso Carotenuto-Marchetti"));
   assert.ok(email.html.includes("répondez STOP"));
   assert.ok(email.html.includes("Google Maps &lt;script&gt;"), "origine échappée");
   assert.equal(email.html.includes("«"), false, "aucun guillemet français demandé par le propriétaire");

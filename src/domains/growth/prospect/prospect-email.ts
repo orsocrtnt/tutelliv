@@ -94,7 +94,7 @@ ${STEPS.map(stepRow).join("\n")}
 <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#4f5953">Envie d'être parmi les premiers informés ?</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px"><tr><td style="border-radius:999px;background:#0e1310"><a href="${escapeHtml(links.join)}" style="display:inline-block;padding:15px 26px;font-family:${FONT};font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px">Je veux en être</a></td></tr></table>
 <p style="margin:0 0 26px;font-size:13px;line-height:1.5;color:#68726b">Ou découvrez TutelLiv sur <a href="${escapeHtml(links.site)}" style="color:#08783f;text-decoration:underline">tutelliv.fr</a></p>
-<p style="margin:0;font-size:15px;line-height:1.6;color:#0e1310"><strong>Carotenuto-Marchetti Orso</strong><br><span style="color:#68726b;font-size:13px">Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS}</span></p>
+<p style="margin:0;font-size:15px;line-height:1.6;color:#0e1310"><strong>Orso Carotenuto-Marchetti</strong><br><span style="color:#68726b;font-size:13px">Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS}</span></p>
 </td></tr>
 </table>
 </td></tr>
@@ -121,7 +121,7 @@ ${STEPS.map(stepRow).join("\n")}
     `Envie d'être parmi les premiers informés ? Je veux en être : ${links.join}`,
     `Découvrir TutelLiv : ${links.site}`,
     "",
-    "Carotenuto-Marchetti Orso",
+    "Orso Carotenuto-Marchetti",
     `Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS}`,
     "",
     "--",
