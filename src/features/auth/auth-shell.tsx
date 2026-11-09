@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { sora } from "@/app/(client-portal)/portal-font";
+import { growthFont } from "@/features/landing/growth-font";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { PublicSupportLink } from "@/features/support/public-support-link";
@@ -19,8 +19,8 @@ const legalLink =
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${sora.variable} flex min-h-dvh flex-col bg-background text-foreground`}
-      style={{ fontFamily: "var(--font-sora), ui-sans-serif, system-ui, sans-serif" }}
+      className={`${growthFont.variable} flex min-h-dvh flex-col bg-background text-foreground`}
+      style={{ fontFamily: "var(--font-growth), ui-sans-serif, system-ui, sans-serif" }}
     >
       <header className="mx-auto flex w-full max-w-[1180px] items-center justify-between gap-3 px-4 py-3">
         <Link

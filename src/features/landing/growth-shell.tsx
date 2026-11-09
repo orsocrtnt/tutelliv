@@ -33,17 +33,19 @@ export function GrowthShell({
         <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <p className="font-bold tracking-tight">{APP_NAME}</p>
-            <p className="mt-1 text-sm text-muted-foreground">Pilotage des livraisons B2B.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Pilotage des livraisons B2B</p>
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#506070] dark:text-text-secondary">
-            <Link href="/" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Accueil</Link>
-            <Link href="/contact" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Demander un pilote</Link>
-            <Link href="/login/client" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Espace client</Link>
-            <Link href="/login/driver" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Espace livreur</Link>
+          {/* Mêmes liens que le pied de page de l'accueil (AUDIT-0411). */}
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#506070] dark:text-text-secondary">
+            <Link href="/fonctionnalites" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Fonctionnalités</Link>
+            <Link href="/tarifs" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Tarifs</Link>
             <Link href="/contact" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Contact</Link>
+            <Link href="/login?espace=entreprise" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Entreprise</Link>
+            <Link href="/login/client" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Client</Link>
+            <Link href="/login/driver" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Livreur</Link>
             <Link href="/mentions-legales" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Mentions légales</Link>
             <Link href="/confidentialite" className="hover:text-[#243447] dark:hover:text-foreground hover:underline hover:underline-offset-4 max-md:inline-flex max-md:min-h-11 max-md:min-w-11 max-md:items-center">Confidentialité</Link>
-          </div>
+          </nav>
         </div>
       </footer>
     </div>

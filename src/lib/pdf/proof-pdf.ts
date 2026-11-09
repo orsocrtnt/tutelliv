@@ -57,6 +57,11 @@ export function pdfSafeText(value: string): string {
     .join("");
 }
 
+/** « 48,86244° N » : virgule française et sens, au lieu des coordonnées brutes. */
+function gpsCoordinate(value: number, positive: string, negative: string): string {
+  return `${Math.abs(value).toFixed(5).replace(".", ",")}° ${value >= 0 ? positive : negative}`;
+}
+
 function dateTime(value: Date | null | undefined): string {
   if (!value || Number.isNaN(value.getTime())) return "Non renseigné";
   return `${value.toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "medium", timeZone: "Europe/Paris" })} (heure de Paris)`;
@@ -168,7 +173,8 @@ export async function buildProofPdf(data: ProofPdfData): Promise<Uint8Array> {
     const { latitude, longitude, at } = data.position;
     field(
       "Dernière position connue du livreur",
-      `${latitude.toFixed(5)}, ${longitude.toFixed(5)}${at ? ` - relevée le ${dateTime(at)}` : ""}`
+      // Coordonnées à la française, avec leur sens (AUDIT-0411, PDF de preuve).
+      `${gpsCoordinate(latitude, "N", "S")}, ${gpsCoordinate(longitude, "E", "O")}${at ? `, relevée le ${dateTime(at)}` : ""}`
     );
   }
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { InboundEmailItem, IntakeChannelAction, IntakeChannels } from "./order-intake-api";
 import { useCloseInboundEmail, useInboundEmails, useIntakeChannels, useUpdateIntakeChannel } from "./order-intake-hooks";
+import { formatPhoneDisplay } from "@/lib/format/phone";
 
 function ChannelRow({ testId, title, description, value, enabled, disabledReason, onAction, pending, canRotate = true }: {
   testId: string;
@@ -64,7 +65,7 @@ function WhatsAppTeam({ team }: { team: NonNullable<IntakeChannels["whatsappTeam
           <li key={`${member.name}-${index}`} className="flex flex-wrap justify-between gap-2">
             <span>{member.name}</span>
             {member.phone
-              ? <span className="font-mono text-xs">{member.phone}</span>
+              ? <span className="text-xs tabular-nums">{formatPhoneDisplay(member.phone)}</span>
               : <span className="text-xs text-warning">Aucun numéro : à ajouter dans son profil</span>}
           </li>
         ))}

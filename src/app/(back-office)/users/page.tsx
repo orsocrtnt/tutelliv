@@ -85,7 +85,7 @@ export default function UsersPage() {
     },
     {
       key: "email",
-      header: "Email",
+      header: "E-mail",
       sortable: true,
       hideOnMobile: true,
       className: USER_TABLE_COL.email,

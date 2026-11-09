@@ -73,7 +73,7 @@ export default function ClientSupportPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Support</h1>
         <p className="mt-1 text-muted-foreground max-md:hidden">
-          Contactez votre administrateur ou votre livreur selon votre livraison
+          Contactez votre transporteur ou votre livreur selon votre livraison
         </p>
       </div>
 
@@ -211,7 +211,7 @@ export default function ClientSupportPage() {
             )}
 
             <FormField label="Sujet" error={form.formState.errors.subject?.message} required>
-              <Input placeholder="Ex: Problème de livraison" {...form.register("subject")} />
+              <Input placeholder="Ex. : problème de livraison" {...form.register("subject")} />
             </FormField>
             <FormField label="Message" error={form.formState.errors.message?.message} required>
               <textarea

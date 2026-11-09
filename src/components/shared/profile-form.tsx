@@ -68,7 +68,7 @@ export function ProfileForm({
               <Input {...form.register("lastName")} />
             </FormField>
           </div>
-          <FormField label="Email" hint="L'email ne peut pas être modifié ici">
+          <FormField label="E-mail" hint="L’e-mail ne peut pas être modifié ici">
             <Input value={user?.email ?? ""} disabled />
           </FormField>
           <FormField label="Téléphone" error={form.formState.errors.phone?.message}>

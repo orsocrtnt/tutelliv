@@ -299,7 +299,7 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
           {isInvitedUser && mode === "login" && (
             <Alert variant="info" className="mt-5">
               <AlertDescription>
-                La création de compte est réservée à votre administrateur. Utilisez votre e-mail et le mot de passe choisi lors de votre invitation.
+                Votre compte est créé par l’entreprise de livraison qui vous invite. Utilisez votre e-mail et le mot de passe choisi lors de votre invitation.
               </AlertDescription>
             </Alert>
           )}
@@ -325,7 +325,7 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
               <Suspense fallback={null}>
                 <LoginEmailPrefill form={loginForm} />
               </Suspense>
-              <FormField label="Email" error={loginForm.formState.errors.email?.message} required>
+              <FormField label="E-mail" error={loginForm.formState.errors.email?.message} required>
                 <Input
                   type="email"
                   autoComplete="email"
@@ -384,7 +384,7 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
                   <Input placeholder="Dupont" {...registerForm.register("lastName")} />
                 </FormField>
               </div>
-              <FormField label="Email" error={registerForm.formState.errors.email?.message} required>
+              <FormField label="E-mail" error={registerForm.formState.errors.email?.message} required>
                 <Input type="email" autoComplete="email" placeholder="vous@entreprise.fr" {...registerForm.register("email")} />
               </FormField>
               <FormField label="Entreprise" hint="Optionnel">
@@ -410,7 +410,7 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
 
           {mode === "forgot-password" && (
             <form onSubmit={forgotForm.handleSubmit(onForgotPassword)} className="mt-8 space-y-5">
-              <FormField label="Email" error={forgotForm.formState.errors.email?.message} required>
+              <FormField label="E-mail" error={forgotForm.formState.errors.email?.message} required>
                 <Input type="email" placeholder="vous@entreprise.fr" {...forgotForm.register("email")} />
               </FormField>
               <Button type="submit" variant="brand" size="lg" className="w-full" loading={forgotForm.formState.isSubmitting}>

@@ -114,7 +114,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={state.kind === "sending"}
-        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#243447] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_30px_rgba(36,52,71,0.18)] transition hover:bg-[#182535] disabled:cursor-wait disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3d5a73] focus-visible:ring-offset-2"
+        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-sm transition hover:bg-primary-hover disabled:cursor-wait disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <Send className="h-4 w-4" aria-hidden />
         {state.kind === "sending" ? "Envoi…" : "Envoyer"}

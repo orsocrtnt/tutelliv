@@ -26,6 +26,9 @@ const TABS: { key: BillingTab; label: string; icon: typeof Bike }[] = [
   { key: "general", label: "Factures", icon: FileText },
 ];
 
+const euroFormat = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
+const euro = (value: number) => euroFormat.format(value);
+
 function parseNumber(value: string) {
   const parsed = parseFloat(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -176,10 +179,10 @@ function CourierPricingSection({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-semibold">{previewEstimate.toFixed(2)} € HT</p>
+          <p className="text-2xl font-semibold">{euro(previewEstimate)} HT</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            max({courier.minimumPrice.toFixed(2)} €, {courier.basePrice.toFixed(2)} € +{" "}
-            {courier.pricePerKm.toFixed(2)} €/km × distance)
+            max({euro(courier.minimumPrice)}, {euro(courier.basePrice)} +{" "}
+            {euro(courier.pricePerKm)}/km × distance)
           </p>
         </CardContent>
       </Card>

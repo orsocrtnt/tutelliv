@@ -1,14 +1,14 @@
 import { z } from "zod";
 
+// Connexion : on ne rappelle pas la règle des 8 caractères, elle ne sert qu'à la création (AUDIT-0411).
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, "L'email est requis")
-    .email("Format d'email invalide"),
+    .min(1, "L’e-mail est requis")
+    .email("Format d’e-mail invalide"),
   password: z
     .string()
-    .min(1, "Le mot de passe est requis")
-    .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    .min(1, "Le mot de passe est requis"),
 });
 
 export const registerSchema = z
@@ -23,8 +23,8 @@ export const registerSchema = z
       .min(2, "Le nom doit contenir au moins 2 caractères"),
     email: z
       .string()
-      .min(1, "L'email est requis")
-      .email("Format d'email invalide"),
+      .min(1, "L’e-mail est requis")
+      .email("Format d’e-mail invalide"),
     password: z
       .string()
       .min(8, "Le mot de passe doit contenir au moins 8 caractères")
@@ -43,8 +43,8 @@ export const registerSchema = z
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .min(1, "L'email est requis")
-    .email("Format d'email invalide"),
+    .min(1, "L’e-mail est requis")
+    .email("Format d’e-mail invalide"),
 });
 
 export const resetPasswordSchema = z

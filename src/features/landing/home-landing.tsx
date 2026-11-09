@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { growthFont } from "@/features/landing/growth-font";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { APP_NAME } from "@/lib/constants";
 import { PublicTopNavbar } from "@/features/landing/public-top-navbar";
@@ -19,8 +20,9 @@ const footerLink =
   "inline-flex min-h-11 items-center rounded-md px-1.5 text-[var(--l-mute)] hover:text-[var(--l-ink)] hover:underline hover:underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export function HomeLanding() {
+  // Même police que les pages publiques et la connexion (AUDIT-0411 : un seul style de site).
   return (
-    <div className="landing min-h-screen font-sans">
+    <div className={`landing min-h-screen ${growthFont.className}`}>
       <PublicTopNavbar />
 
       <main id="main-content" tabIndex={-1} className="focus:outline-none">

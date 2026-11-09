@@ -42,7 +42,7 @@ const base: ProofPdfData = {
 
 test("PDF livré : référence, donneur d'ordre, adresses, horodatages, position et réceptionnaire", async () => {
   const { text, doc } = await pdfText(await buildProofPdf(base));
-  for (const expected of ["LIV-2026-0042", "Alice Donneur", "1 rue A", "2 rue B", "Prise en charge", "Mme Martin", "45.76000, 4.83000", "Express Test", "Non recueillie"]) {
+  for (const expected of ["LIV-2026-0042", "Alice Donneur", "1 rue A", "2 rue B", "Prise en charge", "Mme Martin", "45,76000° N, 4,83000° E", "Express Test", "Non recueillie"]) {
     assert.ok(text.includes(expected), `absent du PDF : ${expected}`);
   }
   assert.ok(doc.getPageCount() >= 1);

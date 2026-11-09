@@ -111,7 +111,7 @@ export function ActionsRace() {
         <div className="mt-[22px]">
           <div className={laneHeader}>
             <span className={laneLabel}>À la main · téléphone, tableur, Word</span>
-            <span className={laneCount} aria-live="polite">{plural(counts.manual)}</span>
+            <span className={laneCount} aria-live="polite">{startedAt === null ? "?" : plural(counts.manual)}</span>
           </div>
           <ul className={road} aria-label="Actions à la main">
             {MANUAL_ACTIONS.map((label, index) =>
@@ -124,7 +124,7 @@ export function ActionsRace() {
         <div className="mt-[22px]">
           <div className={laneHeader}>
             <span className={laneLabel}>Avec TutelLiv</span>
-            <span className={laneCount} aria-live="polite">{plural(counts.tutelliv)}</span>
+            <span className={laneCount} aria-live="polite">{startedAt === null ? "?" : plural(counts.tutelliv)}</span>
           </div>
           <ul className={road} aria-label="Actions avec TutelLiv">
             {TUTELLIV_ACTIONS.map((action, index) =>

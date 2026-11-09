@@ -153,7 +153,7 @@ export default function AdminOperationsPage() {
           </TableBody>
         </Table>
       )}
-      {data ? <div className="flex flex-wrap items-center justify-between gap-3">
+      {data ? <div className={data.total === 0 ? "hidden" : "flex flex-wrap items-center justify-between gap-3"}>
         <label className="flex items-center gap-2 text-sm">
           Lignes
           <Select value={String(pageSize)} onValueChange={(value) => { setPageSize(Number(value)); setPage(1); }}>
