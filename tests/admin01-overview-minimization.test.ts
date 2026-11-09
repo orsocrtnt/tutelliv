@@ -49,7 +49,7 @@ test("ADMIN-1 vue plateforme : les entreprises récentes n'emportent plus le slu
   assert.equal(Object.hasOwn(overview.stats, "totalRevenue"), false);
   const page = readFileSync("src/app/(back-office)/admin/page.tsx", "utf8");
   const service = readFileSync("src/domains/admin/platform.service.ts", "utf8");
-  assert.equal(page.includes("Factures de livraison payées"), true);
+  assert.equal(page.includes("Livraisons facturées et payées"), true);
   assert.equal(page.includes("totalRevenue") || service.includes("totalRevenue"), false);
   for (const word of ["MRR", "ARR", "revenu d’abonnement", "chiffre d’affaires"]) {
     assert.equal(page.includes(word), false, word);

@@ -332,12 +332,12 @@ export function buildSaasHealthIndicators(
     companies: companies.slice(0, 50),
     alerts: alerts.sort((a, b) => ALERT_SEVERITY[b.kind] - ALERT_SEVERITY[a.kind] || a.name.localeCompare(b.name) || a.companyId.localeCompare(b.companyId)),
     definitions: [
-      "Période : mois civil UTC ; commandes issues des compteurs SaaS et options/sièges observés à la date de lecture.",
-      "SaaS : montant HT brut des factures marquées payées dont l’échéance est dans le mois, complété par les faux paiements confirmés sans compte de facturation.",
-      "Factures de livraison : indicateur séparé ; elles ne sont jamais incluses dans le montant SaaS.",
-      "Remboursements : déduits dans le mois de leur facture, faute de date de remboursement chez le fournisseur ; HT ventilé au prorata de la facture, à titre provisoire et sans validation comptable.",
-      "Lecture locale : le rapprochement facture par facture avec le fournisseur se lance par `npm run saas02:reconcile` ; aucun taux de conversion, rétention, coût ou marge n’est déduit.",
-      "Alertes (décision C10) : 80, 100 et 120 % des commandes incluses du mois ; Business dès deux fois les commandes incluses ou 40 livreurs actifs ou invités. Calculées à la lecture, une seule par entreprise et par nature.",
+      "Période : le mois en cours (calendrier UTC). Commandes, options et sièges lus au moment de l’affichage.",
+      "Abonnements encaissés : montant HT des factures d’abonnement payées dont l’échéance tombe ce mois-ci, plus les paiements d’essai confirmés sans compte de facturation. Ce n’est pas le total des prix des formules (page Souscriptions).",
+      "Livraisons facturées : argent que les entreprises encaissent de leurs clients ; jamais compté dans les abonnements.",
+      "Remboursements : retirés le mois de leur facture, au prorata HT, à titre provisoire et sans validation comptable.",
+      "Lecture TutelLiv seulement : le contrôle facture par facture chez le fournisseur de paiement se fait à part ; ni conversion, ni rétention, ni marge ne sont calculées.",
+      "Alertes : 80, 100 et 120 % des commandes incluses du mois ; Business dès deux fois les commandes incluses ou 40 livreurs actifs ou invités. Une seule alerte par entreprise et par type.",
     ],
   };
 }

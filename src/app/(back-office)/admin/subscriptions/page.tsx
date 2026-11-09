@@ -74,7 +74,7 @@ export default function AdminSubscriptionsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Souscriptions</h1>
         <p className="mt-1 text-sm text-muted-foreground max-md:hidden">
-          {"Lecture seule des souscriptions commerciales. HT enregistré : prix de la formule et des options. Le suivi dit qui relancer. Aucun paiement Stripe n'est lu."}
+          {"Lecture seule des souscriptions commerciales. Prix HT : prix de la formule, des options et des sièges, pas un encaissement. Ce qui a été encaissé ce mois-ci est sur le tableau de bord (« Abonnements encaissés HT »). Le suivi dit qui relancer."}
         </p>
       </div>
 
@@ -160,41 +160,54 @@ export default function AdminSubscriptionsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Entreprise</TableHead>
-              <TableHead>Contact</TableHead>
               <TableHead>Formule</TableHead>
-              <TableHead>Suivi</TableHead>
-              <TableHead>HT enregistré</TableHead>
+              <TableHead className="text-right">Prix HT</TableHead>
               <TableHead>Statut</TableHead>
-              <TableHead>Périodicité</TableHead>
               <TableHead>Période</TableHead>
               <TableHead>Commandes</TableHead>
-              <TableHead>Alerte</TableHead>
               <TableHead>Options et sièges</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.rows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell className="font-medium">
-                  <Link href={`/companies/${row.companyId}`} className="max-md:inline-flex max-md:min-h-11 max-md:items-center">{row.company}</Link>
+                <TableCell className="min-w-44 max-w-64 align-top">
+                  <Link href={`/companies/${row.companyId}`} className="font-medium max-md:inline-flex max-md:min-h-11 max-md:items-center">{row.company}</Link>
+                  {/* Contact sous le nom : le tableau tient sur un ordinateur (AUDIT-0411, console interne). */}
+                  <span className="mt-0.5 block break-all text-xs text-muted-foreground">
+                    {row.email ?? "Pas d'e-mail"}{row.phone ? ` · ${formatPhoneDisplay(row.phone)}` : ""}
+                  </span>
                 </TableCell>
-                <TableCell>{row.email ?? "—"}{row.phone ? ` · ${formatPhoneDisplay(row.phone)}` : ""}</TableCell>
-                <TableCell>{row.plan ? planLabel[row.plan] : "Non déterminée"}</TableCell>
-                <TableCell>{FOLLOW_UP[row.followUp]}</TableCell>
-                <TableCell>{euroFormat.format(row.amountCents / 100)}</TableCell>
-                <TableCell>
-                  <Badge variant={row.status === "ACTIVE" ? "success" : "secondary"}>{statusLabel[row.status]}</Badge>
+                <TableCell className="align-top">
+                  {row.plan ? planLabel[row.plan] : "Non déterminée"}
+                  <span className="block text-xs text-muted-foreground">{row.interval === "ANNUAL" ? "Annuel" : row.interval === "MONTHLY" ? "Mensuel" : "Périodicité inconnue"}</span>
                 </TableCell>
-                <TableCell>{row.interval === "ANNUAL" ? "Annuel" : row.interval === "MONTHLY" ? "Mensuel" : "—"}</TableCell>
-                <TableCell>{formatDate(row.periodStart)} – {formatDate(row.periodEnd)}</TableCell>
-                <TableCell>{row.orders.consumed} / {row.orders.included} <span className="text-muted-foreground">(+{row.orders.overage})</span></TableCell>
-                <TableCell>
-                  {row.orders.included <= 0 ? "—" : row.usageAlertPercent === 120 ? "120 % ou plus" : row.usageAlertPercent === 100 ? "100 %" : row.usageAlertPercent === 80 ? "80 %" : "Sous 80 %"}
+                <TableCell className="whitespace-nowrap text-right align-top tabular-nums">
+                  {euroFormat.format(row.amountCents / 100)}
+                  <span className="block text-xs text-muted-foreground">{row.interval === "ANNUAL" ? "par an" : row.interval === "MONTHLY" ? "par mois" : ""}</span>
                 </TableCell>
-                <TableCell>
-                  {row.quantities.options.map((option) => `${option.code} × ${option.quantity}`).join(", ") || "Aucune option"}
-                  {" · "}
-                  livreurs {row.quantities.seats.DRIVER_SEAT}, admins {row.quantities.seats.ADMIN_SEAT}, dispatchers {row.quantities.seats.DISPATCHER_SEAT}
+                <TableCell className="align-top">
+                  <Badge variant={row.status === "ACTIVE" ? "success" : "secondary"}>{statusLabel[row.status] ?? "Statut inconnu"}</Badge>
+                  <span className="mt-1 block text-xs text-muted-foreground">{FOLLOW_UP[row.followUp]}</span>
+                </TableCell>
+                <TableCell className="whitespace-nowrap align-top text-sm">
+                  {formatDate(row.periodStart)}
+                  <span className="block text-xs text-muted-foreground">au {formatDate(row.periodEnd)}</span>
+                </TableCell>
+                <TableCell className="whitespace-nowrap align-top tabular-nums">
+                  {row.orders.consumed} / {row.orders.included}
+                  {row.orders.overage > 0 && <span className="text-muted-foreground"> (+{row.orders.overage})</span>}
+                  {row.usageAlertPercent !== null && (
+                    <span className="block text-xs font-medium text-warning">
+                      Alerte {row.usageAlertPercent === 120 ? "120 % ou plus" : `${row.usageAlertPercent} %`}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="min-w-40 align-top text-xs text-muted-foreground">
+                  <span className="block text-foreground">
+                    {row.quantities.options.map((option) => option.quantity > 1 ? `${option.name} × ${option.quantity}` : option.name).join(", ") || "Aucune option"}
+                  </span>
+                  Livreurs {row.quantities.seats.DRIVER_SEAT} · Admins {row.quantities.seats.ADMIN_SEAT} · Dispatchers {row.quantities.seats.DISPATCHER_SEAT}
                 </TableCell>
               </TableRow>
             ))}

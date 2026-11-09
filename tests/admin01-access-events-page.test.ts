@@ -32,7 +32,7 @@ test("ADMIN-1 journal : filtres, tailles et pagination restent dans le source", 
 
 test("ADMIN-1 journal : l'écran n'affiche que les champs autorisés", () => {
   const fields = [...page.matchAll(/row\.(\w+)/g)].map((match) => match[1]);
-  assert.deepEqual([...new Set(fields)].sort(), ["actorId", "decision", "id", "occurredAt", "resource", "role"]);
+  assert.deepEqual([...new Set(fields)].sort(), ["actorName", "decision", "id", "occurredAt", "resource", "role"]);
   assert.equal(page.includes("key={row.id}"), true);
   for (const absent of ["expiresAt", "method", "email", "e-mail", "href=", "next/link", "Exporter", "Supprimer", "Rechercher"]) {
     assert.equal(page.includes(absent), false, absent);

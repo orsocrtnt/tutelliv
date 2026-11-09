@@ -194,6 +194,8 @@ export type PlatformAccessListRow = {
   id: string;
   occurredAt: string;
   actorId: string;
+  /** Prénom et nom lus à l'affichage (AUDIT-0411) ; le journal n'en stocke aucun. Null : compte supprimé. */
+  actorName: string | null;
   role: PlatformAccessRole;
   resource: PlatformAccessResource;
   decision: PlatformAccessDecision;
@@ -237,9 +239,23 @@ export function parsePlatformAccessListParams(search: URLSearchParams): { query:
   };
 }
 
+async function defaultActorNames(ids: string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) return new Map();
+  const { prisma } = await import("@/services/prisma/client");
+  const users = await prisma.user.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, firstName: true, lastName: true },
+  });
+  return new Map(users.map((user) => [user.id, `${user.firstName} ${user.lastName}`.trim()]));
+}
+
 export async function listPlatformAccessEvents(
   query: PlatformAccessListParams,
-  dependencies?: { now?: () => Date; repository?: PlatformAccessRepository },
+  dependencies?: {
+    now?: () => Date;
+    repository?: PlatformAccessRepository;
+    readActorNames?: (ids: string[]) => Promise<Map<string, string>>;
+  },
 ): Promise<PlatformAccessEventPage> {
   const now = dependencies?.now?.() ?? new Date();
   const repository = dependencies?.repository ?? await defaultRepository();
@@ -250,14 +266,17 @@ export async function listPlatformAccessEvents(
     skip: (query.page - 1) * query.pageSize,
     take: query.pageSize,
   });
+  const rows = page.rows.filter((row) => row.expiresAt > now);
+  const names = await (dependencies?.readActorNames ?? defaultActorNames)([...new Set(rows.map((row) => row.actorId))]);
   return {
     page: query.page,
     pageSize: query.pageSize,
     total: page.total,
-    rows: page.rows.filter((row) => row.expiresAt > now).map((row): PlatformAccessListRow => ({
+    rows: rows.map((row): PlatformAccessListRow => ({
       id: row.id,
       occurredAt: row.occurredAt.toISOString(),
       actorId: row.actorId,
+      actorName: names.get(row.actorId) || null,
       role: row.role,
       resource: row.resource,
       decision: row.decision,

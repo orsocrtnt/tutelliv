@@ -77,7 +77,7 @@ test("ADMIN-1 : paramètres stricts, pagination et fenêtre effective", async ()
           company: { id: "company-acme", name: "Acme", email: "contact@acme.fr", phone: "0102030405" },
           planAssignments: [{ plan: { code: "BUSINESS" as const, name: "Business", monthlyPriceCents: 34900, annualPriceCents: 349000 } }],
           items: [
-            { code: "AUTO_DISPATCH", kind: "OPTION" as const, quantity: 1, unitPriceCents: 0 },
+            { code: "AUTO_DISPATCH", kind: "OPTION" as const, quantity: 1, unitPriceCents: 0, option: { name: "Dispatch automatique" } },
             { code: "AUTO_DISPATCH", kind: "OPTION" as const, quantity: 1, unitPriceCents: 0 },
             { code: "DRIVER_BUSINESS", kind: "DRIVER_SEAT" as const, quantity: 5, unitPriceCents: 900 },
             { code: "ADMIN", kind: "ADMIN_SEAT" as const, quantity: 1, unitPriceCents: 1200 },
@@ -112,7 +112,7 @@ test("ADMIN-1 : paramètres stricts, pagination et fenêtre effective", async ()
   const row = page.rows[0];
   assert.ok(row);
   assert.deepEqual(row.quantities, {
-    options: [{ code: "AUTO_DISPATCH", quantity: 2 }],
+    options: [{ code: "AUTO_DISPATCH", name: "Dispatch automatique", quantity: 2 }],
     seats: { DRIVER_SEAT: 5, ADMIN_SEAT: 1, DISPATCHER_SEAT: 2 },
   });
   assert.deepEqual(row.orders, { consumed: 8000, included: 6000, overage: 2000 });
@@ -174,7 +174,7 @@ test("ADMIN-1 : alerte de consommation 79, 80, 100, 120 et volume inclus nul", (
   assert.equal(alertFor(120, 100), 120);
   assert.equal(alertFor(10, 0), null);
   const screen = readFileSync("src/app/(back-office)/admin/subscriptions/page.tsx", "utf8");
-  for (const label of ["Sous 80 %", "80 %", "100 %", "120 % ou plus", "—", "À jour", "À relancer", "Résiliation en cours", "Ne paie plus", "HT enregistré"]) {
+  for (const label of ["Alerte", "120 % ou plus", "À jour", "À relancer", "Résiliation en cours", "Ne paie plus", "Prix HT", "par mois", "par an"]) {
     assert.equal(screen.includes(label), true, label);
   }
 });

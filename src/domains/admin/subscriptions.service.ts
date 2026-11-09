@@ -50,7 +50,7 @@ export type CommercialSubscriptionRow = {
   orders: { consumed: number; included: number; overage: number };
   usageAlertPercent: 80 | 100 | 120 | null;
   quantities: {
-    options: Array<{ code: string; quantity: number }>;
+    options: Array<{ code: string; name: string; quantity: number }>;
     seats: { DRIVER_SEAT: number; ADMIN_SEAT: number; DISPATCHER_SEAT: number };
   };
 };
@@ -63,7 +63,7 @@ export type CommercialSubscriptionPage = {
   rows: CommercialSubscriptionRow[];
 };
 
-type RawItem = { code: string; kind: ItemKind; quantity: number; unitPriceCents: number };
+type RawItem = { code: string; kind: ItemKind; quantity: number; unitPriceCents: number; option?: { name: string } | null };
 type RawPlan = { code: Plan; name: string; monthlyPriceCents: number; annualPriceCents: number };
 type RawRow = {
   id: string;
@@ -179,7 +179,7 @@ export function commercialSubscriptionSelect(now: Date) {
     },
     items: {
       where: activeAt(now),
-      select: { code: true, kind: true, quantity: true, unitPriceCents: true },
+      select: { code: true, kind: true, quantity: true, unitPriceCents: true, option: { select: { name: true } } },
     },
     usagePeriods: {
       where: { startsAt: { lte: now }, endsAt: { gt: now } },
@@ -224,12 +224,13 @@ export function recordedPriceCents(
 }
 
 export function toCommercialSubscriptionRow(row: RawRow): CommercialSubscriptionRow {
-  const options = new Map<string, number>();
+  const options = new Map<string, { name: string; quantity: number }>();
   const seats = { DRIVER_SEAT: 0, ADMIN_SEAT: 0, DISPATCHER_SEAT: 0 };
   for (const item of row.items) {
     const quantity = nonNegative(item.quantity);
     if (item.kind === "OPTION") {
-      options.set(item.code, (options.get(item.code) ?? 0) + quantity);
+      const current = options.get(item.code);
+      options.set(item.code, { name: current?.name ?? item.option?.name ?? item.code, quantity: (current?.quantity ?? 0) + quantity });
     } else {
       seats[item.kind] += quantity;
     }
@@ -261,7 +262,7 @@ export function toCommercialSubscriptionRow(row: RawRow): CommercialSubscription
     usageAlertPercent: orders.included > 0 ? orderUsageAlertPercent(orders.consumed, orders.included) : null,
     quantities: {
       options: [...options.entries()]
-        .map(([code, quantity]) => ({ code, quantity }))
+        .map(([code, option]) => ({ code, name: option.name, quantity: option.quantity }))
         .sort((a, b) => a.code.localeCompare(b.code)),
       seats,
     },

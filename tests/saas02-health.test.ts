@@ -102,8 +102,8 @@ test("SAAS-02 : revenu SaaS HT séparé, activation et faux paiement dédupliqu�
   assert.equal(result.revenue.refundedHtCents, 0, "le remboursement de septembre ne touche pas octobre");
   assert.equal(result.revenue.netPaidHtCents, 26_800);
   assert.deepEqual(result.activation, { commercialSubscriptions: 2, newSubscriptions: 1 });
-  assert.ok(result.definitions.some((definition) => definition.includes("Factures de livraison")));
-  assert.ok(result.definitions.some((definition) => definition.includes("Remboursements : déduits dans le mois de leur facture")));
+  assert.ok(result.definitions.some((definition) => definition.includes("Livraisons facturées")));
+  assert.ok(result.definitions.some((definition) => definition.includes("Remboursements : retirés le mois de leur facture")));
 });
 
 test("SAAS-02 : les remboursements du mois sont déduits du net, ventilés en HT au prorata", () => {
@@ -195,7 +195,7 @@ test("SAAS-02 (C10) : alertes 80/100/120 % et seuils Business, une seule par nat
     "Starter à 120 % pile ; Business à 133 % mais sous deux fois l'inclus et sous 40 livreurs"
   );
   assert.equal(indicators.alerts.some((alert) => alert.companyId === "company-pilot"), false);
-  assert.match(indicators.definitions.join(" "), /Alertes \(décision C10\)/);
+  assert.match(indicators.definitions.join(" "), /Alertes : 80, 100 et 120 %/);
 
   const company = { companyId: "c", name: "Société", drivers: 0 };
   assert.deepEqual(companyUsageAlerts({ ...company, planCode: "PRO", orders: 799, includedOrders: 1_000 }), []);

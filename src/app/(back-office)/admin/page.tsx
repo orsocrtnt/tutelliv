@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/features/client-portal/utils";
+import { SUBSCRIPTION_STATUS_LABELS } from "@/features/admin/company/company-file-format";
 import { AlertTriangle } from "lucide-react";
 import type { TableColumn } from "@/types";
 
@@ -62,7 +63,7 @@ function OverviewPanel() {
 
   const figures = [
     { label: "Utilisateurs totaux", value: String(data.stats.totalUsers), note: "toutes entreprises" },
-    { label: "Factures de livraison payées", value: formatCurrency(data.stats.paidDeliveryInvoiceRevenue), note: "mois UTC · flux séparé" },
+    { label: "Livraisons facturées et payées", value: formatCurrency(data.stats.paidDeliveryInvoiceRevenue), note: "ce mois-ci, argent des entreprises clientes, hors abonnements TutelLiv" },
   ];
 
   return (
@@ -110,7 +111,7 @@ function SaasHealthPanel() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          <Card><CardHeader><CardDescription>Abonnements confirmés HT</CardDescription><CardTitle>{formatCurrency(data.revenue.subscriptionPaidHtCents / 100)}</CardTitle><CardDescription>journal local · + {formatCurrency(data.revenue.usagePaidHtCents / 100)} de dépassements{data.revenue.refundedHtCents > 0 ? ` · − ${formatCurrency(data.revenue.refundedHtCents / 100)} remboursés, net ${formatCurrency(data.revenue.netPaidHtCents / 100)}` : ""}</CardDescription></CardHeader></Card>
+          <Card><CardHeader><CardDescription>Abonnements encaissés HT ce mois-ci</CardDescription><CardTitle>{formatCurrency(data.revenue.subscriptionPaidHtCents / 100)}</CardTitle><CardDescription>pas le total des prix (page Souscriptions) · + {formatCurrency(data.revenue.usagePaidHtCents / 100)} de dépassements{data.revenue.refundedHtCents > 0 ? ` · − ${formatCurrency(data.revenue.refundedHtCents / 100)} remboursés, net ${formatCurrency(data.revenue.netPaidHtCents / 100)}` : ""}</CardDescription></CardHeader></Card>
           <Card><CardHeader><CardDescription>Nouvelles activations</CardDescription><CardTitle>{data.activation.newSubscriptions}</CardTitle></CardHeader></Card>
           <Card><CardHeader><CardDescription>Commandes mesurées</CardDescription><CardTitle>{data.consumption.orders}</CardTitle></CardHeader></Card>
           <Card><CardHeader><CardDescription>Livreurs actifs ou invités</CardDescription><CardTitle>{data.consumption.drivers}</CardTitle></CardHeader></Card>
@@ -170,7 +171,7 @@ function SaasHealthPanel() {
               <TableBody>{data.companies.map((company) => <TableRow key={company.companyId}>
                 <TableCell className="font-medium">{company.name}</TableCell>
                 <TableCell>{company.planCode ? planLabels[company.planCode] : "Non déterminée"}</TableCell>
-                <TableCell><Badge variant={company.status === "ACTIVE" ? "success" : "secondary"}>{company.status}</Badge></TableCell>
+                <TableCell><Badge variant={company.status === "ACTIVE" ? "success" : "secondary"}>{SUBSCRIPTION_STATUS_LABELS[company.status] ?? "Statut inconnu"}</Badge></TableCell>
                 <TableCell>{company.orders}</TableCell>
                 <TableCell>{company.drivers}</TableCell>
                 <TableCell>{company.activeOptionUnits}</TableCell>

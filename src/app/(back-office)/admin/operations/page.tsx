@@ -27,7 +27,7 @@ const TYPES = [
 ] as const;
 const statusLabel = Object.fromEntries(STATUSES.map((item) => [item.value, item.label]));
 const typeLabel = Object.fromEntries(TYPES.map((item) => [item.value, item.label]));
-const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
+const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Paris" });
 const healthLabel = { ok: "Disponible", degraded: "Dégradé", down: "Indisponible" } as const;
 
 function formatDate(value: string | null) {
@@ -65,7 +65,7 @@ function HealthPanel() {
           </div>
         ))}
       </div>
-      <p className="text-sm text-muted-foreground">Contrôlé le {formatDate(data.checkedAt)} UTC</p>
+      <p className="text-sm text-muted-foreground">Contrôlé le {formatDate(data.checkedAt)}, heure de Paris</p>
     </section>
   );
 }
@@ -140,7 +140,7 @@ export default function AdminOperationsPage() {
                 <TableCell className="font-medium">{row.company ?? "Plateforme"}</TableCell>
                 <TableCell>{typeLabel[row.type]}</TableCell>
                 <TableCell>
-                  <Badge variant={row.status === "FAILED" || row.stale ? "destructive" : "secondary"}>
+                  <Badge className="whitespace-nowrap" variant={row.status === "FAILED" || row.stale ? "destructive" : "secondary"}>
                     {row.stale ? "Bloqué" : statusLabel[row.status]}
                   </Badge>
                 </TableCell>

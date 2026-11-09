@@ -226,8 +226,10 @@ test("ADMIN-1 journal : la consultation filtre, pagine et minimise", async () =>
 
   let seen: { now: Date; resource?: string; decision?: string; skip: number; take: number } | undefined;
   const fresh = new Date("2026-10-25T12:00:00.000Z");
+  let askedNames: string[] = [];
   const page = await listPlatformAccessEvents(parsed.query, {
     now: () => now,
+    readActorNames: async (ids) => { askedNames = ids; return new Map([["actor-1", "Ada Lovelace"]]); },
     repository: {
       record: async () => { throw new Error("unused"); },
       listActive: async () => [],
@@ -250,7 +252,10 @@ test("ADMIN-1 journal : la consultation filtre, pagine et minimise", async () =>
   assert.equal(seen?.now, now);
   assert.equal(page.total, 51);
   assert.equal(page.rows.length, 1);
-  assert.deepEqual(Object.keys(page.rows[0] ?? {}).sort(), ["actorId", "decision", "id", "occurredAt", "resource", "role"]);
+  assert.deepEqual(Object.keys(page.rows[0] ?? {}).sort(), ["actorId", "actorName", "decision", "id", "occurredAt", "resource", "role"]);
+  // AUDIT-0411 : nom lu à l'affichage pour les seuls acteurs de la page, jamais stocké dans le journal.
+  assert.deepEqual(askedNames, ["actor-1"]);
+  assert.equal(page.rows[0]?.actorName, "Ada Lovelace");
   assert.equal(JSON.stringify(page).includes("method"), false);
   assert.equal(JSON.stringify(page).includes("expiresAt"), false);
 
