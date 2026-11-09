@@ -29,6 +29,7 @@ Cet index distingue la documentation courante des preuves datées. En cas de con
 - [`operations/env1/COSTS.md`](operations/env1/COSTS.md) — estimation fournisseur avant toute dépense.
 - [`operations/db1/README.md`](operations/db1/README.md) — diff de schéma, brouillons de baseline et stratégie de migration.
 - [`operations/mob01c/README.md`](operations/mob01c/README.md) — protocole de recette sur iPhone et Android physiques.
+- [`operations/dispatch5/MESURE_2026-11-09.md`](operations/dispatch5/MESURE_2026-11-09.md) — le Dispatch intelligent est-il efficace : simulation avec le vrai code et contrôle sur la démo.
 - [`operations/data02/RETENTION_POLICY_DRAFT.md`](operations/data02/RETENTION_POLICY_DRAFT.md) — proposition de conservation et suppression à valider juridiquement.
 - [`operations/map3/REVIEW.md`](operations/map3/REVIEW.md) — support de validation des cartes noir/blanc.
 - [`operations/bill01b/README.md`](operations/bill01b/README.md) — export comptable versionné des prestations, colonnes, filtres, rapprochement et limites historiques.
