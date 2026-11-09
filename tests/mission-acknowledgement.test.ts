@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import * as driverQueue from "../src/lib/dispatch/driver-queue";
+import * as roundOrder from "../src/lib/dispatch/round-order";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -148,6 +150,8 @@ test("ACK : auto-dispatch traite la perte du libre choix comme conflit terminal"
     "@/lib/query/list-limits": { AUTO_DISPATCH_QUEUE_TAKE: 100 },
     "@/lib/validations/dispatch-settings": dispatchSettings,
     "@/lib/dispatch/dispatch-score": dispatchScore,
+    "@/lib/dispatch/driver-queue": driverQueue,
+    "@/lib/dispatch/round-order": roundOrder,
     "@/lib/format/plural": pluralLib,
     "@/lib/dispatch/travel-time": travelTime,
   });

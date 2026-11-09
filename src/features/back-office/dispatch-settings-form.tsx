@@ -663,7 +663,7 @@ export function DispatchSettingsForm() {
                 {!local.bestScore && local.strategy === "ZONE_THEN_PRIORITY" &&
                   "Livreur préféré de la zone, puis priorité."}
                 {local.bestScore &&
-                  "Score sur 100 : temps de trajet jusqu'au retrait 50 %, charge 30 %, zone 10 %, priorité 10 %."}
+                  "Score sur 100 : heure d'arrivée, livraisons en cours comprises, au retrait (ou à l'adresse de livraison s'il n'est pas saisi) 80 %, zone 10 %, priorité 10 %. Pour un créneau, le livreur le plus occupé qui le tient passe devant."}
               </p>
             </div>
 
@@ -711,12 +711,19 @@ export function DispatchSettingsForm() {
                 <p className="text-sm font-medium">Tenir compte de la position GPS</p>
                 <p className="text-xs text-muted-foreground">
                   À égalité, le livreur en service le plus proche du retrait est choisi. Avec le
-                  meilleur score et les suggestions : temps de trajet jusqu&apos;au retrait.
+                  meilleur score et les suggestions : heure d&apos;arrivée, livraisons en cours comprises.
                 </p>
               </div>
             </label>
             <div className="space-y-3 rounded-lg border border-border p-3">
-              <p className="text-sm font-medium">Tournées</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-medium">Tournées</p>
+                <Badge variant="secondary" className="text-xs">Recommandé</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Regroupe les livraisons proches en une tournée par livreur. En simulation, environ 20 % de
+                kilomètres à vide en moins qu&apos;une affectation livraison par livraison, à ponctualité comparable.
+              </p>
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="round-day">Durée maximale (minutes)</Label>

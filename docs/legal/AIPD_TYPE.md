@@ -57,9 +57,9 @@
 ### 3.1 Ce que fait le code
 
 - **Option désactivée par défaut** : l'entreprise l'active dans Paramètres, catégorie par catégorie (`enabled`, `autoAssignCategories` dans [dispatch-settings.ts](../../src/lib/validations/dispatch-settings.ts)). Les tournées ne sont affectées sans validation que si `rounds.autoAssign` est activé, également faux par défaut.
-- **Critères** : un score de 0 à 100 calculé sur les livreurs éligibles : trajet jusqu'au retrait 50 %, charge en cours 30 %, zone 10 %, priorité fixée par l'entreprise 10 % ([dispatch-score.ts](../../src/lib/dispatch/dispatch-score.ts)). L'éligibilité dépend des règles posées par l'entreprise : livreur actif ou en pause, catégories autorisées, zones, codes postaux, charge maximale, capacité du véhicule.
+- **Critères** (revus le 9 novembre 2026, DISPATCH-5) : un score de 0 à 100 calculé sur les livreurs éligibles. Heure d'arrivée estimée 80 % : temps pour finir les livraisons déjà confiées, puis trajet jusqu'au retrait, ou jusqu'à l'adresse de livraison si le retrait n'est pas saisi. Zone 10 % et priorité fixée par l'entreprise 10 % ([dispatch-score.ts](../../src/lib/dispatch/dispatch-score.ts), [driver-queue.ts](../../src/lib/dispatch/driver-queue.ts)). Pour une livraison à créneau, les livreurs qui le tiennent sont à égalité et le plus occupé d'entre eux passe devant. L'estimation utilise la position du livreur en service et les adresses de ses livraisons en cours, lues au moment du calcul et non conservées. L'éligibilité dépend des règles posées par l'entreprise : livreur actif ou en pause, catégories autorisées, zones, codes postaux, charge maximale, capacité du véhicule.
 - **Aucune évaluation de la personne** : pas de note client, de vitesse, de taux de réussite, d'ancienneté ni de comportement dans le score.
-- **Explication gardée** : la raison est écrite dans l'historique de la livraison (« Meilleur score (trajet, charge, zone) » ou « Suggestion validée par le dispatch »).
+- **Explication gardée** : la raison est écrite dans l'historique de la livraison (« Meilleur score (heure d'arrivée, zone) » ou « Suggestion validée par le dispatch »).
 - **Intervention humaine** : le dispatcher peut réaffecter à tout moment ; le livreur peut être mis en pause, ce qui l'exclut.
 
 ### 3.2 Analyse

@@ -27,8 +27,12 @@ import {
   compareDispatchProximity,
   computeDispatchProximity,
   getDispatchPickupPoint,
+  getDispatchTargetPoint,
   type DispatchProximity,
+  type DispatchTarget,
 } from "@/lib/dispatch/dispatch-proximity";
+import { QUEUE_MISSION_FALLBACK_SECONDS, QUEUE_STOP_SECONDS, estimateDriverQueue, type DriverQueue } from "@/lib/dispatch/driver-queue";
+import { orderMissionsByRound } from "@/lib/dispatch/round-order";
 import { trackingService } from "@/domains/tracking/tracking.policy";
 import {
   BEST_SCORE_HISTORY_REASON,
@@ -37,7 +41,7 @@ import {
   type RankedCandidate,
   type ScoreCandidate,
 } from "@/lib/dispatch/dispatch-score";
-import { estimateTravelTimes, type TravelEstimate } from "@/lib/dispatch/travel-time";
+import { estimateTravelTimes, straightLineSeconds, type GeoPoint, type TravelEstimate } from "@/lib/dispatch/travel-time";
 import { countLabel } from "@/lib/format/plural";
 
 type DriverActivity = Awaited<ReturnType<typeof getCompanyDriversWithActivity>>[number];
@@ -49,10 +53,15 @@ type DeliveryForDispatch = DeliveryForEligibility & {
   createdAt: Date;
   pickupLatitude?: number | null;
   pickupLongitude?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  /** Début du créneau promis (commande), s'il y en a un. */
+  order?: { deliverySlotStart: Date | null } | null;
 };
 
 type Proximities = ReadonlyMap<string, DispatchProximity>;
 type TravelTimes = ReadonlyMap<string, TravelEstimate>;
+type DriverQueues = ReadonlyMap<string, DriverQueue>;
 type TariffZones = Awaited<ReturnType<typeof getCompanyTariffSettings>>["tariffZones"];
 
 export const AUTO_ROUND_WAIT_REASON = "En attente de la prochaine tournée automatique";
@@ -245,10 +254,14 @@ export function buildScoreCandidates(
   settings: CompanyDispatchSettings,
   tariffZones: TariffZones,
   proximities: Proximities,
-  travel: TravelTimes
+  travel: TravelTimes,
+  queues: DriverQueues = new Map(),
+  now = Date.now()
 ): ScoreCandidate[] {
   const zone = findTariffZoneForPostalCode(getDispatchPostalCode(delivery), tariffZones);
   const preferredId = zone ? settings.zoneDriverMap[zone.id] : undefined;
+  const target = getDispatchTargetPoint(delivery);
+  const slot = slotFor(delivery, target, now);
   return eligible.map((driver) => {
     const rule = getDispatchDriverRule(settings, driver.id);
     const restricted = Boolean(rule && (rule.zoneIds.length > 0 || rule.postalCodePrefixes.length > 0));
@@ -261,8 +274,22 @@ export function buildScoreCandidates(
       zoneName: zone?.name ?? null,
       travel: travel.get(driver.id) ?? null,
       positionStatus: proximities.get(driver.id)?.status ?? "NO_POSITION",
+      queueSeconds: queues.get(driver.id)?.seconds,
+      target: target?.kind ?? "PICKUP",
+      slot,
     };
   });
+}
+
+/** Créneau à venir : la livraison est faite `afterArrivalSeconds` après l'arrivée au point visé. */
+function slotFor(delivery: DeliveryForDispatch, target: DispatchTarget | null, now: number): ScoreCandidate["slot"] {
+  const start = delivery.order?.deliverySlotStart;
+  if (!start || start.getTime() <= now) return null;
+  const destination = getDispatchTargetPoint({ latitude: delivery.latitude, longitude: delivery.longitude });
+  const afterArrivalSeconds = target?.kind === "PICKUP" && destination
+    ? QUEUE_STOP_SECONDS + straightLineSeconds(target.point, destination.point)
+    : 0;
+  return { startsInSeconds: Math.round((start.getTime() - now) / 1000), afterArrivalSeconds };
 }
 
 /** Livreurs éligibles classés par score (DISPATCH-4), sans aucun appel réseau. */
@@ -272,11 +299,12 @@ export function rankEligibleDrivers(
   drivers: DriverActivity[],
   tariffZones: TariffZones,
   proximities: Proximities = new Map(),
-  travel: TravelTimes = new Map()
+  travel: TravelTimes = new Map(),
+  queues: DriverQueues = new Map()
 ): RankedCandidate[] {
   const eligible = filterEligibleDrivers(drivers, delivery, settings, tariffZones);
   return rankDispatchCandidates(
-    buildScoreCandidates(eligible, delivery, settings, tariffZones, proximities, travel)
+    buildScoreCandidates(eligible, delivery, settings, tariffZones, proximities, travel, queues)
   );
 }
 
@@ -286,7 +314,8 @@ export function resolveDriverForDelivery(
   drivers: DriverActivity[],
   tariffZones: Awaited<ReturnType<typeof getCompanyTariffSettings>>["tariffZones"],
   proximities: Proximities = new Map(),
-  travel: TravelTimes = new Map()
+  travel: TravelTimes = new Map(),
+  queues: DriverQueues = new Map()
 ): { driverId: string; reason: string } | null {
   if (delivery.driverId) return null;
   if (delivery.status !== "PENDING") return null;
@@ -306,7 +335,7 @@ export function resolveDriverForDelivery(
 
   if (settings.bestScore) {
     const best = rankDispatchCandidates(
-      buildScoreCandidates(eligible, delivery, settings, tariffZones, proximities, travel)
+      buildScoreCandidates(eligible, delivery, settings, tariffZones, proximities, travel, queues)
     )[0];
     pick = best ? { driverId: best.id, reason: BEST_SCORE_HISTORY_REASON } : null;
   } else switch (settings.strategy) {
@@ -360,14 +389,18 @@ export const ROUTE_CALLS_PER_PASS = 20;
 /** …et durée totale au-delà de laquelle la file passe au vol d'oiseau (OSRM lent). */
 export const ROUTE_TIME_BUDGET_MS = 10_000;
 
-/** Seuls les livreurs en service ont une position utilisée ; le reste est neutre. */
+/**
+ * Seuls les livreurs en service ont une position utilisée ; le reste est neutre. Par défaut au retrait
+ * (départage des stratégies classiques) ; le score passe le point visé (`getDispatchTargetPoint`).
+ */
 function proximitiesFromDrivers(
   delivery: DeliveryForDispatch,
   drivers: DriverWithDispatchPosition[],
   settings: CompanyDispatchSettings,
+  point: GeoPoint | null = getDispatchPickupPoint(delivery),
   now = new Date()
 ): Map<string, DispatchProximity> {
-  const pickup = getDispatchPickupPoint(delivery);
+  const pickup = point;
   return new Map(
     drivers.map((driver) => [
       driver.id,
@@ -391,15 +424,18 @@ export async function computeTravelTimes(
   eligibleIds: ReadonlySet<string>,
   drivers: DriverWithDispatchPosition[],
   proximities: Proximities,
-  pass?: AutoDispatchPass
+  pass?: AutoDispatchPass,
+  queues: DriverQueues = new Map()
 ): Promise<Map<string, TravelEstimate>> {
-  const pickup = getDispatchPickupPoint(delivery);
+  const pickup = getDispatchTargetPoint(delivery)?.point;
   if (!pickup) return new Map();
+  // Départ : fin de la file du livreur (DISPATCH-5), sinon sa position.
   const origins = drivers.flatMap((driver) => {
     const status = proximities.get(driver.id)?.status;
     const position = driver.driverLocation;
     if (!eligibleIds.has(driver.id) || !position || (status !== "NEAR" && status !== "FAR")) return [];
-    return [{ id: driver.id, point: { latitude: position.latitude, longitude: position.longitude } }];
+    const end = queues.get(driver.id)?.end;
+    return [{ id: driver.id, point: end ?? { latitude: position.latitude, longitude: position.longitude } }];
   });
   if (origins.length === 0) return new Map();
   if (pass) pass.routeStartedAt ??= Date.now();
@@ -409,6 +445,57 @@ export async function computeTravelTimes(
   const { estimates, networkCalls } = await estimateTravelTimes(origins, pickup, { allowNetwork });
   if (pass) pass.routeCallsLeft = (pass.routeCallsLeft ?? ROUTE_CALLS_PER_PASS) - networkCalls;
   return estimates;
+}
+
+const QUEUE_MISSIONS_TAKE = 500;
+
+/**
+ * DISPATCH-5 — file de chaque livreur localisé (en service, position récente), dans l'ordre de son
+ * application. Lecture seule, hors transaction. Les affectations seulement prévues par un passage de file
+ * comptent au forfait de 15 min chacune.
+ */
+export async function loadDriverQueues(
+  companyId: string,
+  drivers: DriverWithDispatchPosition[],
+  proximities: Proximities,
+  plannedLoad?: AutoDispatchPass["plannedLoad"]
+): Promise<Map<string, DriverQueue>> {
+  const located = drivers.filter((driver) => {
+    const status = proximities.get(driver.id)?.status;
+    return driver.driverLocation && (status === "NEAR" || status === "FAR");
+  });
+  if (located.length === 0) return new Map();
+  const missions = await prisma.delivery.findMany({
+    where: { companyId, driverId: { in: located.map((driver) => driver.id) }, status: { in: ["ASSIGNED", "PURCHASING", "IN_DELIVERY"] } },
+    select: {
+      id: true,
+      driverId: true,
+      status: true,
+      latitude: true,
+      longitude: true,
+      pickupLatitude: true,
+      pickupLongitude: true,
+      roundId: true,
+      roundSequence: true,
+    },
+    orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
+    take: QUEUE_MISSIONS_TAKE,
+  });
+  const queues = new Map<string, DriverQueue>();
+  for (const driver of located) {
+    const own = orderMissionsByRound(missions.filter((mission) => mission.driverId === driver.id));
+    const queue = estimateDriverQueue(
+      { latitude: driver.driverLocation!.latitude, longitude: driver.driverLocation!.longitude },
+      own.map((mission) => ({
+        status: mission.status,
+        pickup: getDispatchPickupPoint(mission),
+        destination: getDispatchTargetPoint({ latitude: mission.latitude, longitude: mission.longitude })?.point ?? null,
+      }))
+    );
+    const planned = plannedLoad?.get(driver.id)?.assigned ?? 0;
+    queues.set(driver.id, { ...queue, seconds: queue.seconds + planned * QUEUE_MISSION_FALLBACK_SECONDS, missions: queue.missions + planned });
+  }
+  return queues;
 }
 
 type AutoPick = { driverId: string; reason: string; driverName: string; category: DeliveryCategory };
@@ -436,10 +523,13 @@ async function pickAutoDriver(
       pickupPostalCode: true,
       pickupLatitude: true,
       pickupLongitude: true,
+      latitude: true,
+      longitude: true,
       deliveryCategory: true,
       driverId: true,
       status: true,
       createdAt: true,
+      order: { select: { deliverySlotStart: true } },
     },
   });
 
@@ -478,25 +568,28 @@ async function pickAutoDriver(
     return { skippedReason: "Aucun livreur actif" };
   }
 
-  const proximities = proximitiesFromDrivers(delivery, drivers, settings);
-  // Meilleur score : trajet calculé ici, avant la transaction d'affectation.
-  const travel =
-    settings.bestScore
-      ? await computeTravelTimes(
-          delivery,
-          new Set(filterEligibleDrivers(drivers, delivery, settings, tariffSettings.tariffZones).map((d) => d.id)),
-          drivers,
-          proximities,
-          pass
-        )
-      : new Map<string, TravelEstimate>();
+  // Meilleur score : proximité au point visé (retrait, sinon adresse de livraison), file des livreurs et
+  // trajet calculés ici, avant la transaction d'affectation. Autres stratégies : départage au retrait.
+  const proximities = settings.bestScore
+    ? proximitiesFromDrivers(delivery, drivers, settings, getDispatchTargetPoint(delivery)?.point ?? null)
+    : proximitiesFromDrivers(delivery, drivers, settings);
+  const eligibleIds = settings.bestScore
+    ? new Set(filterEligibleDrivers(drivers, delivery, settings, tariffSettings.tariffZones).map((d) => d.id))
+    : null;
+  const queues = eligibleIds
+    ? await loadDriverQueues(companyId, drivers.filter((d) => eligibleIds.has(d.id)), proximities, pass?.plannedLoad)
+    : new Map<string, DriverQueue>();
+  const travel = eligibleIds
+    ? await computeTravelTimes(delivery, eligibleIds, drivers, proximities, pass, queues)
+    : new Map<string, TravelEstimate>();
   const pick = resolveDriverForDelivery(
     delivery,
     settings,
     drivers,
     tariffSettings.tariffZones,
     proximities,
-    travel
+    travel,
+    queues
   );
 
   if (!pick) {
@@ -770,7 +863,7 @@ export type DispatchSuggestion = {
   explanation: string;
   load: number;
   maxLoad: number;
-  /** Minutes jusqu'au retrait ; `null` si trajet inconnu. Jamais de coordonnée. */
+  /** Minutes avant l'arrivée au point visé, file comprise ; `null` si trajet inconnu. Jamais de coordonnée. */
   travelMinutes: number | null;
   travelSource: "ROUTE" | "STRAIGHT_LINE" | null;
 };
@@ -806,11 +899,14 @@ export async function getDispatchSuggestions(
         pickupPostalCode: true,
         pickupLatitude: true,
         pickupLongitude: true,
+        latitude: true,
+        longitude: true,
         deliveryCategory: true,
         driverId: true,
         status: true,
         createdAt: true,
         missionStartedAt: true,
+        order: { select: { deliverySlotStart: true } },
       },
     }),
     getCompanyDispatchSettings(companyId),
@@ -836,15 +932,19 @@ export async function getDispatchSuggestions(
   const zones = tariffSettings.tariffZones;
   const eligible = filterEligibleDrivers(positioned, delivery, settings, zones)
     .filter((driver) => driver.id !== delivery.driverId);
-  const proximities = proximitiesFromDrivers(delivery, eligible as DriverWithDispatchPosition[], settings);
+  const target = getDispatchTargetPoint(delivery)?.point ?? null;
+  const proximities = proximitiesFromDrivers(delivery, eligible as DriverWithDispatchPosition[], settings, target);
+  const queues = await loadDriverQueues(companyId, eligible as DriverWithDispatchPosition[], proximities);
   const travel = await computeTravelTimes(
     delivery,
     new Set(eligible.map((driver) => driver.id)),
     positioned,
-    proximities
+    proximities,
+    undefined,
+    queues
   );
   const ranked = rankDispatchCandidates(
-    buildScoreCandidates(eligible, delivery, settings, zones, proximities, travel)
+    buildScoreCandidates(eligible, delivery, settings, zones, proximities, travel, queues)
   );
   const byId = new Map(positioned.map((driver) => [driver.id, driver]));
 
@@ -864,7 +964,7 @@ export async function getDispatchSuggestions(
         explanation: candidate.explanation,
         load: candidate.load,
         maxLoad: candidate.maxLoad,
-        travelMinutes: candidate.travel ? Math.max(1, Math.round(candidate.travel.seconds / 60)) : null,
+        travelMinutes: candidate.arrivalMinutes,
         travelSource: candidate.travel?.source ?? null,
       };
     }),

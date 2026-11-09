@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import * as driverQueue from "../src/lib/dispatch/driver-queue";
+import * as roundOrder from "../src/lib/dispatch/round-order";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -45,6 +47,8 @@ function load(deps: {
   assign?: (...args: unknown[]) => Promise<unknown>;
   zone?: Row | null;
   log?: string[];
+  /** Livraisons en cours des livreurs (file lue par le score). */
+  missions?: Row[];
 }) {
   const log = deps.log ?? [];
   const state = travelTime.createTravelTimeState();
@@ -53,7 +57,10 @@ function load(deps: {
   const prisma = {
     delivery: {
       findFirst: async (args: Row) => { deliveryQueries.push(args); return deps.delivery ?? null; },
-      findMany: async () => (deps.delivery ? [deps.delivery] : []),
+      findMany: async (args: { where?: { driverId?: { in?: string[] } } } = {}) =>
+        args.where?.driverId?.in
+          ? (deps.missions ?? []).filter((m) => args.where!.driverId!.in!.includes(m.driverId as string))
+          : deps.delivery ? [deps.delivery] : [],
     },
   };
   const travel = {
@@ -85,6 +92,8 @@ function load(deps: {
     "@/lib/query/list-limits": { AUTO_DISPATCH_QUEUE_TAKE: 100 },
     "@/lib/validations/dispatch-settings": dispatchSettings,
     "@/lib/dispatch/dispatch-score": dispatchScore,
+    "@/lib/dispatch/driver-queue": driverQueue,
+    "@/lib/dispatch/round-order": roundOrder,
     "@/lib/format/plural": pluralLib,
     "@/lib/dispatch/travel-time": travel,
   };
@@ -107,7 +116,7 @@ test("score : poids documentés (somme 1) et bornes 0–100", () => {
   const sum = Object.values(DISPATCH_SCORE_WEIGHTS).reduce((a, b) => a + b, 0);
   assert.equal(Math.round(sum * 1000), 1000);
   const best = scoreCandidate(candidate({ travel: { source: "ROUTE", seconds: 0 }, zone: "PREFERRED", priority: 1 }));
-  const worst = scoreCandidate(candidate({ travel: { source: "ROUTE", seconds: 3 * 3600 }, load: 3, priority: null }));
+  const worst = scoreCandidate(candidate({ travel: { source: "ROUTE", seconds: 4 * 3600 }, load: 3, priority: null }));
   assert.equal(best, 100);
   assert.equal(worst, 5, "seule la part « sans restriction de zone » reste");
 });
@@ -145,11 +154,11 @@ test("score : égalité stricte départagée par trajet, charge puis id (ordre t
 test("explication : une phrase lisible avec trajet, charge, zone, priorité et raison du repli", () => {
   assert.equal(
     explainCandidate(candidate({ travel: { source: "ROUTE", seconds: 420 }, load: 1, zone: "PREFERRED", zoneName: "Centre", priority: 2 })),
-    "Retrait à 7 min (trajet routier), 1 livraison en cours sur 3, attitré à la zone « Centre », priorité 2."
+    "Arrivée au retrait dans environ 22 min (dont 7 min de trajet routier), 1 livraison en cours sur 3, attitré à la zone « Centre », priorité 2."
   );
   assert.equal(
     explainCandidate(candidate({ travel: { source: "STRAIGHT_LINE", seconds: 600, fallbackReason: "UNAVAILABLE" } })),
-    "Retrait à environ 10 min à vol d'oiseau (service de trajet indisponible), aucune livraison en cours."
+    "Arrivée au retrait dans environ 10 min (à vol d'oiseau, service de trajet indisponible), aucune livraison en cours."
   );
   assert.equal(
     explainCandidate(candidate({ positionStatus: "STALE", load: 2 })),
@@ -181,7 +190,7 @@ test("auto meilleur score : trajet routier calculé AVANT l'affectation, raison 
   const options = assigned[0]![3] as Row;
   assert.equal(options.expectUnassigned, true);
   assert.equal(options.automatic, true);
-  assert.equal(options.reason, "Meilleur score (trajet, charge, zone)");
+  assert.equal(options.reason, "Meilleur score (heure d'arrivée, zone)");
   assert.doesNotMatch(String(options.reason), HISTORY_SAFE);
 });
 
@@ -243,10 +252,15 @@ test("suggestions : 3 meilleurs, explication, aucune coordonnée ni contact, req
       driver("d", 3, fresh(0.001)),
       driver("e", 1),
     ],
+    // « b » a deux livraisons en cours à environ 2 km : sa file compte (DISPATCH-5).
+    missions: [
+      { id: "m1", driverId: "b", status: "ASSIGNED", latitude: PICKUP.pickupLatitude + 0.02, longitude: PICKUP.pickupLongitude, pickupLatitude: null, pickupLongitude: null, roundId: null, roundSequence: null },
+      { id: "m2", driverId: "b", status: "IN_DELIVERY", latitude: PICKUP.pickupLatitude + 0.02, longitude: PICKUP.pickupLongitude, pickupLatitude: null, pickupLongitude: null, roundId: null, roundSequence: null },
+    ],
     osrm: (url) => {
-      // Seuls les livreurs en service partent au service de trajet (b puis a, par distance).
+      // Seuls les livreurs en service partent au service de trajet : 10 min chacun depuis la fin de sa file.
       assert.equal(new URL(url).searchParams.get("sources"), "0;1");
-      return { status: 200, body: { code: "Ok", durations: [[120], [600]] } };
+      return { status: 200, body: { code: "Ok", durations: [[600], [600]] } };
     },
   });
   const result = await svc.getDispatchSuggestions("c1", "d1");
@@ -258,12 +272,13 @@ test("suggestions : 3 meilleurs, explication, aucune coordonnée ni contact, req
   const suggestions = result.suggestions as Row[];
   assert.equal(suggestions.length, 3);
   assert.deepEqual(suggestions.map((s) => s.rank), [1, 2, 3]);
-  // a : 10 min libre (74) ; b : 2 min mais 2 livraisons (63) ; c : hors service, libre (35) ;
-  // e : hors service, 1 livraison (25), 4e donc absent.
+  // a : libre, arrivée dans 10 min (82) ; b : tout près mais 2 livraisons à finir d'abord, 26 min (76) ;
+  // c : hors service, libre (5) ; e : hors service, 1 livraison (5), 4e donc absent.
   assert.deepEqual(suggestions.map((s) => s.driverId), ["a", "b", "c"]);
-  assert.deepEqual(suggestions.map((s) => s.score), [74, 63, 35]);
-  assert.deepEqual(suggestions.map((s) => s.travelMinutes), [10, 2, null]);
+  assert.deepEqual(suggestions.map((s) => s.score), [82, 76, 5]);
+  assert.deepEqual(suggestions.map((s) => s.travelMinutes), [10, 26, null]);
   assert.deepEqual(suggestions.map((s) => s.travelSource), ["ROUTE", "ROUTE", null]);
+  assert.match(String(suggestions[1]!.explanation), /dans environ 26 min \(dont 10 min de trajet routier\), 2 livraisons en cours/);
   assert.match(String(suggestions[2]!.explanation), /hors service/);
   for (const s of suggestions) {
     assert.equal(typeof s.explanation, "string");
@@ -340,6 +355,8 @@ function loadQueue(deliveries: Row[], osrm: (url: string) => { status: number; b
     "@/lib/query/list-limits": { AUTO_DISPATCH_QUEUE_TAKE: 100 },
     "@/lib/validations/dispatch-settings": dispatchSettings,
     "@/lib/dispatch/dispatch-score": dispatchScore,
+    "@/lib/dispatch/driver-queue": driverQueue,
+    "@/lib/dispatch/round-order": roundOrder,
     "@/lib/format/plural": pluralLib,
     "@/lib/dispatch/travel-time": {
       ...travelTime,
@@ -356,3 +373,48 @@ function loadQueue(deliveries: Row[], osrm: (url: string) => { status: number; b
     require: (id: string) => { assert.ok(id in all, id); return all[id]; } });
   return module.exports as Service;
 }
+
+test("DISPATCH-5 : file du livreur — retrait seulement s'il reste à faire, forfait sans coordonnées", () => {
+  const start = { latitude: 48.85, longitude: 2.35 };
+  const shop = { latitude: 48.86, longitude: 2.35 };
+  const client = { latitude: 48.87, longitude: 2.35 };
+  const leg = travelTime.straightLineSeconds;
+  const waiting = driverQueue.estimateDriverQueue(start, [{ status: "ASSIGNED", pickup: shop, destination: client }]);
+  assert.equal(waiting.seconds, leg(start, shop) + leg(shop, client) + 2 * driverQueue.QUEUE_STOP_SECONDS);
+  assert.deepEqual(waiting.end, client);
+  const onboard = driverQueue.estimateDriverQueue(start, [{ status: "IN_DELIVERY", pickup: shop, destination: client }]);
+  assert.equal(onboard.seconds, leg(start, client) + driverQueue.QUEUE_STOP_SECONDS, "colis à bord : livraison seule");
+  const unknown = driverQueue.estimateDriverQueue(start, [{ status: "ASSIGNED", pickup: null, destination: null }]);
+  assert.equal(unknown.seconds, driverQueue.QUEUE_MISSION_FALLBACK_SECONDS);
+  assert.deepEqual(unknown.end, start);
+  assert.deepEqual(driverQueue.estimateDriverQueue(start, []), { seconds: 0, missions: 0, end: start });
+});
+
+test("DISPATCH-5 : sans retrait saisi, le score vise l'adresse de livraison", () => {
+  assert.deepEqual(proximityLib.getDispatchTargetPoint({ pickupLatitude: 1, pickupLongitude: 2, latitude: 3, longitude: 4 }), { point: { latitude: 1, longitude: 2 }, kind: "PICKUP" });
+  assert.deepEqual(proximityLib.getDispatchTargetPoint({ pickupLatitude: null, pickupLongitude: null, latitude: 3, longitude: 4 }), { point: { latitude: 3, longitude: 4 }, kind: "DROPOFF" });
+  assert.equal(proximityLib.getDispatchTargetPoint({ latitude: null, longitude: 4 }), null);
+  assert.equal(
+    explainCandidate(candidate({ target: "DROPOFF", travel: { source: "ROUTE", seconds: 300 }, queueSeconds: 0 })),
+    "Arrivée à l'adresse de livraison dans environ 5 min (trajet routier), aucune livraison en cours."
+  );
+});
+
+test("DISPATCH-5 : créneau — le plus occupé qui le tient passe devant, celui qui le manque passe derrière", () => {
+  const slot = { startsInSeconds: 2 * 3600, afterArrivalSeconds: 0 };
+  const ranked = rankDispatchCandidates([
+    candidate({ id: "libre", travel: { source: "ROUTE", seconds: 600 }, queueSeconds: 0, slot }),
+    candidate({ id: "occupe-a-temps", load: 2, travel: { source: "ROUTE", seconds: 600 }, queueSeconds: 90 * 60, slot }),
+    candidate({ id: "trop-tard", load: 2, travel: { source: "ROUTE", seconds: 600 }, queueSeconds: 2 * 3600, slot }),
+  ]);
+  assert.deepEqual(ranked.map((r) => r.id), ["occupe-a-temps", "libre", "trop-tard"]);
+  assert.equal(ranked[0]!.score, ranked[1]!.score, "à temps tous les deux : même score, départagés par l'occupation");
+  assert.match(ranked[0]!.explanation, /à temps pour le créneau/);
+  assert.doesNotMatch(ranked[2]!.explanation, /à temps pour le créneau/);
+  // Sans créneau : le premier arrivé, file comprise.
+  const urgent = rankDispatchCandidates([
+    candidate({ id: "proche-occupe", load: 2, travel: { source: "ROUTE", seconds: 120 }, queueSeconds: 40 * 60 }),
+    candidate({ id: "loin-libre", travel: { source: "ROUTE", seconds: 20 * 60 }, queueSeconds: 0 }),
+  ]);
+  assert.deepEqual(urgent.map((r) => r.id), ["loin-libre", "proche-occupe"]);
+});

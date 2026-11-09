@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import * as driverQueue from "../src/lib/dispatch/driver-queue";
+import * as roundOrder from "../src/lib/dispatch/round-order";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -42,6 +44,8 @@ function load(deps: { prisma?: Row; settings?: Row; drivers?: Row[]; getDrivers?
     "@/lib/query/list-limits": { AUTO_DISPATCH_QUEUE_TAKE: 100 },
     "@/lib/validations/dispatch-settings": dispatchSettings,
     "@/lib/dispatch/dispatch-score": dispatchScore,
+    "@/lib/dispatch/driver-queue": driverQueue,
+    "@/lib/dispatch/round-order": roundOrder,
     "@/lib/dispatch/travel-time": travelTime,
     "@/lib/format/plural": plural,
   };

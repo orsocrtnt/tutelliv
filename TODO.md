@@ -17,6 +17,7 @@
 - SAAS-02 — Mesurer le revenu et la santé du SaaS (après les pilotes)
 - COST-1 — Simuler les coûts d'exploitation et la marge contributive (après les pilotes)
 - GROWTH-1 — Construire le site commercial relié au parcours autonome (après la vérification de conformité)
+- DISPATCH-5 — Imprévus et mesure du dispatch (vérifier en ligne après le déploiement)
 - MOTS-UNIFIES — Employer les mêmes mots partout à l'écran (après la vérification de conformité)
 - RELEASE-1 — Réaliser la recette de mise en vente (en dernier, avant la mise en vente)
 - SMS — Ajouter seulement les extensions justifiées (seulement si les pilotes le demandent)
@@ -39,7 +40,6 @@
 - PILOT-1 — Recruter et conduire trois pilotes accompagnés (après les entretiens)
 - PILOT-2 — Décider avec les preuves des pilotes (après les pilotes)
 - LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public (SIREN, e-mail, téléphone ; puis Claude)
-- DISPATCH-5 — Imprévus et mesure du dispatch (choisir la correction, puis Claude)
 - MAIL-PONT — Relier la boîte de commandes de l'entreprise à TutelLiv (régler `NEXT_PUBLIC_APP_URL` sur `https://tutelliv.fr` (Vercel, Preview `preproduction`) et retirer le filtre Gmail d'essai ; Outlook plus tard (décidé le 4 novembre) ; ensuite Claude)
 - WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (après le SIREN : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
 
@@ -88,7 +88,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - E-mails « Run failed » de GitHub (7 novembre, CI-POLICES, fait) : la cause était le téléchargement des polices chez Google pendant le build ; les polices sont maintenant dans le dépôt. Revérifié le 8 novembre : tout vert ; les runs « cancelled » ne sont pas des erreurs (deux envois rapprochés). Rien à faire.
 
 **2. Claude — peut le faire seul, dans cet ordre**
-- DISPATCH-5 : le score du Dispatch intelligent n'est pas efficace, les tournées le sont (mesure du 9 novembre) ; corriger le score dès ton choix.
+- DISPATCH-5 : score corrigé et tournées mises en avant le 9 novembre ; reste à vérifier l'écran et les suggestions en ligne après le déploiement.
 - DATA-02 : purge des prospects faite le 9 novembre ; reste la fin de pilote (export remis puis effacement à 30 jours), à cadrer avec toi au premier pilote.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - OPS-FIAB : dès tes trois commandes lancées, déclencher une panne fictive et vérifier l'e-mail d'alerte dans Gmail, puis l'alerte d'une tâche de fond en retard.
@@ -356,9 +356,11 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
 - [ ] **DISPATCH-5 — Imprévus et mesure du dispatch.**
 
-  **Qui : Toi — choisir la correction, puis Claude.**
+  **Qui : Claude — vérifier en ligne après le déploiement.**
 
   9 novembre 2026, mesure demandée par le propriétaire (`docs/operations/dispatch5/MESURE_2026-11-09.md`). Simulation de 30 journées par scénario avec le vrai code (`scripts/dispatch5/simulate-day.ts`) et lecture des suggestions réelles d'une démo sur tutelliv.fr. Résultat : les **tournées automatiques** sont efficaces (retards 3,0 % contre 14 à 16 % un jour calme, 13,8 % contre 33 à 35 % un jour chargé, 20 à 25 % de km à vide en moins). Le **score** (modes Automatique et Suggestion) ne fait pas mieux que « moins chargé » et guère mieux que le hasard, pour deux raisons : il ignore la file du livreur, et il mesure le trajet jusqu'au retrait, facultatif (sur la démo, « Trajet inconnu (retrait sans coordonnées) » pour toutes les suggestions). Vérifications : types et lint du script, résultats identiques sur deux exécutions. Limites : simulation à vol d'oiseau, pas de vraie journée. Suite : décision du propriétaire sur la correction (score « livré le plus tôt, file comprise », ou tournées mises en avant).
+
+  9 novembre 2026, correction (choix du propriétaire en questionnaire : « les deux »). Score : heure d'arrivée, livraisons en cours comprises, 80 % ; zone 10 % ; priorité 10 % ; la charge n'a plus de poids propre, le plafond reste. Le point visé est l'adresse de livraison si le retrait n'est pas saisi. Pour un créneau, le plus occupé qui le tient passe devant. Fichiers : `src/lib/dispatch/driver-queue.ts` (nouveau), `dispatch-score.ts`, `dispatch-proximity.ts` (`getDispatchTargetPoint`), `auto-dispatch.service.ts` (`loadDriverQueues`, lecture seule hors transaction). Historique client : « Meilleur score (heure d'arrivée, zone) ». Paramètres › Dispatch : bloc « Tournées » marqué « Recommandé », avec ce qu'il apporte, et textes d'aide du score à jour. `docs/legal/AIPD_TYPE.md` mis à jour (critères). Simulation avec le vrai code : retards 15,8 → 3,0 % (calme), 35,4 → 19,0 % (chargé), 38,6 → 6,1 % (plafond 6), 56,5 → 22,0 % (très chargé). Vérifications : `tests/dispatch-suggestions.test.ts` 17/17 (3 nouveaux : file, adresse de livraison en repli, créneau), `npm run check` 1 743/1 743. Non vérifié : affichage du bloc Tournées et suggestions en ligne, à faire après le déploiement. Constat : le plafond par défaut de 3 livraisons en cours freine le nouveau score (avec 6 : 6,1 % de retards contre 19,0 %) ; changer le défaut reste ta décision.
 
   Terminé quand : chaque proposition reste explicable et validable par le dispatcher ; aucune coordonnée de livreur exposée au client ; tests métier et `npm run check` verts ; recette navigateur.
 

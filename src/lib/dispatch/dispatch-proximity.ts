@@ -41,6 +41,24 @@ export function getDispatchPickupPoint(delivery: {
   return { latitude: delivery.pickupLatitude, longitude: delivery.pickupLongitude };
 }
 
+export type DispatchTarget = { point: GeoPoint; kind: "PICKUP" | "DROPOFF" };
+
+/**
+ * DISPATCH-5 — point visé par le score : le retrait s'il est connu, sinon l'adresse de livraison.
+ * Le retrait est facultatif ; sans ce repli, le trajet comptait pareil pour tous les livreurs.
+ */
+export function getDispatchTargetPoint(delivery: {
+  pickupLatitude?: number | null;
+  pickupLongitude?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+}): DispatchTarget | null {
+  const pickup = getDispatchPickupPoint(delivery);
+  if (pickup) return { point: pickup, kind: "PICKUP" };
+  if (!isFiniteCoordinate(delivery.latitude) || !isFiniteCoordinate(delivery.longitude)) return null;
+  return { point: { latitude: delivery.latitude, longitude: delivery.longitude }, kind: "DROPOFF" };
+}
+
 export function computeDispatchProximity(input: {
   settings: DispatchProximitySettings;
   pickup: GeoPoint | null;

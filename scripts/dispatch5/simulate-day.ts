@@ -15,6 +15,7 @@
  */
 import { resolveDriverForDelivery } from "@/domains/delivery/auto-dispatch.service";
 import { computeDispatchProximity, type DispatchProximity } from "@/lib/dispatch/dispatch-proximity";
+import { estimateDriverQueue, type DriverQueue } from "@/lib/dispatch/driver-queue";
 import { planRounds, type RoundDelivery, type RoundDriver, type RoundStop } from "@/lib/dispatch/round-planner";
 import { straightLineSeconds, type GeoPoint, type TravelEstimate } from "@/lib/dispatch/travel-time";
 import { DEFAULT_DISPATCH_SETTINGS, companyDispatchSettingsSchema, type CompanyDispatchSettings } from "@/lib/validations/dispatch-settings";
@@ -198,7 +199,7 @@ function settingsFor(strategy: "SCORE" | "LEAST_LOADED", cap: number): CompanyDi
 
 /** Vrai code TutelLiv : mode Automatique. */
 function appPicker(strategy: "SCORE" | "LEAST_LOADED", pickupKnown = true): Picker {
-  return ({ order, t, drivers, cap }) => {
+  return ({ order, t, drivers, orders, cap }) => {
     const settings = settingsFor(strategy, cap);
     const now = new Date(t);
     const activity = drivers.map((driver) => {
@@ -218,13 +219,23 @@ function appPicker(strategy: "SCORE" | "LEAST_LOADED", pickupKnown = true): Pick
     });
     const proximities = new Map<string, DispatchProximity>();
     const travel = new Map<string, TravelEstimate>();
+    const queues = new Map<string, DriverQueue>();
+    // Comme `loadDriverQueues` : file estimée depuis la position, missions dans l'ordre reçu.
+    const target = pickupKnown ? order.pickup : order.dropoff;
     for (const driver of drivers) {
       const position = driver.position(t);
       proximities.set(
         driver.id,
-        computeDispatchProximity({ settings, pickup: pickupKnown ? order.pickup : null, onDuty: true, position: { ...position, updatedAt: now }, now })
+        computeDispatchProximity({ settings, pickup: target, onDuty: true, position: { ...position, updatedAt: now }, now })
       );
-      if (pickupKnown) travel.set(driver.id, { source: "ROUTE", seconds: legSeconds(position, order.pickup) });
+      const missions = [...driver.missions].map((id) => ({
+        status: driver.pickedUp.has(id) ? "IN_DELIVERY" : "ASSIGNED",
+        pickup: orders.get(id)!.pickup,
+        destination: orders.get(id)!.dropoff,
+      }));
+      const queue = estimateDriverQueue(position, missions);
+      queues.set(driver.id, queue);
+      travel.set(driver.id, { source: "ROUTE", seconds: legSeconds(queue.end, target) });
     }
     const delivery = {
       id: order.id,
@@ -236,9 +247,12 @@ function appPicker(strategy: "SCORE" | "LEAST_LOADED", pickupKnown = true): Pick
       pickupPostalCode: "13001",
       pickupLatitude: pickupKnown ? order.pickup.latitude : null,
       pickupLongitude: pickupKnown ? order.pickup.longitude : null,
+      latitude: order.dropoff.latitude,
+      longitude: order.dropoff.longitude,
+      order: { deliverySlotStart: order.windowStart === null ? null : new Date(order.windowStart) },
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- forme minimale d'un livreur pour le calcul pur
-    return resolveDriverForDelivery(delivery as any, settings, activity as any, [], proximities, travel)?.driverId ?? null;
+    return resolveDriverForDelivery(delivery as any, settings, activity as any, [], proximities, travel, queues)?.driverId ?? null;
   };
 }
 
