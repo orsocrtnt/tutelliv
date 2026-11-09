@@ -84,6 +84,8 @@ Une réponse, même négative, arrête la suite automatique. Un « stop » arrê
 
 ## 5. Calendrier
 
+**Changé le 9 novembre 2026 (décision du propriétaire) :** le propriétaire, en stage à New York, ne peut pas appeler en journée. C'est l'ami basé à Paris qui appelle **et fait lui-même l'entretien** (6 questions, page 2 de l'antisèche `outputs/commercial/kit/TutelLiv-antiseche-commercial.pdf`), puis note les réponses dans la colonne Notes. Si le dirigeant veut voir le logiciel, il cale une visio de 20 minutes avec Orso **du lundi au vendredi entre 18 h et 18 h 30, heure française** (sa pause de midi à New York) et le prévient par mail. Le calendrier ci-dessous reste comme trace du plan de départ.
+
 Tu es à New York : **6 h de décalage avec la France depuis ce matin** (passage à l'heure d'hiver américaine). Tout tient dans un bloc : **de 8 h à 11 h à New York, soit de 14 h à 17 h en France.** Le matin français est sans doute le moment le plus chargé des dispatchers : à confirmer dès les premiers appels.
 
 | Date | Heure de New York | À faire |
@@ -258,6 +260,8 @@ Avant la première campagne (une seule fois) : migration `20261106100000_prospec
 Chiffres par campagne : envoyés, clics « Je veux en être », clics vers le site, visites du formulaire, candidatures, réponses. Pas de comptage des ouvertures (pixel bloqué par Outlook, faussé par l'iPhone, encadré par la CNIL). Les robots évidents ne sont pas comptés. Depuis le 6 novembre 2026, un clic ou une visite du formulaire n'est compté qu'après un geste réel du visiteur sur la page d'arrivée (appui, touche, molette ou mouvements de souris) : les antivirus des messageries (Microsoft, Proofpoint, Altospam, mail-tester), qui ouvraient chaque lien et gonflaient les clics lors des essais du 5 novembre, ne comptent plus. Un antivirus qui simulerait des gestes resterait compté. Supprimer une campagne efface aussi ses compteurs de clics et de visites, pas les candidatures.
 
 ## 8. Le rendez-vous de 20 à 30 minutes
+
+Depuis le 9 novembre 2026 : la partie « écouter » est faite par l'ami à Paris, au téléphone ; la démonstration par Orso, en visio entre 18 h et 18 h 30, heure française (partie 5).
 
 Pitch en 10 secondes, 30 secondes et 2 minutes, supports et démonstration minute par minute : [`PITCH.md`](PITCH.md).
 
