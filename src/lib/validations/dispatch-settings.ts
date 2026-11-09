@@ -54,7 +54,8 @@ export const companyDispatchSettingsSchema = z.object({
     .number()
     .int()
     .min(1, "Minimum 1 livraison active")
-    .default(3),
+    // DISPATCH-5 (décision du 9 novembre 2026) : 6 au lieu de 3, le score comptant la file du livreur.
+    .default(6),
   prioritizeCourier: z.boolean().default(true),
   autoAssignCategories: z.object({
     STANDARD: z.boolean(),
@@ -125,7 +126,7 @@ export const DEFAULT_DISPATCH_DRIVER_CATEGORIES: DispatchDriverCategories = {
 export const DEFAULT_DISPATCH_SETTINGS: CompanyDispatchSettings = {
   enabled: false,
   strategy: "PRIORITY_LIST",
-  maxActiveDeliveriesPerDriver: 3,
+  maxActiveDeliveriesPerDriver: 6,
   prioritizeCourier: true,
   autoAssignCategories: {
     STANDARD: true,

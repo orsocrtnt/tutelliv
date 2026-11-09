@@ -112,6 +112,11 @@ const candidate = (over: Partial<ScoreCandidate>): ScoreCandidate => ({
   id: "x", load: 0, maxLoad: 3, priority: null, zone: "ANY", zoneName: null, travel: null, positionStatus: "NO_POSITION", ...over,
 });
 
+test("plafond par défaut : 6 livraisons en cours (DISPATCH-5, décision du 9 novembre 2026)", () => {
+  assert.equal(base.maxActiveDeliveriesPerDriver, 6);
+  assert.equal(dispatchSettings.companyDispatchSettingsSchema.parse({ ...base, maxActiveDeliveriesPerDriver: undefined }).maxActiveDeliveriesPerDriver, 6);
+});
+
 test("score : poids documentés (somme 1) et bornes 0–100", () => {
   const sum = Object.values(DISPATCH_SCORE_WEIGHTS).reduce((a, b) => a + b, 0);
   assert.equal(Math.round(sum * 1000), 1000);
@@ -243,7 +248,7 @@ test("mode suggestion : la file refuse d'affecter en masse, rien n'est affecté"
 
 test("suggestions : 3 meilleurs, explication, aucune coordonnée ni contact, requête limitée à l'entreprise", async () => {
   const { svc, deliveryQueries } = load({
-    settings: { ...base, enabled: false },
+    settings: { ...base, enabled: false, maxActiveDeliveriesPerDriver: 3 },
     delivery: pending,
     drivers: [
       driver("a", 0, fresh(0.01)),
