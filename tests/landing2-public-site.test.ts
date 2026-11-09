@@ -87,7 +87,7 @@ test("LANDING-2 : formulaire de connexion en POST, même appel serveur et mêmes
   const form = read("src/features/auth/auth-form.tsx");
   assert.match(form, /<form method="post" onSubmit=\{loginForm\.handleSubmit\(onLogin\)\}/);
   assert.doesNotMatch(form, /method="get"/i);
-  assert.match(form, /setError\(json\.error \?\? "Email ou mot de passe incorrect\."\)/);
+  assert.match(form, /setError\(json\.error \?\? "E-mail ou mot de passe incorrect\."\)/);
 });
 
 function fakeScheduler() {

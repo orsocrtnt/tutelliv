@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     if (signInError || !signInData.user?.email) {
       await settleLoginAttempt(rateLimit.attempt, "failure");
       return NextResponse.json(
-        { error: "Email ou mot de passe incorrect." },
+        { error: "E-mail ou mot de passe incorrect." },
         { status: 401 }
       );
     }

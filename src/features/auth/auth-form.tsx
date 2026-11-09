@@ -170,7 +170,7 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
     }
     if (!res.ok) {
       loginGuard.release();
-      setError(json.error ?? "Email ou mot de passe incorrect.");
+      setError(json.error ?? "E-mail ou mot de passe incorrect.");
       return;
     }
     const requestedRedirect = new URLSearchParams(window.location.search).get("redirect");
