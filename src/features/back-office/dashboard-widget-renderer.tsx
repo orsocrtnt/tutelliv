@@ -107,7 +107,7 @@ function AlertsRowWidget() {
       />
       <StatCard
         quiet
-        label="Assignées non démarrées"
+        label="Assignées"
         tone="info"
         value={dashboard.alerts.assignedNotStarted}
         icon={UserCheck}
@@ -184,7 +184,7 @@ function AlertAssignedNotStartedWidget() {
   return (
     <StatCard
       quiet
-      label="Assignées non démarrées"
+      label="Assignées"
       tone="info"
       value={dashboard.alerts.assignedNotStarted}
       icon={UserCheck}
