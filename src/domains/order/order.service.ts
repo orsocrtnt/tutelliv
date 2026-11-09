@@ -13,7 +13,7 @@ import {
   isTeamStatusChangeAllowed,
 } from "@/lib/constants/order-status";
 import {
-  generateDeliveryReference,
+  deliveryReferenceForOrder,
   generateOrderReference,
 } from "@/lib/order-reference";
 import { formatStopAddress, getPrimaryCourierPickupFields } from "@/lib/order/courier-pickups";
@@ -616,7 +616,7 @@ export async function createClientOrder(
     ? pickupStops.flatMap((stop) => stop.items ?? []).reduce((sum, item) => sum + item.quantity, 0)
     : input.items.reduce((sum, item) => sum + item.quantity, 0);
   const orderReference = await generateOrderReference(deliveryCategory);
-  const deliveryReference = await generateDeliveryReference();
+  const deliveryReference = deliveryReferenceForOrder(orderReference);
 
   const pickupStopCoords =
     isCourier && pickupStops.length > 0
@@ -1128,7 +1128,7 @@ export async function updateCompanyOrderStatus(
   const quoteFirstStop = quoteStops[0];
   const quoteLastStop = quoteStops[quoteStops.length - 1] ?? quoteFirstStop;
   const quoteDeliveryReference = acceptingQuote
-    ? await generateDeliveryReference()
+    ? deliveryReferenceForOrder(order.reference)
     : null;
   const quoteDeliveryCoords = acceptingQuote
     ? await resolveDeliveryCoordinateFields({

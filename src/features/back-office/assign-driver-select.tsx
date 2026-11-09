@@ -47,7 +47,7 @@ function getDriverLabel(
   driver?: { firstName: string; lastName: string } | null
 ) {
   const label = formatDriverFromParts(driver, driverName, { unassignedLabel: "" });
-  return label === "Non assigné" ? null : label;
+  return label || null;
 }
 
 function DriverSelectItems({

@@ -42,7 +42,7 @@ const FIELDS = [
 const FIELD_TEXTS = FIELDS.map((field) => field.value);
 
 const HOME_DELIVERIES = [
-  { number: "#1038", place: "Bureau Bastille", status: "En route", x: 256, y: 168, live: true },
+  { number: "#1038", place: "Bureau Bastille", status: "En livraison", x: 256, y: 168, live: true },
   { number: "#1040", place: "Studio Oberkampf", status: "Livrée", x: 176, y: 96, live: false },
 ] as const;
 
@@ -54,7 +54,7 @@ const HOME_ACTIVITY = [
 
 /** Tableau de bord du client (démo) : ce qu'il suit d'un coup d'œil avant de commander. */
 const HOME_KPIS = [
-  { label: "En cours", value: "1", icon: Truck, tone: "bg-[#eaf2ff] text-[#1d4f9e]" },
+  { label: "En livraison", value: "1", icon: Truck, tone: "bg-[#eaf2ff] text-[#1d4f9e]" },
   { label: "Livrées ce mois", value: "14", icon: CheckCircle2, tone: "bg-[#e6f8ee] text-[#00a854]" },
   { label: "Prochain créneau", value: TOUR_ORDER.slot, icon: CalendarClock, tone: "bg-[#f0f4f1] text-[#0e1310]" },
   { label: "À régler", value: TOUR_INVOICE.amount, icon: Receipt, tone: "bg-[#fff1d6] text-[#a8660b]" },

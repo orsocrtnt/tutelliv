@@ -225,7 +225,7 @@ export function getDeliveryMapPhaseHint(delivery: DispatchMapDelivery): string |
   }
 
   if (isAwaitingPurchasePhase(delivery)) {
-    return "Attente d'achat · itinéraire vers la livraison";
+    return "Achat à faire · itinéraire vers la livraison";
   }
 
   if (

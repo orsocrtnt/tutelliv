@@ -878,7 +878,7 @@ export function DispatchSettingsForm() {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Assigné si aucun livreur compatible n&apos;est trouvé (doit respecter le profil).
+              Reçoit la livraison si aucun livreur compatible n&apos;est trouvé (doit respecter le profil).
             </p>
           </div>
         </CardContent>

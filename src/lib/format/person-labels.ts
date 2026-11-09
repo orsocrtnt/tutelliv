@@ -42,7 +42,7 @@ export function formatDriverFromParts(
   driverName?: string | null,
   options?: { unassignedLabel?: string }
 ): string {
-  const unassigned = options?.unassignedLabel ?? "Non assigné";
+  const unassigned = options?.unassignedLabel ?? "Sans livreur";
   if (driver) {
     const name = `${driver.firstName} ${driver.lastName}`.trim();
     if (name) return formatDriverDisplayName(name);

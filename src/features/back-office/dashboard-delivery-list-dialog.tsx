@@ -56,7 +56,9 @@ export function DashboardDeliveryListDialog({
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {delivery.customerName ?? "Client"} · Cmd {delivery.orderReference}
+                    {delivery.customerName ?? "Client"}
+                    {/* Les livraisons récentes portent le numéro de leur commande (AUDIT-0411) : pas de doublon. */}
+                    {delivery.orderReference && delivery.orderReference !== delivery.reference ? ` · Cmd ${delivery.orderReference}` : ""}
                     {delivery.driverName ? ` · ${delivery.driverName}` : ""}
                   </p>
                   {delivery.address && (

@@ -149,7 +149,7 @@ function fixture(failureStage: FailureStage) {
       },
       "@/lib/order-reference": {
         generateOrderReference: async () => "CMD-ATOMIC",
-        generateDeliveryReference: async () => "LIV-ATOMIC",
+        deliveryReferenceForOrder: (reference: string) => reference,
       },
       "@/lib/order/courier-pickups": {
         formatStopAddress: (stop: { address: string }) => stop.address,
@@ -285,6 +285,7 @@ for (const [label, input] of [
     assert.equal(order.id, "order-1");
     assert.equal(f.state.orders.length, 1);
     assert.equal(f.state.deliveries.length, 1);
+    assert.equal((f.state.deliveries[0] as { reference?: string }).reference, "CMD-ATOMIC");
     assert.equal(f.state.items.length, 1);
     assert.equal(f.state.stops.length, label === "coursier" ? 1 : 0);
     assert.equal(f.state.addresses.length, label === "standard" ? 1 : 0);

@@ -22,27 +22,31 @@ async function generateUniqueReference(
   throw new Error("REFERENCE_GENERATION_FAILED");
 }
 
+/**
+ * Un numéro de commande ne doit exister ni comme commande ni comme livraison : depuis
+ * AUDIT-0411, la livraison porte le numéro de sa commande.
+ */
+async function isReferenceTaken(reference: string): Promise<boolean> {
+  const [order, delivery] = await Promise.all([
+    prisma.order.findUnique({ where: { reference }, select: { id: true } }),
+    prisma.delivery.findUnique({ where: { reference }, select: { id: true } }),
+  ]);
+  return !!order || !!delivery;
+}
+
 export async function generateOrderReference(
   category: DeliveryCategory = "STANDARD"
 ): Promise<string> {
-  const prefix = ORDER_PREFIX[category];
-  return generateUniqueReference(prefix, async (reference) => {
-    const existing = await prisma.order.findUnique({
-      where: { reference },
-      select: { id: true },
-    });
-    return !!existing;
-  });
+  return generateUniqueReference(ORDER_PREFIX[category], isReferenceTaken);
 }
 
-export async function generateDeliveryReference(): Promise<string> {
-  return generateUniqueReference("LIV", async (reference) => {
-    const existing = await prisma.delivery.findUnique({
-      where: { reference },
-      select: { id: true },
-    });
-    return !!existing;
-  });
+/**
+ * Une commande donne une seule livraison, qui porte le même numéro (« CMD-… », « CRS-… »,
+ * « MIS-… ») : l'équipe et le client voient un seul numéro partout. Décision du propriétaire
+ * du 9 novembre 2026 (AUDIT-0411). Les livraisons créées avant gardent leur « LIV-… ».
+ */
+export function deliveryReferenceForOrder(orderReference: string): string {
+  return orderReference;
 }
 
 /** Plusieurs références uniques en une lecture par tour (créations en lot de la démo). */
@@ -66,13 +70,11 @@ async function generateUniqueReferences(
 }
 
 export async function generateOrderReferences(category: DeliveryCategory, count: number): Promise<string[]> {
-  return generateUniqueReferences(ORDER_PREFIX[category], count, async (references) =>
-    (await prisma.order.findMany({ where: { reference: { in: references } }, select: { reference: true } }))
-      .map((row) => row.reference));
-}
-
-export async function generateDeliveryReferences(count: number): Promise<string[]> {
-  return generateUniqueReferences("LIV", count, async (references) =>
-    (await prisma.delivery.findMany({ where: { reference: { in: references } }, select: { reference: true } }))
-      .map((row) => row.reference));
+  return generateUniqueReferences(ORDER_PREFIX[category], count, async (references) => {
+    const [orders, deliveries] = await Promise.all([
+      prisma.order.findMany({ where: { reference: { in: references } }, select: { reference: true } }),
+      prisma.delivery.findMany({ where: { reference: { in: references } }, select: { reference: true } }),
+    ]);
+    return [...orders, ...deliveries].map((row) => row.reference);
+  });
 }

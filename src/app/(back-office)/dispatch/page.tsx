@@ -370,7 +370,7 @@ function DispatcherDashboardContent() {
         <>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
             <StatCard
-              label="En attente"
+              label="Sans livreur"
               value={stats?.unassigned ?? 0}
               icon={Radio}
               changeLabel="À assigner"
@@ -379,13 +379,13 @@ function DispatcherDashboardContent() {
               label="En cours"
               value={stats?.activeDeliveries ?? 0}
               icon={Truck}
-              changeLabel="Assignées + en route"
+              changeLabel="Assignées + en livraison"
             />
             <StatCard
-              label="Non assignées"
+              label="Dans la file"
               value={pendingUnassigned}
               icon={Radio}
-              changeLabel="En attente d'un livreur"
+              changeLabel="Sans livreur, filtre appliqué"
             />
             <StatCard
               label="Livrées aujourd'hui"

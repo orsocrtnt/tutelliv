@@ -83,7 +83,7 @@ export const STATUS_ROWS: {
 }[] = [
   { key: "pending", label: "Sans livreur" },
   { key: "assigned", label: "Assignées" },
-  { key: "purchasing", label: "Achat / Collecté" },
+  { key: "purchasing", label: "En cours d'achat / Collectées" },
   { key: "inDelivery", label: "En livraison" },
   { key: "delivered", label: "Livrées" },
 ];

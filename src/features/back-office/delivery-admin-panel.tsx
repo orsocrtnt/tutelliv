@@ -177,7 +177,7 @@ export function DeliveryAdminPanel({ delivery, deliveryCategory }: DeliveryAdmin
           <FormField label="Statut">
             <Select value={status} onValueChange={(v) => setStatus(v as DeliveryStatus)}>
               <SelectTrigger aria-label="Statut de la livraison">
-                {/* « Assigné » est exclu de la liste : on affiche quand même le statut courant. */}
+                {/* « Assignée » est exclu de la liste : on affiche quand même le statut courant. */}
                 <SelectValue>{getFulfillmentStatusLabel(status, deliveryCategory)}</SelectValue>
               </SelectTrigger>
               <SelectContent>

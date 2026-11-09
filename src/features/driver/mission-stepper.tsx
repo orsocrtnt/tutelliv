@@ -12,13 +12,13 @@ interface MissionStepperProps {
   category: DeliveryCategory;
 }
 
-/** Indicateur de progression de la mission (Assignée → Collecte/Achat → Livraison → Livré). */
+/** Indicateur de progression de la mission (Assignée → Collecte/Achat → Livraison → Livrée). */
 export function MissionStepper({ status, category }: MissionStepperProps) {
   const steps = [
     { label: "Assignée" },
     { label: category === "COURIER" ? "Collecte" : "Achat" },
     { label: "Livraison" },
-    { label: "Livré" },
+    { label: "Livrée" },
   ];
   const currentIndex = STATUS_ORDER.indexOf(status);
   if (currentIndex < 0) return null;

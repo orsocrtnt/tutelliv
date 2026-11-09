@@ -12,11 +12,11 @@ type TrackingStep = {
 };
 
 const TRACKING_STEPS: TrackingStep[] = [
-  { key: "PENDING", label: "En attente" },
-  { key: "ASSIGNED", label: "Assigné" },
-  { key: "PURCHASING", label: "En cours d'achat", courierLabel: "Collecté" },
-  { key: "IN_DELIVERY", label: "En cours de livraison" },
-  { key: "DELIVERED", label: "Livré" },
+  { key: "PENDING", label: "Sans livreur" },
+  { key: "ASSIGNED", label: "Assignée" },
+  { key: "PURCHASING", label: "En cours d'achat", courierLabel: "Collectée" },
+  { key: "IN_DELIVERY", label: "En livraison" },
+  { key: "DELIVERED", label: "Livrée" },
 ];
 
 type ConnectorState = "completed" | "loading" | "upcoming";
@@ -45,7 +45,7 @@ function getStepIndex(status: DeliveryStatus): number {
 
 function stepLabel(step: TrackingStep, deliveryCategory: DeliveryCategory, status?: DeliveryStatus) {
   if (step.key === "DELIVERED" && (status === "FAILED" || status === "CANCELLED")) {
-    return status === "FAILED" ? "Échec" : "Annulé";
+    return status === "FAILED" ? "Échec" : "Annulée";
   }
   if (step.key === "PURCHASING" && deliveryCategory === "COURIER" && step.courierLabel) {
     return step.courierLabel;

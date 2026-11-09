@@ -91,7 +91,7 @@ export default function CompanyOrderDetailPage() {
               <p className="rounded-lg border border-amber-200 bg-background p-3 text-amber-900 dark:text-amber-100">
                 Fonction en essai. Le devis chiffré et son acceptation
                 restent gérés hors TutelLiv. Après accord externe, passez manuellement le statut
-                en « En attente » pour créer la livraison.
+                à « Sans livreur » pour créer la livraison.
               </p>
             )}
             {order.missionDescription && (

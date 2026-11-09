@@ -10,9 +10,9 @@ export function proposeLegacyDeliveryRecovery(delivery: {
   const legacy = delivery.status === "INVOICED" || delivery.status === "PAID";
   if (!legacy) return { legacy: false, candidateStatus: null, completedAt: delivery.completedAt, reviewRequired: false };
   const statuses: Record<string, DeliveryStatus> = {
-    "En attente": "PENDING", "Assigné": "ASSIGNED", "Assignée au livreur": "ASSIGNED",
-    "En cours d'achat": "PURCHASING", "Collecté": "PURCHASING", "En livraison": "IN_DELIVERY",
-    "Livré": "DELIVERED", "Échec de livraison": "FAILED", "Annulé": "CANCELLED",
+    "En attente": "PENDING", "Sans livreur": "PENDING", "Assigné": "ASSIGNED", "Assignée": "ASSIGNED", "Assignée au livreur": "ASSIGNED",
+    "En cours d'achat": "PURCHASING", "Collecté": "PURCHASING", "Collectée": "PURCHASING", "En livraison": "IN_DELIVERY",
+    "Livré": "DELIVERED", "Livrée": "DELIVERED", "Échec de livraison": "FAILED", "Annulé": "CANCELLED", "Annulée": "CANCELLED",
   };
   const events = [...delivery.trackingEvents].sort((a, b) => +a.occurredAt - +b.occurredAt);
   const last = events.filter((event) => statuses[event.label]).at(-1);

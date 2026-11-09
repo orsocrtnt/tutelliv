@@ -41,8 +41,8 @@ export function SceneTracking({ onDone, reducedMotion }: SceneProps) {
   const timeline = [
     { label: "Commandée", done: true },
     { label: "Attribuée à Lucas", done: true },
-    { label: "En route", done: delivered, active: !delivered },
-    { label: "Arrivé", done: delivered },
+    { label: "En livraison", done: delivered, active: !delivered },
+    { label: "Livrée", done: delivered },
   ];
 
   return (
@@ -58,7 +58,7 @@ export function SceneTracking({ onDone, reducedMotion }: SceneProps) {
             delivered ? "bg-[#e6f8ee] text-[#0e1310]" : "bg-[#eaf2ff] text-[#1d4f9e]"
           )}
         >
-          {delivered ? "Arrivé" : "En route"}
+          {delivered ? "Livrée" : "En livraison"}
         </span>
       </div>
 

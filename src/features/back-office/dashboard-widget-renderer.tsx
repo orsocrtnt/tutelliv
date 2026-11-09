@@ -115,13 +115,13 @@ function AlertsRowWidget() {
           openDrillDown({
             scope: "alert",
             key: "assignedNotStarted",
-            title: "Missions assignées non démarrées",
+            title: "Livraisons assignées, pas encore démarrées",
           })
         }
       />
       <StatCard
         quiet
-        label="En cours de route"
+        label="En livraison"
         tone="success"
         value={dashboard.alerts.inProgress}
         icon={Truck}
@@ -192,7 +192,7 @@ function AlertAssignedNotStartedWidget() {
         openDrillDown({
           scope: "alert",
           key: "assignedNotStarted",
-          title: "Missions assignées non démarrées",
+          title: "Livraisons assignées, pas encore démarrées",
         })
       }
     />
@@ -204,7 +204,7 @@ function AlertInProgressWidget() {
   return (
     <StatCard
       quiet
-      label="En cours de route"
+      label="En livraison"
       tone="success"
       value={dashboard.alerts.inProgress}
       icon={Truck}
@@ -248,7 +248,7 @@ function TodaySummaryWidget() {
             }
           />
           <TodayMetric
-            label="En cours"
+            label="En livraison"
             tone="info"
             counts={dashboard.today.inProgress}
             onClick={() =>
@@ -290,7 +290,7 @@ function TodaySummaryWidget() {
         <TodayDonut
           segments={[
             { label: "Livrées", value: dashboard.today.delivered.total, tone: "success" },
-            { label: "En cours", value: dashboard.today.inProgress.total, tone: "info" },
+            { label: "En livraison", value: dashboard.today.inProgress.total, tone: "info" },
             { label: "Restantes", value: dashboard.today.remaining.total, tone: "neutral" },
           ]}
         />

@@ -2,28 +2,31 @@ import type { DeliveryCategory, DeliveryStatus, OrderStatus } from "@prisma/clie
 
 export const FULFILLMENT_STATUS_LABELS: Record<OrderStatus, string> = {
   QUOTE_REQUESTED: "Devis demandé",
-  PENDING: "En attente",
-  ASSIGNED: "Assigné",
+  PENDING: "Sans livreur",
+  ASSIGNED: "Assignée",
   PURCHASING: "En cours d'achat",
   IN_DELIVERY: "En livraison",
-  DELIVERED: "Livré",
-  INVOICED: "Facturé",
-  PAID: "Payé",
-  CANCELLED: "Annulé",
+  DELIVERED: "Livrée",
+  INVOICED: "Facturée",
+  PAID: "Payée",
+  CANCELLED: "Annulée",
   FAILED: "Échec de livraison",
 };
 
-/** Libellés courts pour les selects en tableau */
+/**
+ * Libellés courts pour les selects en tableau. Mêmes mots que les libellés longs,
+ * au féminin (une livraison, une commande) : décision du propriétaire du 9 novembre 2026 (AUDIT-0411).
+ */
 export const COMPACT_STATUS_LABELS: Record<OrderStatus, string> = {
   QUOTE_REQUESTED: "Devis",
-  PENDING: "Attente",
-  ASSIGNED: "Assigné",
-  PURCHASING: "Achats",
-  IN_DELIVERY: "En cours",
-  DELIVERED: "Livré",
-  INVOICED: "Facturé",
-  PAID: "Payé",
-  CANCELLED: "Annulé",
+  PENDING: "Sans livreur",
+  ASSIGNED: "Assignée",
+  PURCHASING: "En cours d'achat",
+  IN_DELIVERY: "En livraison",
+  DELIVERED: "Livrée",
+  INVOICED: "Facturée",
+  PAID: "Payée",
+  CANCELLED: "Annulée",
   FAILED: "Échec",
 };
 
@@ -129,10 +132,10 @@ export function getFulfillmentStatusLabel(
   deliveryCategory?: DeliveryCategory | null
 ): string {
   if (status === "QUOTE_REQUESTED") {
-    return deliveryCategory === "SPECIAL_MISSION" ? "Devis demandé" : "Devis demandé";
+    return "Devis demandé";
   }
   if (status === "PURCHASING" && deliveryCategory === "COURIER") {
-    return "Collecté";
+    return "Collectée";
   }
   return FULFILLMENT_STATUS_LABELS[status as OrderStatus];
 }
@@ -145,7 +148,7 @@ export function getCompactStatusLabel(
     return "Devis";
   }
   if (status === "PURCHASING" && deliveryCategory === "COURIER") {
-    return "Collecté";
+    return "Collectée";
   }
   return COMPACT_STATUS_LABELS[status as OrderStatus];
 }

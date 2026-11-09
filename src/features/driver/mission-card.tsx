@@ -126,7 +126,7 @@ export function MissionCard({ mission, showActions = true }: MissionCardProps) {
   const showNavigation = canNavigateMission(mission);
 
   const statusLabels = {
-    PURCHASING: isCourier ? "Collecté" : "Achat en cours",
+    PURCHASING: isCourier ? "Collectée" : "En cours d'achat",
     IN_DELIVERY: "En livraison",
     DELIVERED: "Livraison terminée",
     FAILED: "Échec enregistré",

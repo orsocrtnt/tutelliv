@@ -28,7 +28,7 @@ test("MAP-3 : la progression reste compréhensible sans palette arc-en-ciel", ()
   const html = renderToStaticMarkup(
     DeliveryMapStatusBar({ status: "IN_DELIVERY", deliveryCategory: "STANDARD" })
   );
-  assert.match(html, /Statut : En cours de livraison/);
+  assert.match(html, /Statut : En livraison/);
   assert.match(html, /aria-current="step"/);
   assert.match(html, /bg-black/);
   assert.doesNotMatch(html, /#2563eb|#7c3aed|#ea580c|#16a34a|#f59e0b/);

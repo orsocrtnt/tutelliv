@@ -12,8 +12,8 @@ export const DISPATCH_MAP_STATUSES: {
 }[] = [
   { key: "late", label: "En retard", pill: "bg-[#fde3e0] text-[#b8352b] dark:bg-error-subtle dark:text-error dark:ring-1 dark:ring-current", dot: "#e5533f" },
   { key: "unassigned", label: "Sans livreur", pill: "bg-[#fde9d6] text-[#9a4e0c] dark:bg-warning-subtle dark:text-warning dark:ring-1 dark:ring-current", dot: "#ffffff" },
-  { key: "pending", label: "À démarrer", pill: "bg-[#e1ebfb] text-[#2a62bd] dark:bg-secondary dark:text-secondary-foreground dark:ring-1 dark:ring-current", dot: "#ffffff" },
-  { key: "route", label: "En route", pill: "bg-[#dff5e8] text-[#08783f] dark:bg-success-subtle dark:text-success dark:ring-1 dark:ring-current", dot: "#00d46a" },
+  { key: "pending", label: "Assignées", pill: "bg-[#e1ebfb] text-[#2a62bd] dark:bg-secondary dark:text-secondary-foreground dark:ring-1 dark:ring-current", dot: "#ffffff" },
+  { key: "route", label: "En livraison", pill: "bg-[#dff5e8] text-[#08783f] dark:bg-success-subtle dark:text-success dark:ring-1 dark:ring-current", dot: "#00d46a" },
 ];
 
 export function getDispatchMapStatus(
@@ -42,7 +42,7 @@ export function getDispatchMapStatusMeta(key: DispatchMapStatusKey) {
 
 /**
  * Filtres de la carte, comptés comme les cartes du tableau de bord : une livraison en retard compte
- * aussi dans « Sans livreur », « À démarrer » ou « En route ». La couleur du repère garde la priorité au retard.
+ * aussi dans « Sans livreur », « Assignées » ou « En livraison ». La couleur du repère garde la priorité au retard.
  * Avant, une livraison en retard sortait des autres filtres (0 · 0 · 0 contre 5 · 4 · 5 au tableau de bord).
  */
 export function getDispatchMapStatusMemberships(

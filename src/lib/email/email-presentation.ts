@@ -10,7 +10,7 @@ const DELIVERY: Record<string, { heading: string; status: string; tone?: "warnin
   "Livreur assigné": { heading: "Un livreur pour votre livraison.", status: "Livreur assigné" },
   "Prise en charge": { heading: "Votre livraison est prise en charge.", status: "Prise en charge" },
   "Courses en cours": { heading: "Vos courses ont commencé.", status: "Courses en cours" },
-  "En cours de livraison": { heading: "Votre livraison est en route.", status: "En cours de livraison" },
+  "En livraison": { heading: "Votre livraison est en route.", status: "En livraison" },
   "Livraison effectuée": { heading: "Votre livraison est arrivée.", status: "Livrée" },
   "Livraison annulée": { heading: "Votre livraison a été annulée.", status: "Annulée", tone: "warning" },
   "Livraison non effectuée": { heading: "Votre livraison n’a pas pu aboutir.", status: "Non effectuée", tone: "danger" },

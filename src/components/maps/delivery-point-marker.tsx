@@ -191,7 +191,7 @@ export function DeliveryOverviewMarker({
         className: "delivery-point-marker",
         html: `<div style="position:relative;width:0;height:0;overflow:visible;cursor:pointer;">
             <div style="position:absolute;left:0;top:0;transform:translate(-50%,-100%);">${pinSvg(isSelected ? 32 : 26, status, false, theme, isSelected)}</div>
-            ${showCallout ? calloutHtml(title || reference.replace(/^LIV-/, "#"), subtitle, status, isSelected ? 48 : 40, theme) : ""}
+            ${showCallout ? calloutHtml(title || reference.replace(/^[A-Z]+-/, "#"), subtitle, status, isSelected ? 48 : 40, theme) : ""}
           </div>`,
         iconSize: [1, 1],
         iconAnchor: [0, 0],

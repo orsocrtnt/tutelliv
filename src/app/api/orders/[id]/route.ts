@@ -84,7 +84,7 @@ export async function PATCH(
       return NextResponse.json(
         {
           error:
-            "Cette demande doit être confirmée en « En attente » après accord externe, ou annulée.",
+            "Cette demande doit être passée à « Sans livreur » après accord externe, ou annulée.",
           code: error.message,
         },
         { status: 409 }

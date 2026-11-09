@@ -79,7 +79,7 @@ const DELIVERY_COPY: Partial<
     body: (ref) => `Les courses de ${ref} ont commencé.`,
   },
   IN_DELIVERY: {
-    title: "En cours de livraison",
+    title: "En livraison",
     body: (ref) => `${ref} est en route.`,
   },
   DELIVERED: {

@@ -11,7 +11,7 @@ const NAV = companyNav("Tableau de bord");
 const KPIS = [
   { label: "En retard", value: "3", icon: AlertTriangle, tone: "bg-[#fde8e6] text-[#c2382a]" },
   { label: "Sans livreur", value: "5", icon: PackageOpen, tone: "bg-[#fff1d6] text-[#a8660b]" },
-  { label: "En route", value: "7", icon: Truck, tone: "bg-[#eaf2ff] text-[#1d4f9e]" },
+  { label: "En livraison", value: "7", icon: Truck, tone: "bg-[#eaf2ff] text-[#1d4f9e]" },
   { label: "Livrées", value: "48", icon: CheckCircle2, tone: "bg-[#e6f8ee] text-[#00a854]" },
 ] as const;
 

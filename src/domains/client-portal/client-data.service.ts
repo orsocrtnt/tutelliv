@@ -1,6 +1,6 @@
 import { prisma } from "@/services/prisma/client";
 import {
-  generateDeliveryReference,
+  deliveryReferenceForOrder,
   generateOrderReference,
 } from "@/lib/order-reference";
 
@@ -62,7 +62,7 @@ export async function provisionClientTestData(
   if (existingOrders > 0) return;
 
   const orderReference = await generateOrderReference("STANDARD");
-  const deliveryReference = await generateDeliveryReference();
+  const deliveryReference = deliveryReferenceForOrder(orderReference);
 
   await prisma.$transaction(async (tx) => {
     const order = await tx.order.create({

@@ -20,8 +20,7 @@ import {
 import { createAdminClient } from "@/services/supabase/admin";
 import { formatDriverDisplayName } from "@/lib/format/person-labels";
 import {
-  generateDeliveryReference,
-  generateDeliveryReferences,
+  deliveryReferenceForOrder,
   generateOrderReference,
   generateOrderReferences,
 } from "@/lib/order-reference";
@@ -177,7 +176,7 @@ export function buildScenario(anchor: Date): ScenarioItem[] {
       tracking: [
         { label: "Commande reçue", offsetHours: -5.5 },
         { label: "En livraison", offsetHours: -4.5, latitude: 48.8606, longitude: 2.3376 },
-        { label: "Livré", description: "Colis remis au destinataire", offsetHours: -4, latitude: 48.86244, longitude: 2.3362 },
+        { label: "Livrée", description: "Colis remis au destinataire", offsetHours: -4, latitude: 48.86244, longitude: 2.3362 },
       ],
       proof: proof("Marie Dubois"),
       invoice: { status: "PAID", paidOffsetHours: -1 },
@@ -198,7 +197,7 @@ export function buildScenario(anchor: Date): ScenarioItem[] {
       tracking: [
         { label: "Commande reçue", offsetHours: -4.5 },
         { label: "En livraison", offsetHours: -3.5 },
-        { label: "Livré", description: "Remis à l'accueil", offsetHours: -3, latitude: 48.87393, longitude: 2.31534 },
+        { label: "Livrée", description: "Remis à l'accueil", offsetHours: -3, latitude: 48.87393, longitude: 2.31534 },
       ],
       proof: proof("Accueil du cabinet"),
       invoice: { status: "PENDING", dueInDays: 30 },
@@ -227,7 +226,7 @@ export function buildScenario(anchor: Date): ScenarioItem[] {
       tracking: [
         { label: "Course reçue", offsetHours: -4 },
         { label: "Collecte faite", offsetHours: -2.5 },
-        { label: "Livré", description: "Remis en boutique", offsetHours: -2, latitude: 48.87311, longitude: 2.38148 },
+        { label: "Livrée", description: "Remis en boutique", offsetHours: -2, latitude: 48.87311, longitude: 2.38148 },
       ],
       proof: proof("Léa Martin"),
     },
@@ -247,7 +246,7 @@ export function buildScenario(anchor: Date): ScenarioItem[] {
       tracking: [
         { label: "Commande reçue", offsetHours: -3 },
         { label: "En livraison", offsetHours: -1.75 },
-        { label: "Livré", description: "Remis en main propre", offsetHours: -1, latitude: 48.85277, longitude: 2.36994 },
+        { label: "Livrée", description: "Remis en main propre", offsetHours: -1, latitude: 48.85277, longitude: 2.36994 },
       ],
       proof: proof("Hugo Lambert"),
     },
@@ -493,7 +492,7 @@ export function buildScenarioHistory(anchor: Date): ScenarioItem[] {
         items: [{ name: "Colis", quantity: 1, unitPrice: 25.0 + (n % 4) * 5 }],
         tracking: [
           { label: "Commande reçue", offsetHours: completed - 3 },
-          { label: "Livré", offsetHours: completed },
+          { label: "Livrée", offsetHours: completed },
         ],
         proof: proof("Réception"),
       });
@@ -766,10 +765,8 @@ async function createScenarioDelivery(
     ? courierItems.reduce((sum, item) => sum + item.quantity, 0)
     : items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const [orderReference, deliveryReference] = await Promise.all([
-    generateOrderReference(scenario.deliveryCategory),
-    generateDeliveryReference(),
-  ]);
+  const orderReference = await generateOrderReference(scenario.deliveryCategory);
+  const deliveryReference = deliveryReferenceForOrder(orderReference);
   const primaryPickup = isCourier
     ? getPrimaryCourierPickupFields(
         pickupStops.map((stop) => ({
@@ -916,7 +913,7 @@ async function createScenarioDelivery(
 
     if (scenario.invoice) {
       // Full delivery ref keeps global uniqueness (slice(-6) can collide).
-      const invoiceRef = `FAC-DEMO-${deliveryReference.replace(/^LIV-/, "")}`;
+      const invoiceRef = `FAC-DEMO-${deliveryReference.replace(/^[A-Z]+-/, "")}`;
       await tx.invoice.create({
         data: {
           reference: invoiceRef,
@@ -976,10 +973,8 @@ async function createScenarioHistory(
   if (items.some((item) => item.deliveryCategory !== "STANDARD" || item.invoice || item.supportTicket || item.pickupStops)) {
     throw new Error("DEMO_HISTORY_ITEM_UNSUPPORTED");
   }
-  const [orderReferences, deliveryReferences] = await Promise.all([
-    generateOrderReferences("STANDARD", items.length),
-    generateDeliveryReferences(items.length),
-  ]);
+  const orderReferences = await generateOrderReferences("STANDARD", items.length);
+  const deliveryReferences = orderReferences.map(deliveryReferenceForOrder);
   const actors = items.map(actorsFor);
   const at = (offset: number | undefined) => (offset != null ? hoursFromNow(offset, referenceDate) : null);
 

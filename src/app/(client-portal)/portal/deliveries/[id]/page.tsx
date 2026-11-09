@@ -87,7 +87,7 @@ export default function ClientDeliveryDetailPage() {
               )}
             </p>
           )}
-          {delivery.order && (
+          {delivery.order && delivery.order.reference !== delivery.reference && (
             <p className="mt-1 text-xs text-muted-foreground">Commande {delivery.order.reference}</p>
           )}
         </div>

@@ -72,7 +72,7 @@ test("les mails reconnus ont leur titre et leur statut sans inventer de données
     ["Livreur assigné", "Un livreur pour votre livraison.", "LIVREUR ASSIGNÉ"],
     ["Prise en charge", "Votre livraison est prise en charge.", "PRISE EN CHARGE"],
     ["Courses en cours", "Vos courses ont commencé.", "COURSES EN COURS"],
-    ["En cours de livraison", "Votre livraison est en route.", "EN COURS DE LIVRAISON"],
+    ["En livraison", "Votre livraison est en route.", "EN LIVRAISON"],
     ["Livraison effectuée", "Votre livraison est arrivée.", "LIVRAISON EFFECTUÉE"],
     ["Livraison annulée", "Votre livraison a été annulée.", "LIVRAISON ANNULÉE"],
     ["Livraison non effectuée", "Votre livraison n’a pas pu aboutir.", "LIVRAISON NON EFFECTUÉE"],
