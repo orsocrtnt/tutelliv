@@ -93,8 +93,12 @@ Verdicts : **Cohérent** (constat conforme au texte lu), **Écart** (à corriger
 - Appels aux professionnels : maintenus avec prudence (lignes professionnelles, en semaine de 14 h à 17 h, sujet lié à l'activité, refus respecté), risque accepté.
 - Textes J5 : accès au Drive donné par le propriétaire pour ce travail, en lecture seule. Rien n'a été modifié sur Drive.
 
+**Décidé le 9 novembre**
+- Durées de conservation du [projet DATA-02](../operations/data02/RETENTION_POLICY_DRAFT.md) validées telles que proposées, sans avis d'un juriste.
+- CGV, articles 16 et 17 : plafond de responsabilité égal aux sommes payées par le client sur les 12 derniers mois ; préavis de 30 jours pour changer les conditions.
+- SIREN : demande déposée au Guichet unique, numéro pas encore reçu.
+
 **À décider**
-- Durées de conservation du [projet DATA-02](../operations/data02/RETENTION_POLICY_DRAFT.md).
 - Faire confirmer ou non les points incertains par un professionnel.
 - Clauses marquées « choix contractuel » dans les CGV et le DPA (section 6).
 
@@ -117,7 +121,7 @@ Lus sur Drive le 2 novembre 2026, avec l'accord du propriétaire. Complète [la 
 | **CGV, article 6** | Baisse de formule : refusée tant que des comptes dépassent la limite (C10) | Préciser |
 | **CGV, article 7** | Découverte de 60 jours : s'arrête au premier échec de paiement et dès une demande de résiliation (C10) | Ajouter |
 | **CGV, article 11** | Rien sur le changement de fournisseur (Data Act) ; durée d'accès après la fin non fixée | Ajouter après lecture du texte |
-| **CGV, articles 16 et 17** | Plafond de responsabilité et préavis de 30 jours encore au stade de propositions | Décision du propriétaire |
+| **CGV, articles 16 et 17** | Plafond de responsabilité et préavis de 30 jours : décidés le 9 novembre (section 4) | Reporter dans les CGV |
 | **CGU, article 2** | « Dispatcher / mini-administrateur » réunis ; le code a deux rôles distincts (`DISPATCHER`, `MINI_ADMIN`) | Séparer |
 | **CGU, articles 6 et 7** | Faits à inscrire : position lue pendant le service, dernière position seule en base, effacée à chaque changement de service ; métadonnées des photos retirées. Signature et nom du destinataire absents | Compléter |
 | **CGU, article 14** | Acceptation enregistrée avec version et date : aucun champ de ce type trouvé dans `prisma/schema.prisma` ni dans l'inscription | Développement avant la vente |

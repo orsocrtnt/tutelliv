@@ -2,6 +2,8 @@
 
 Date de référence : 18 octobre 2026. Cette proposition traduit les orientations produit en règles techniques. Elle doit être validée par le futur responsable juridique avant activation sur des données réelles.
 
+Durées validées par le propriétaire le 9 novembre 2026, sans avis d'un juriste : elles servent de base à la purge et à l'export.
+
 ## Politique proposée
 
 | Catégorie | Base active proposée | Archivage ou suppression | Conséquence technique |
