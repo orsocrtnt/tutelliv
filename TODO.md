@@ -4,7 +4,7 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**111 tâches terminées sur 141 — 79 %**
+**112 tâches terminées sur 142 — 79 %**
 
 `████████████████░░░░` · 30 tâches restantes
 
@@ -83,6 +83,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Avant le dépôt au Guichet unique : vérifier la reprise de ton ancien SIREN, et ta capacité à exercer depuis les États-Unis sous visa J-1 avec ta résidence fiscale (checklist J5, non tranché).
 - LEGAL-1 (sections 4 et 6 de `docs/legal/VERIFICATION_2026-11-02.md`) : fournir SIREN, e-mail et téléphone. Décidé le 9 novembre : durées de conservation de DATA-02 validées telles que proposées ; CGV, plafond de responsabilité = sommes payées sur les 12 derniers mois, préavis de 30 jours. Confirmer aussi la durée provisoire de sept jours pour la file hors ligne du livreur, et, si un pilote emploie des livreurs indépendants payés à la livraison, faire qualifier l'affectation automatique (`docs/legal/AIPD_TYPE.md`, section 3).
 - Plus tard : trouver un téléphone Android (essais MOB-01C).
+- Page GitHub du projet (10 novembre, GITHUB-VITRINE, fait) : description, lien du site, sujets et README avec logo, badges et captures de la démo. Le dépôt est public. Rien à faire ; si tu veux une image d'aperçu pour les partages, c'est dans Settings → Social preview sur GitHub.
 - Vidéo d'explication de 2 min 15 (10 novembre, VIDEO-EXPLICATION) : prête dans `outputs/brag/tutelliv-explication.mp4`, on garde cette base. Dis à Claude les retouches que tu veux (scène, texte, musique, voix) ; à écouter : la prononciation de « TutelLiv ».
 - Plus tard : passer Supabase en Pro (environ 25 $/mois) avant les vraies données, pour la protection contre les mots de passe compromis.
 - MAIL-PONT : essai Gmail réussi le 4 novembre ; revérifié le 9 novembre : `NEXT_PUBLIC_APP_URL` pas encore changée (inchangée depuis le 17 octobre). À faire : dans Vercel, mettre `NEXT_PUBLIC_APP_URL` = `https://tutelliv.fr` pour Preview `preproduction` (les liens de suivi des e-mails pointent vers l'adresse `…vercel.app`), puis redéployer (contrôlé par Claude le 4 novembre : `https://tutelliv.fr/reset-password` est déjà autorisé dans Supabase, donc le changement ne casse pas « mot de passe oublié » ; modification refusée à l'agent par l'outil de sécurité) ; supprimer le filtre Gmail d'essai (Paramètres > Filtres) ; fournir une boîte Outlook pour l'essai Outlook.

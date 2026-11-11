@@ -1,6 +1,63 @@
-# TutelLiv
+<div align="center">
 
-TutelLiv est un SaaS multi-entreprise pour centraliser les commandes de livraison, l'affectation des chauffeurs, les échanges, le suivi daté, les preuves et l'historique. Le produit comporte trois espaces : administration/dispatch, portail client et application web chauffeur.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="public/brand/logo-horizontal-fond-sombre.png">
+  <img src="public/brand/logo-horizontal-fond-clair.png" alt="TutelLiv" width="260">
+</picture>
+
+### Le logiciel des entreprises de livraison B2B
+
+Commandes, dispatch, suivi en direct, preuve de livraison et facturation, au même endroit.<br>
+Un espace pour l'entreprise, un pour ses clients, un pour ses livreurs.
+
+[**Essayer la démo**](https://tutelliv.fr/demo) · [Site](https://tutelliv.fr) · [Documentation](docs/README.md)
+
+[![CI](https://github.com/orsocrtnt/tutelliv/actions/workflows/ci.yml/badge.svg?branch=preproduction)](https://github.com/orsocrtnt/tutelliv/actions/workflows/ci.yml)
+![Next.js 15](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-PostgreSQL-2D3748?logo=prisma&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20Storage-3ECF8E?logo=supabase&logoColor=white)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+
+<br>
+
+<img src="docs/assets/readme/admin-dashboard.jpg" alt="Tableau de bord de l'entreprise de livraison" width="900">
+
+</div>
+
+## En bref
+
+TutelLiv est un SaaS multi-entreprise pour centraliser les commandes de livraison, l'affectation des chauffeurs, les échanges, le suivi daté, les preuves et l'historique. Il remplace les appels, les SMS et le tableur par un seul outil, partagé par trois espaces :
+
+| Espace | Pour qui | Ce qu'on y fait |
+| --- | --- | --- |
+| **Entreprise** | Le dirigeant et le dispatch | Recevoir les commandes, affecter les livreurs, suivre la journée sur la carte, facturer |
+| **Client** | Les clients de l'entreprise | Commander seul, répéter une commande chaque semaine, suivre sa livraison sans appeler |
+| **Livreur** | Les chauffeurs | Voir ses missions, se guider, livrer avec photo et signature, signaler un imprévu, sans application à installer |
+
+Chacun ne voit que ce qui le concerne.
+
+## Aperçu
+
+_Captures de la [démonstration publique](https://tutelliv.fr/demo) : données fictives._
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/assets/readme/admin-dispatch.jpg" alt="Centre de dispatch"><br><b>Dispatch</b> : une seule file d'attente, un livreur choisi en un clic, ou proposé par TutelLiv.</td>
+    <td width="50%"><img src="docs/assets/readme/admin-map.jpg" alt="Carte des livraisons en cours"><br><b>Carte</b> : toutes les livraisons et tous les livreurs de la journée, en direct.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/assets/readme/client-delivery.jpg" alt="Suivi d'une livraison côté client"><br><b>Espace client</b> : l'état de la livraison, le livreur et l'heure d'arrivée, sans appeler.</td>
+    <td width="50%"><img src="docs/assets/readme/admin-billing.jpg" alt="Facturation"><br><b>Facturation</b> : factures issues des livraisons, paiements suivis, relance en un clic.</td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/assets/readme/livreur.jpg" alt="Espace livreur sur téléphone : missions, guidage et confirmation" width="760"><br>
+  <b>Espace livreur</b> : missions du jour, guidage jusqu'à l'adresse, confirmation avec preuve.
+</p>
+
+## Pour les contributeurs
 
 L'état et l'ordre du travail sont suivis dans [`TODO.md`](TODO.md). Les instructions persistantes destinées aux contributeurs et agents se trouvent dans [`AGENTS.md`](AGENTS.md).
 
