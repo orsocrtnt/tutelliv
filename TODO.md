@@ -4,9 +4,9 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**112 tâches terminées sur 142 — 79 %**
+**113 tâches terminées sur 142 — 80 %**
 
-`████████████████░░░░` · 30 tâches restantes
+`████████████████░░░░` · 29 tâches restantes
 
 **À faire par Claude**
 
@@ -34,7 +34,6 @@
 - PROPRIO-2810 — Actions du propriétaire avant mise en ligne
 - ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire (brancher le fichier Google (`docs/operations/prospection/SHEET.md`), puis Claude vérifie la lecture réelle ; campagnes : l'autre session les fusionne)
 - ONBOARD-1 — Guider jusqu’à la première livraison (pendant les pilotes)
-- OPS-FIAB — Fiabiliser les tâches de fond et l'exploitation (une commande, puis Claude)
 - LEGAL-1 — Vérifier le respect des exigences applicables et préparer les documents (fournir les pièces et décider, puis Claude)
 - OFFER-1 — Valider la grille cible et l'offre pilote (pendant les entretiens et les pilotes)
 - PILOT-1 — Recruter et conduire trois pilotes accompagnés (après les entretiens)
@@ -47,12 +46,12 @@
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
 <!-- TODO_PROGRESS_END -->
 
-## Ce qu'il reste vraiment à faire (vue simple, à jour au 9 novembre 2026)
+## Ce qu'il reste vraiment à faire (vue simple, à jour au 10 novembre 2026)
 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
-- **À lancer toi-même (refusé à Claude le 9 novembre par la sécurité de Claude Code) :** 1) dans le terminal du dépôt, `sh scripts/ops03b/copy-alert-email.sh` (doit afficher `"stored":true`) ; 2) sur Vercel, projet `tutelliv-v2`, Settings → Environment Variables, `NEXT_PUBLIC_APP_URL` (Preview, branche `preproduction`) = `https://tutelliv.fr`, puis Redeploy du dernier déploiement `preproduction` ; 3) brancher le fichier Google : créer la clé du compte de service dans Google Cloud (`docs/operations/prospection/SHEET.md`, étape 1 ; Claude peut la faire dans ton Chrome si l'extension est connectée), puis `sh outputs/prospection-sheet/brancher-vercel.sh` (pose les 3 variables sans afficher la clé et relance le déploiement), puis partager la Sheet en Lecteur avec l'adresse `client_email`. Dis ensuite à Claude « vérifie » : il teste l'alerte, les liens des e-mails et `/admin/prospection`. Pour ne plus avoir ce refus, tu peux ajouter une règle de permission dans Claude Code.
+- **À lancer toi-même (refusé à Claude le 9 novembre par la sécurité de Claude Code) :** 1) sur Vercel, projet `tutelliv-v2`, Settings → Environment Variables, `NEXT_PUBLIC_APP_URL` (Preview, branche `preproduction`) = `https://tutelliv.fr`, puis Redeploy du dernier déploiement `preproduction` ; 2) brancher le fichier Google : créer la clé du compte de service dans Google Cloud (`docs/operations/prospection/SHEET.md`, étape 1 ; Claude peut la faire dans ton Chrome si l'extension est connectée), puis `sh outputs/prospection-sheet/brancher-vercel.sh` (pose les 3 variables sans afficher la clé et relance le déploiement), puis partager la Sheet en Lecteur avec l'adresse `client_email`. Dis ensuite à Claude « vérifie » : il teste les liens des e-mails et `/admin/prospection`. Pour ne plus avoir ce refus, tu peux ajouter une règle de permission dans Claude Code.
 - Campagnes (9 novembre, ADMIN-ESPACE) : sur tutelliv.fr/admin/campaigns, chaque campagne montre maintenant l'aperçu du mail (De, Objet, Aperçu, puis le mail tel qu'il partira) et un bouton « Retirer » sur chaque adresse pas encore envoyée. À regarder une fois en ligne ; Claude vérifiera aussi en cliquant dès que Chrome est connecté.
 - Démo, liste « À essayer » (DEMO-ESSAYER-2, close le 6 novembre, vérifiée en ligne) : chaque étape dit quoi faire, une bande sous la barre de démo guide l'étape en cours, chaque étape se coche toute seule dans n'importe quelle vue, puis l'annonce propose « Y aller » vers la suivante. Au passage : /dispatch ne plante plus à l'affectation d'un livreur (environ 1 fois sur 3 avant). Rien à faire.
 - Démo refondue (DEMO-REFONTE close le 6 novembre, tout vérifié en ligne) : journée claire remise à l'heure à l'ouverture (1 seul retard), clients entreprises, liste « À essayer 0/4 », démo expirée renvoyée vers une neuve, espaces abandonnés repris après 30 min, preuves du jour avec photo et signature (PDF : titre « PHOTO » gardé avec sa photo), téléphones « 06 12 34 56 78 », espace de base vidé (ton script). À regarder en ouvrant une démo neuve. Rien à faire.
@@ -67,7 +66,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Connexion et démo (5 novembre, AUTH-DIRECT, terminé et poussé sur `preproduction`) : « Connexion » ouvre tout de suite le formulaire, chaque compte arrive dans son espace ; « Voir la démo » ouvre l'espace de démo sans identifiants (`/demo`). À essayer sur tutelliv.fr après le déploiement.
 - Barre du haut (5 novembre) : sur le site public, liens Fonctionnalités · Tarifs · Contact remis au centre exact de la barre, comme avant (à ta demande, après l'essai « entre le logo et les boutons ») ; l'espace client garde le réglage entre le logo et les boutons. Rien à faire ; poussé sur `preproduction`.
 - Site public (5 novembre) : Démonstration retirée, Fonctionnalités mise à jour, Tarifs remplacée par une page « TutelLiv arrive bientôt » avec liste d'attente (détail dans GROWTH-1). Les inscriptions arrivent dans `/admin/contact`, marquées « Liste d'attente ». Rien à faire ; poussé sur `preproduction`.
-- OPS-FIAB (4 novembre ; revérifié le 9 novembre : commande pas encore lancée, les secrets d'alerte sont absents du coffre de préproduction) : push et migration faits par Claude (déploiement prêt, sonde toujours saine). Reste une commande, refusée à l'agent : `sh scripts/ops03b/copy-alert-email.sh` (doit afficher `"stored":true`). Dis-moi quand c'est fait : je teste l'e-mail.
+- Alertes de panne (OPS-FIAB, close le 10 novembre) : ta commande a stocké les secrets ; Claude a vérifié dans ton Gmail les trois e-mails (panne fictive, tâche de fond en échec, retour à la normale). Rien à faire.
 - Le 3 novembre, règles d'autorisation ajoutées à ta demande (`.claude/settings.local.json`, non versionné) : migration de préproduction, variable `DRIVE_ROUTE_IGN_URL`, push et copie du secret du relais faits par Claude.
 - Avant le premier pilote : faire confirmer par un comptable le mot « Facture » à l'écran pour un document sans toutes les mentions légales (le PDF classique reste « Relevé de prestation »).
 - Cette semaine, le plus important (audit du 1er novembre, PDF dans `outputs/audit-2026-11-01/`) : contacter des sociétés de livraison et tenir dix entretiens (PROD-02) ; le plan complet, les textes, la liste d'entreprises et le pitch avec déroulé de démonstration sont prêts (`docs/operations/prospection/README.md`, `docs/operations/prospection/PITCH.md`). Liste à appeler : fichier Drive « TutelLiv_Suivi_Prospection_2026 », onglets PARIS (214 entreprises) et MARSEILLE (123 entreprises, Marseille, Bouches-du-Rhône et Toulon), avec téléphone ou e-mail, refaits le 4 novembre. Chaque jour à partir du 2 novembre : trouver les coordonnées, écrire et appeler de 8 h à 11 h à New York (14 h à 17 h en France).
@@ -83,7 +82,6 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Avant le dépôt au Guichet unique : vérifier la reprise de ton ancien SIREN, et ta capacité à exercer depuis les États-Unis sous visa J-1 avec ta résidence fiscale (checklist J5, non tranché).
 - LEGAL-1 (sections 4 et 6 de `docs/legal/VERIFICATION_2026-11-02.md`) : fournir SIREN, e-mail et téléphone. Décidé le 9 novembre : durées de conservation de DATA-02 validées telles que proposées ; CGV, plafond de responsabilité = sommes payées sur les 12 derniers mois, préavis de 30 jours. Confirmer aussi la durée provisoire de sept jours pour la file hors ligne du livreur, et, si un pilote emploie des livreurs indépendants payés à la livraison, faire qualifier l'affectation automatique (`docs/legal/AIPD_TYPE.md`, section 3).
 - Plus tard : trouver un téléphone Android (essais MOB-01C).
-- Page GitHub (10 novembre, GITHUB-VITRINE) : dépôt TutelLiv embelli (description, sujets, README illustré) et sujets ajoutés à Atelia. À faire toi (refusé à Claude, Chrome non connecté) : 1) `sh outputs/github-profil/publier.sh` crée ta page de profil publique (ton nom, TutelLiv et Atelia avec images) ; 2) sur github.com/settings/profile, Name = « Orso Carotenuto-Marchetti » ; 3) sur ton profil, « Customize your pins » : cocher tutelliv et atelia.
 - Vidéo d'explication de 2 min 15 (10 novembre, VIDEO-EXPLICATION) : prête dans `outputs/brag/tutelliv-explication.mp4`, on garde cette base. Dis à Claude les retouches que tu veux (scène, texte, musique, voix) ; à écouter : la prononciation de « TutelLiv ».
 - Plus tard : passer Supabase en Pro (environ 25 $/mois) avant les vraies données, pour la protection contre les mots de passe compromis.
 - MAIL-PONT : essai Gmail réussi le 4 novembre ; revérifié le 9 novembre : `NEXT_PUBLIC_APP_URL` pas encore changée (inchangée depuis le 17 octobre). À faire : dans Vercel, mettre `NEXT_PUBLIC_APP_URL` = `https://tutelliv.fr` pour Preview `preproduction` (les liens de suivi des e-mails pointent vers l'adresse `…vercel.app`), puis redéployer (contrôlé par Claude le 4 novembre : `https://tutelliv.fr/reset-password` est déjà autorisé dans Supabase, donc le changement ne casse pas « mot de passe oublié » ; modification refusée à l'agent par l'outil de sécurité) ; supprimer le filtre Gmail d'essai (Paramètres > Filtres) ; fournir une boîte Outlook pour l'essai Outlook.
@@ -96,7 +94,6 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 **2. Claude — peut le faire seul, dans cet ordre**
 - DATA-02 : purge des prospects faite le 9 novembre ; reste la fin de pilote (export remis puis effacement à 30 jours), à cadrer avec toi au premier pilote.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
-- OPS-FIAB : dès tes trois commandes lancées, déclencher une panne fictive et vérifier l'e-mail d'alerte dans Gmail, puis l'alerte d'une tâche de fond en retard.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
 
 **3. En attente de quelqu'un d'autre** (rien à faire tant que ça n'arrive pas)
@@ -104,7 +101,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Pilotes (ils attendent les entretiens du point 1, qui ne dépendent que de toi pour démarrer) : PILOT-1 et 2, PROD-04, OFFER-1, V1-GO, ONBOARD-1, DISPATCH-5 (mesure).
 - Mesures et mise en vente : SAAS-02, SAAS-03, COST-1, RELEASE-1, SMS, GROWTH-1.
 
-**Déjà fait côté agent, la case attend une action du point 1 :** SEC-AUDIT (protection des mots de passe : Supabase Pro), POD-2, OPS-FIAB (alertes, cadence), INTAKE-1 (vingt vrais messages), FACTURX-1 (franchise à confirmer par la plateforme), MOB-01C.
+**Déjà fait côté agent, la case attend une action du point 1 :** SEC-AUDIT (protection des mots de passe : Supabase Pro), POD-2, INTAKE-1 (vingt vrais messages), FACTURX-1 (franchise à confirmer par la plateforme), MOB-01C.
 
 Mise à jour : 29 octobre 2026, en fin de journée (revue de cohérence : matrice réalignée sur les cases ; LANDING-3, MAP-UNIFY-2, MAP-INTERACTION, E2E-MAJ, ICONES-IA et CONFIG-MSG-2 closes). Version précédente du même jour : bilan de l'intégration du 28 octobre (neuf chantiers ; voir DEMO-3, DESIGN-1, FACTURX-1, INTAKE-1, POD-2, OPS-FIAB, SEC-AUDIT, RECETTE-2810 et PROPRIO-2810). Précédente : 26 octobre 2026 (revue de cohérence : tableaux de pilotage, priorités et matrice réalignés sur le code). Source unique des priorités du projet. Cette version consolide l’audit initial, l’audit SaaS autonome, les sondes locales et les tests E2E. La copie dans les outputs de la tâche doit rester synchronisée avec ce fichier.
 
@@ -180,22 +177,6 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Terminé quand : une entreprise fictive puis un pilote réalisent une livraison test sans intervention obligatoire ; progression fiable après reconnexion ; invitations d'utilisateurs existants ou nouveaux cohérentes ; étapes facultatives sautables ; temps et interventions mesurés ; import invalide ne corrompt rien.
 
   Détail et historique : `docs/TODO-ARCHIVE.md`, section ONBOARD-1.
-
-- [ ] **OPS-FIAB — Fiabiliser les tâches de fond et l'exploitation.**
-
-  **Qui : Toi — une commande, puis Claude.**
-
-  Terminé quand : le workflow GitHub planifié a réellement tourné sur la préproduction avec ses secrets ; `after()` est vérifié sur Vercel ; Node 22 est réglé sur Vercel ; la migration d'index est appliquée en préproduction (en production avec `CONCURRENTLY`) ; une tâche en retard déclenche une alerte reçue.
-
-  Constat du 2 novembre 2026 : Node 22 réglé sur Vercel ; migration d'index appliquée ; workflow réellement lancé par GitHub, mais **toutes les 4 à 7 heures et non toutes les 5 minutes** (GitHub espace ces lancements) ; aucune variable `OPS_ALERT_WEBHOOK_URL` sur Vercel, donc une alerte ne part que dans les journaux. Reste : une cadence fiable, un canal d'alerte réel, le contrôle d'`after()` en ligne.
-
-  Décisions et travaux du 2 novembre 2026 : relais par Supabase (tâche pg_cron `tutelliv-operations-relay`, pg_net activé, inactive tant que le secret `relay_cron_secret` manque ; copie du secret refusée par l'outil de sécurité, commande à lancer par le propriétaire). Alertes par e-mail : une par empreinte et par jour (`OPS_ALERT_RECIPIENT`, sinon `EMAIL_TEST_RECIPIENT`), tests ajoutés, `npm run check` vert. Non vérifié : relais réellement lancé, e-mail réellement reçu. Constat du 3 novembre (lecture seule, base de préproduction) : le secret `relay_cron_secret` est toujours absent du coffre ; la tâche `tutelliv-operations-relay` tourne toutes les 5 minutes mais à vide. Le 3 novembre au soir, à ta demande : la commande documentée ne pouvait pas marcher (Vercel ne rend pas les variables « sensibles », `[SENSITIVE]` écrit à la place ; le script de garde a refusé, rien stocké). Nouvelle commande `sh scripts/ops03b/copy-relay-secret.sh`, qui lit `.env.preproduction.local` : secret stocké (`stored: true`). Contrôlé : passage du relais de 23 h 10 UTC répondu 200 par `/api/cron/operations` (le secret correspond). Reste pour OPS-FIAB : la réception d'une vraie alerte et la sonde `ops_monitor` à rediriger vers un vrai e-mail. Écart trouvé : la sonde `ops_monitor` (toutes les 30 minutes) écrit encore vers un webhook temporaire de recette, donc une panne totale de Vercel ne prévient pas le propriétaire ; à rediriger vers un vrai e-mail.
-
-  4 novembre 2026 : la sonde externe `ops_monitor` prévient maintenant par **e-mail**, envoyé par la base elle-même via Resend (une panne totale de Vercel reste signalée). Migration `20261104040000_ops_monitor_email_alerts` : canal e-mail prioritaire dès que trois secrets existent dans le coffre Supabase (`ops03b_resend_api_key`, `ops03b_alert_email_from`, `ops03b_alert_email_to`), sinon ancien webhook. Script de copie `sh scripts/ops03b/copy-alert-email.sh` (lit `.env.local` : clé Resend, `MAIL_FROM`, destinataire `OPS_ALERT_RECIPIENT` sinon `EMAIL_TEST_RECIPIENT`, aujourd'hui ton Gmail ; n'affiche rien, refuse toute autre base). Vérifié : test ajouté dans `tests/operations-health.test.ts` ; fonction compilée sur la préproduction dans une transaction annulée (rien gardé) ; lint et 1 587 tests verts ; `npm run typecheck` échoue seulement sur `outputs/recette-wt` (dossier d'une autre session, serveur encore actif, non touché). Refusé à l'agent par l'outil de sécurité : la copie des secrets dans le coffre. Non vérifié : e-mail réellement reçu (Gmail : aucune « Alerte TutelLiv » reçue à ce jour, ni de la sonde ni de l'appli).
-
-  4 novembre au soir, à ta demande (« je te donne tous les accès ») : push et `prisma migrate deploy` faits par Claude ; déploiement `233b73f` prêt ; fonction e-mail présente en base ; passage de 21 h 30 UTC sain. Copie des secrets toujours refusée par l'outil de sécurité (« Secret-Store Writes »). Suite, **toi** : `sh scripts/ops03b/copy-alert-email.sh` (doit afficher `"stored":true`). Puis **Claude** : `select ops_monitor.run(true);` pour un e-mail « [Essai] », contrôle dans Gmail, e-mail de retour à la normale au passage suivant ; puis une tâche de fond en retard fictive (données E2E) pour l'alerte de l'appli.
-
-  Détail et historique : `docs/TODO-ARCHIVE.md`, section OPS-FIAB.
 
 - [ ] **V1-GO — Valider la V1 prête à être essayée.**
 
@@ -403,7 +384,7 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   10. S4 et S5 — Compléter les limites de tentatives, revoir le rattachement par e-mail.
   11. C6 — Faire tourner les parcours complets sur une base dans le contrôle automatique (dernier passage connecté : 20 octobre).
   12. P1 — Réduire cette TODO à une page de pilotage et archiver le journal.
-  13. E2 — Créer une vraie production (accord du propriétaire requis), offres Vercel et Supabase payantes.
+  13. E2 — Créer une vraie production (accord du propriétaire requis), offres Vercel et Supabase payantes ; y appliquer la migration d'index d'OPS-FIAB avec `CONCURRENTLY` et y copier les secrets d'alerte (`scripts/ops03b/copy-alert-email.sh`).
 
   C6, relevé du 2 novembre 2026 : recette connectée réparée (test périmé depuis le 23 octobre, vrai bug de `recordOrderCreatedUsage` corrigé) et verte en ligne sur la préproduction (run 41495900652). Passage de nuit limité à cette recette ; premier passage planifié à contrôler le 3 novembre. Parcours navigateur à la demande (`run_browser`), car le montage sur la préproduction est arrêté par son garde-fou `PREPRODUCTION_PERSISTENT_DEMO_UNEXPECTED`.
 
