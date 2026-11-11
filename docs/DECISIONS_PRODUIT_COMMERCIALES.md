@@ -149,7 +149,7 @@ Décisions du propriétaire en questionnaire, pour l'ami qui démarche depuis Pa
 | Commission | 35 % du montant HT encaissé pendant les 12 premiers mois, puis 15 % tant que le client paie. Remplace, pour ce commercial, la limite de 12 mois de la section « Attribution commerciale et commissions ». Base : éléments pris à l'inscription seulement ; remboursement ou impayé : commission reprise. |
 | Fin du contrat | Les 15 % continuent 12 mois après la fin du contrat, puis s'arrêtent. |
 | Paiement | Mensuel : facture le 1er du mois pour les encaissements du mois précédent, réglée sous 30 jours. |
-| Parts | 3 % de la future société (une micro-entreprise ne peut pas en donner), acquises à 1 % par an sur 3 ans ; le premier 1 % seulement après 10 clients payants ; les parts acquises restent acquises s'il part ; contrat revu s'il passe à mi-temps. |
+| Parts | Révisé le 11 novembre (questionnaire). Parts de la future société (une micro-entreprise ne peut pas en donner), par paliers de clients payants : 10, 25, 50, 75 et 100 clients. Chaque palier atteint débloque 3 %, acquis à 1 % par an sur 3 ans à partir de la date du palier ; maximum 15 % (à 100 clients, environ 12 % des quelque 840 entreprises visées). Un client compte une fois qu'il a payé 3 mois de suite. Les parts acquises restent acquises s'il part ; celles pas encore acquises sont perdues. |
 | Début | Aucune commission avant que la vente soit autorisée (SIREN reçu, vérification LEGAL-1). |
 
 Conséquence technique (CONTRAT-AMI) : le calcul SALES-1 s'arrête à 12 mois ; il faudra ajouter le taux de 15 % après la première année et l'arrêt 12 mois après la fin du contrat.
