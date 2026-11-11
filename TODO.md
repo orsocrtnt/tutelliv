@@ -4,9 +4,9 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**113 tâches terminées sur 142 — 80 %**
+**113 tâches terminées sur 143 — 79 %**
 
-`████████████████░░░░` · 29 tâches restantes
+`████████████████░░░░` · 30 tâches restantes
 
 **À faire par Claude**
 
@@ -38,6 +38,7 @@
 - OFFER-1 — Valider la grille cible et l'offre pilote (pendant les entretiens et les pilotes)
 - PILOT-1 — Recruter et conduire trois pilotes accompagnés (après les entretiens)
 - PILOT-2 — Décider avec les preuves des pilotes (après les pilotes)
+- CONTRAT-AMI — Contrat du commercial de Paris (ton ami) (faire relire le contrat par un juriste ; puis Claude (calcul des commissions))
 - LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public (SIREN, e-mail, téléphone ; puis Claude)
 - MAIL-PONT — Relier la boîte de commandes de l'entreprise à TutelLiv (régler `NEXT_PUBLIC_APP_URL` sur `https://tutelliv.fr` (Vercel, Preview `preproduction`) et retirer le filtre Gmail d'essai ; Outlook plus tard (décidé le 4 novembre) ; ensuite Claude)
 - WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (après le SIREN : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
@@ -46,7 +47,7 @@
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
 <!-- TODO_PROGRESS_END -->
 
-## Ce qu'il reste vraiment à faire (vue simple, à jour au 10 novembre 2026)
+## Ce qu'il reste vraiment à faire (vue simple, à jour au 11 novembre 2026)
 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
@@ -74,6 +75,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Supports des commerciaux (4 novembre, sans prix) : `outputs/commercial/kit/TutelLiv-antiseche-commercial.pdf` (3 pages : l'appel en 5 étapes avec les phrases à dire, quel statut mettre dans le tableau, réponses aux objections et « ne jamais ») et `outputs/commercial/kit/TutelLiv-plaquette-client.pdf` (2 pages, à donner au dirigeant ; cases « Votre contact / Téléphone » à remplir). Sources HTML à côté, PDF refaits par `node outputs/commercial/kit/simple-pdf.cjs` (0 débordement, 0 image cassée, rendu relu en capture). Rangés dans le Drive : Commercial > « Supports pour les commerciaux » (2 PDF, 498 Ko et 3,3 Mo, vérifiés dans la page du dossier). Antisèche complétée le même jour : c’est Orso qui mène les rendez-vous (créneaux lundi-vendredi 14 h-17 h, heure française), le commercial le prévient par mail à orso@tutelliv.fr. Catalogue avec prix laissé dans Commercial : partager aux commerciaux seulement « Supports pour les commerciaux » et le tableau de suivi (droit de modification). Restent à toi : leur contrat (J7 encore en brouillon) et leur adresse mail ; dire si le ton te va. Drive rangé le même jour : 75 éléments à la corbeille (doublons, archives V1, copies obsolètes), « Identité visuelle » gardée.
 - OFFER-1 (4 novembre) : option « Réception automatique des commandes » en place (29 € en Starter, incluse Pro et Business). Push et migration C11 faits par Claude le 4 novembre au soir (déploiement prêt ; `https://tutelliv.fr/tarifs` affiche l'option). Reste à toi (Drive refusé à l'agent) : remplacer le catalogue avec prix du Drive (Commercial) par `outputs/commercial/kit/TutelLiv-kit-commercial.pdf` (Drive refusé à l'agent). Le worktree `outputs/recette-wt` d'une autre session fait échouer `npm run typecheck` : le supprimer quand cette session a fini.
 - Entretiens (9 novembre) : ton ami à Paris appelle et fait l'entretien seul ; tu ne fais que les démos, en visio du lundi au vendredi entre 18 h et 18 h 30 heure française (ta pause de midi). Envoie-lui la nouvelle antisèche (4 pages) : `outputs/commercial/kit/TutelLiv-antiseche-commercial.pdf`, et remplace l'ancienne dans le Drive (Commercial > « Supports pour les commerciaux »).
+- Contrat de ton ami à Paris (CONTRAT-AMI, décidé le 11 novembre) : 35 % la 1re année puis 15 % tant que le client paie, 3 % de parts sur 3 ans dès 10 clients payants, apporteur d'affaires, paiement mensuel. À faire : le faire relire par un juriste avant de signer.
 - Petits changements plus rapides (9 novembre, à ta demande) : pour un texte, une couleur, un espacement ou de la doc, Claude ne relance plus les 1 744 tests du logiciel, seulement ceux du fichier touché (règle dans `AGENTS.md`). Rien à faire.
 - SIREN : demande déposée au Guichet unique, numéro pas encore reçu (confirmé le 9 novembre). Dès qu'il arrive, le donner à Claude : mentions légales, textes LEGAL-1, WhatsApp et Factur-X en dépendent. D'ici là, le démarchage se limite aux entretiens de recherche : aucun prix ni offre de pilote.
 - Étude de marché (`outputs/reports/Marché TutelLiv livraison B2B France.md`, environ 840 entreprises visées, hypothèse à mesurer) : trier la liste de prospects (107 lignes sur 282 ont le bon profil), obtenir 50 réponses tirées au hasard sur la part de clients directs, demander un devis à GTLYS et à Toncarton.
@@ -92,6 +94,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - E-mails « Run failed » de GitHub (7 novembre, CI-POLICES, fait) : la cause était le téléchargement des polices chez Google pendant le build ; les polices sont maintenant dans le dépôt. Revérifié le 8 novembre : tout vert ; les runs « cancelled » ne sont pas des erreurs (deux envois rapprochés). Rien à faire.
 
 **2. Claude — peut le faire seul, dans cet ordre**
+- CONTRAT-AMI : après la relecture du juriste, adapter le calcul des commissions (15 % après la 1re année, arrêt 12 mois après la fin du contrat).
 - DATA-02 : purge des prospects faite le 9 novembre ; reste la fin de pilote (export remis puis effacement à 30 jours), à cadrer avec toi au premier pilote.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
@@ -328,6 +331,16 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   5 novembre 2026 (suite), à la demande du propriétaire (« recentre comme avant les boutons en haut en page d'accueil ») : barre du site public remise au centre géométrique (`absolute left-1/2 -translate-x-1/2`, `public-top-navbar.tsx`), comme avant `72a8800`. Barre de l'espace client inchangée. Vérifié : `npx eslint` du fichier, tests `landing2-public-site` et `growth01-public-journey` verts. Non revu au navigateur : retour à l'état déjà en ligne avant ce matin.
 
   Détail et historique : `docs/TODO-ARCHIVE.md`, section GROWTH-1.
+
+- [ ] **CONTRAT-AMI — Contrat du commercial de Paris (ton ami).**
+
+  **Qui : Toi — faire relire le contrat par un juriste ; puis Claude (calcul des commissions).**
+
+  Décisions du propriétaire du 11 novembre 2026 (questionnaire ; ami disponible quelques heures par semaine) : contrat d'apporteur d'affaires (pas d'agent commercial : pas d'indemnité légale d'environ deux ans de commissions à son départ) ; auto-entrepreneur qui facture ; il appelle et fait l'entretien, le propriétaire fait la démo et conclut ; code commercial personnel, client attribué pour toujours. Commission : 35 % du HT encaissé les 12 premiers mois, puis 15 % tant que le client paie ; base = éléments pris à l'inscription seulement ; remboursement = commission reprise. S'il arrête : les 15 % courent encore 12 mois puis s'arrêtent. Paiement mensuel : facture le 1er du mois pour le mois précédent, réglée sous 30 jours. Parts : 3 % de la future société (SAS à créer, impossible en micro-entreprise), 1 % par an sur 3 ans, le premier seulement après 10 clients payants, acquis gardés s'il part, contrat revu s'il passe à mi-temps. Aucune commission avant que la vente soit autorisée (SIREN + LEGAL-1). Détail : `docs/DECISIONS_PRODUIT_COMMERCIALES.md`, section C16.
+
+  Reste : relecture par un juriste (forme de la promesse de parts, qualification d'apporteur d'affaires) ; puis Claude adapte le calcul SALES-1, qui s'arrête aujourd'hui à 12 mois (ajouter les 15 % après la première année et l'arrêt 12 mois après la fin du contrat). Rien n'est signé ; aucun code modifié le 11 novembre.
+
+  Terminé quand : contrat relu et signé ; calcul des commissions conforme (35 % puis 15 %, arrêt 12 mois après la fin du contrat) avec tests.
 
 - [ ] **LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public.**
 
