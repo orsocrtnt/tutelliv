@@ -142,8 +142,9 @@ Décisions du propriétaire en questionnaire, pour l'ami qui démarche depuis Pa
 
 | Sujet | Décision |
 |---|---|
-| Forme | Contrat d'apporteur d'affaires, pas d'agent commercial (l'agent commercial a droit à une indemnité légale de fin de contrat, souvent environ deux ans de commissions). Le commercial est auto-entrepreneur et facture. |
-| Rôle | Il trouve les entreprises, appelle et fait l'entretien seul ; le propriétaire fait la démonstration et conclut. Horaires libres, sans exclusivité fixée. |
+| Forme | Contrat d'apporteur d'affaires, gardé par le propriétaire le 11 novembre malgré le rôle de A à Z (choix en questionnaire, risque connu). Le commercial est auto-entrepreneur et facture. Risque : s'il négocie de façon permanente pour TutelLiv, un juge peut requalifier le contrat en agent commercial (articles L134-1 et suivants du Code de commerce) ; l'indemnité de fin de contrat (souvent environ deux ans de commissions) serait alors due si TutelLiv met fin au contrat sans faute grave, pas s'il part de lui-même. Garde-fous : le client s'inscrit lui-même en ligne avec le code du commercial et accepte les conditions de TutelLiv ; le commercial ne signe rien au nom de TutelLiv. Point à faire trancher par le juriste. |
+| Rôle | De A à Z : il trouve les entreprises, appelle, fait l'entretien, la démonstration et amène le client jusqu'à l'inscription. Horaires libres (quelques heures par semaine), sans exclusivité fixée. |
+| Prix | Prix publics de la page Tarifs uniquement, aucune remise accordée par le commercial ; toute remise passe par le propriétaire. |
 | Attribution | Code commercial personnel (SALES-1) ; un client inscrit avec ce code lui reste attribué. |
 | Commission | 35 % du montant HT encaissé pendant les 12 premiers mois, puis 15 % tant que le client paie. Remplace, pour ce commercial, la limite de 12 mois de la section « Attribution commerciale et commissions ». Base : éléments pris à l'inscription seulement ; remboursement ou impayé : commission reprise. |
 | Fin du contrat | Les 15 % continuent 12 mois après la fin du contrat, puis s'arrêtent. |
