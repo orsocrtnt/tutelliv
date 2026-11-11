@@ -4,9 +4,9 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**111 tâches terminées sur 140 — 79 %**
+**111 tâches terminées sur 141 — 79 %**
 
-`████████████████░░░░` · 29 tâches restantes
+`████████████████░░░░` · 30 tâches restantes
 
 **À faire par Claude**
 
@@ -42,6 +42,7 @@
 - LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public (SIREN, e-mail, téléphone ; puis Claude)
 - MAIL-PONT — Relier la boîte de commandes de l'entreprise à TutelLiv (régler `NEXT_PUBLIC_APP_URL` sur `https://tutelliv.fr` (Vercel, Preview `preproduction`) et retirer le filtre Gmail d'essai ; Outlook plus tard (décidé le 4 novembre) ; ensuite Claude)
 - WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (après le SIREN : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
+- VIDEO-EXPLICATION — Retoucher la vidéo d'explication de TutelLiv (2 min 15) (dire les retouches à faire, puis Claude)
 
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
 <!-- TODO_PROGRESS_END -->
@@ -82,6 +83,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Avant le dépôt au Guichet unique : vérifier la reprise de ton ancien SIREN, et ta capacité à exercer depuis les États-Unis sous visa J-1 avec ta résidence fiscale (checklist J5, non tranché).
 - LEGAL-1 (sections 4 et 6 de `docs/legal/VERIFICATION_2026-11-02.md`) : fournir SIREN, e-mail et téléphone. Décidé le 9 novembre : durées de conservation de DATA-02 validées telles que proposées ; CGV, plafond de responsabilité = sommes payées sur les 12 derniers mois, préavis de 30 jours. Confirmer aussi la durée provisoire de sept jours pour la file hors ligne du livreur, et, si un pilote emploie des livreurs indépendants payés à la livraison, faire qualifier l'affectation automatique (`docs/legal/AIPD_TYPE.md`, section 3).
 - Plus tard : trouver un téléphone Android (essais MOB-01C).
+- Vidéo d'explication de 2 min 15 (10 novembre, VIDEO-EXPLICATION) : prête dans `outputs/brag/tutelliv-explication.mp4`, on garde cette base. Dis à Claude les retouches que tu veux (scène, texte, musique, voix) ; à écouter : la prononciation de « TutelLiv ».
 - Plus tard : passer Supabase en Pro (environ 25 $/mois) avant les vraies données, pour la protection contre les mots de passe compromis.
 - MAIL-PONT : essai Gmail réussi le 4 novembre ; revérifié le 9 novembre : `NEXT_PUBLIC_APP_URL` pas encore changée (inchangée depuis le 17 octobre). À faire : dans Vercel, mettre `NEXT_PUBLIC_APP_URL` = `https://tutelliv.fr` pour Preview `preproduction` (les liens de suivi des e-mails pointent vers l'adresse `…vercel.app`), puis redéployer (contrôlé par Claude le 4 novembre : `https://tutelliv.fr/reset-password` est déjà autorisé dans Supabase, donc le changement ne casse pas « mot de passe oublié » ; modification refusée à l'agent par l'outil de sécurité) ; supprimer le filtre Gmail d'essai (Paramètres > Filtres) ; fournir une boîte Outlook pour l'essai Outlook.
 - WHATSAPP-1 : option A codée (le dispatcher transfère le message au numéro TutelLiv). Dès le SIREN : créer le compte Meta Business au nom de la société et lancer sa vérification, prévoir une ligne dédiée jamais utilisée sur WhatsApp, puis me donner accès pour créer l'application Meta ; tu poseras ensuite dans Vercel `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_DISPLAY_NUMBER`. En même temps : demander à Meta le statut de prestataire technique pour l'option B.
@@ -505,3 +507,17 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Terminé quand : Chaque extension a un problème mesuré, un coût, un critère de réussite et une place validée dans la roadmap.
 
   Détail et historique : `docs/TODO-ARCHIVE.md`, section SMS.
+
+- [ ] **VIDEO-EXPLICATION — Retoucher la vidéo d'explication de TutelLiv (2 min 15).**
+
+  **Qui : Toi — dire les retouches à faire, puis Claude.**
+
+  10 novembre 2026 : vidéo faite par Claude et gardée comme base : `outputs/brag/tutelliv-explication.mp4` (1920×1080, 30 i/s, 135 s, -14 LUFS) et son affiche `tutelliv-explication.jpg`. Voix Victor (ElevenLabs, prise 1 ; prise 2 de secours dans `outputs/brag/long/take2.mp3`, déjà payée), musique Sascha Ende (CC BY 4.0, crédit dans la vidéo), sous-titres, vrais écrans de la démo publique (données fictives). Chapitres : commande, commander sans compte, dispatch, livreur, suivi, client, facture. Adresse interne du lien de commande floutée. Le propriétaire veut des retouches, pas encore listées : on repart de cette base, pas d'une refonte.
+
+  Pour refaire : `outputs/brag/work/comp3.html` (scènes et textes), `v3data.js` (minutage des phrases), `render3.mjs` (images), `sfxlong.mjs` et le mixage voix + musique ; détail dans `outputs/brag/long/PLAN.md`. Tout reste local (`outputs/` non versionné). Ne pas diffuser `outputs/brag/brag.mp4` (v1 : dit à tort que la relance part toute seule).
+
+  Non vérifié (Claude ne peut pas écouter) : prononciation de « TutelLiv », ressenti de la musique et du volume.
+
+  Terminé quand : les retouches demandées sont faites et le propriétaire valide la vidéo.
+
+  **Modèle conseillé : Claude Opus · effort moyen.**
