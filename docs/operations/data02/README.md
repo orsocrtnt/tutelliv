@@ -115,4 +115,36 @@ Refus : entreprise de démo, déjà effacée, accès non coupé, aucun calendrie
 
 Vérifié : `tests/company-erasure.test.ts` (7 tests, sans base) et l'exercice A/B `scripts/data02/erasure-connected.ts`, lancé le 12 novembre 2026 (UTC) sur la base de préproduction avec l'accord du propriétaire (`tutelliv-dev` en pause) : `npx dotenv -e .env.preproduction.local -- tsx scripts/data02/erasure-connected.ts`. Résultat : A effacée (3 comptes Auth supprimés et absents, photo et logo supprimés, facture gardée en PDF dont l'empreinte est vérifiée), B identique, rejouer refusé (`ALREADY_ERASED`), fixtures nettoyées. Preuve locale : `outputs/data02/erasure-connected.json`.
 
-Restent : canal chiffré de remise de l'export ; sauvegardes (durée de rétention du plan Supabase et procédure après restauration : relancer l'effacement des entreprises effacées depuis la sauvegarde, à partir d'un registre des manifestes tenu hors de la base) ; validation juridique avant un premier usage réel.
+Chaque effacement appliqué écrit aussi son manifeste dans le registre versionné [`registre/`](registre/README.md) (voir « Sauvegardes » plus bas) : le committer sur `preproduction` aussitôt.
+
+Reste : validation juridique avant un premier usage réel.
+
+## Remise de l'export : lien + code (12 novembre 2026)
+
+Décision du propriétaire (questionnaire du 12 novembre 2026) : un lien envoyé par e-mail et un code de 8 caractères donné à part, par SMS ou au téléphone. Code : `src/domains/data-lifecycle/company-export-delivery.service.ts`, page publique `/export/<jeton>`, route `POST /api/export/<jeton>`.
+
+1. Couper l'accès de l'entreprise dans `/admin` (les données ne bougent plus).
+2. Produire et vérifier l'archive (section « Archive locale privée » ci-dessus) : chemin du dossier et empreinte du manifeste.
+3. `npm run data02:export-delivery -- prepare <companyId> <dossier d'archive> <empreinte du manifeste>` : revérifie l'archive (`verify-archive.mjs`), la met en `.zip` ordinaires (volumes de 45 Mo au plus, limite de fichier du plan Supabase gratuit ; `LISEZMOI.txt`, `company.json`, `manifest.json` dans le premier), les dépose dans le bucket privé `company-exports`, puis affiche **une seule fois** le lien et le code. Pour la production, lancer avec les variables de production : le lien prend `NEXT_PUBLIC_APP_URL`.
+4. Envoyer le lien par e-mail à l'administrateur de l'entreprise ; donner le code par SMS ou au téléphone, jamais dans le même message.
+5. Le client ouvre le lien, saisit le code et télécharge ses `.zip` (liens Supabase signés de 10 minutes ; il peut ressaisir le code tant que le lien vit). Les `.zip` s'ouvrent d'un double clic sur Mac et Windows.
+6. `npm run data02:export-delivery -- status <companyId>` : expiration, codes faux, dates d'ouverture. Une fois la réception confirmée par le client : `schedule` (section « Fin de pilote »).
+
+Garanties : seul l'empreinte du jeton (SHA-256) et du code (scrypt salé) sont gardées dans `Company.settings.dataExportDelivery` ; lien valable 7 jours ; 5 codes faux bloquent le lien (même le bon code est ensuite refusé) ; 20 essais par adresse IP et par quart d'heure ; chaque ouverture réussie est notée (date seule). La page ne dit pas si un lien existe avant le bon code. Refus : entreprise de démo, déjà effacée, accès non coupé, remise déjà ouverte (`revoke` d'abord), archive d'une autre entreprise.
+
+Fichiers effacés : par le cron `/api/cron/operations` dès que le lien est expiré, bloqué ou retiré ; par `npm run data02:export-delivery -- revoke <companyId>` ; et avec l'entreprise lors de l'effacement. Pour un nouveau lien : `revoke`, puis `prepare` à nouveau.
+
+Vérifié : `tests/company-export-delivery.test.ts` (zip relu octet par octet, secrets, code, blocage, volumes) ; essai `.zip` avec `unzip -t`, Python `zipfile` et `ditto` (outil du Mac) ; exercice connecté `npx dotenv -e .env.preproduction.local -- tsx scripts/data02/export-delivery-connected.ts` le 12 novembre 2026 sur la base de préproduction (entreprise fictive `data02-export-…`, nettoyée) : accès non coupé refusé, code faux refusé (4 essais restants), bon code saisi en minuscules accepté, `.zip` téléchargé par le lien signé avec la même empreinte, `company.json` et photo identiques à l'archive, retrait (fichiers effacés, lien refusé), blocage au cinquième code faux, purge du cron après blocage et après 7 jours, ni jeton ni code en clair dans la base. Page cliquée dans Chromium (Playwright, serveur de dev isolé) à 1 280 px et 390 px : message « Code incorrect. 3 essais restants. », puis bouton de téléchargement, `.zip` reçu et valide, aucun débordement. Création du bucket privé vide `company-exports` en préproduction. Non vérifié en réel : un export de plusieurs volumes (testé seulement par le calcul de répartition).
+
+## Sauvegardes et reprise après restauration (12 novembre 2026)
+
+Plan Supabase relu le 12 novembre 2026 par l'API : **gratuit**. D'après la documentation Supabase (« Database Backups ») : le plan gratuit n'a aucune sauvegarde automatique ; Pro garde 7 jours de sauvegardes quotidiennes, Team 14, Enterprise 30 ; une restauration ne remet pas les fichiers du stockage effacés depuis (photos, logos, exports), seulement la base, comptes Supabase Auth compris.
+
+Conséquence : une donnée effacée disparaît des sauvegardes au plus tard 7 jours après (plan Pro) ; aujourd'hui, elle ne figure dans aucune sauvegarde. Si une sauvegarde antérieure à un effacement est restaurée, l'entreprise revient (fiche, comptes, commandes). Procédure, juste après toute restauration et avant de rouvrir le service :
+
+1. Récupérer le dépôt à jour (`git pull` sur `preproduction`) : le registre [`registre/`](registre/README.md) liste chaque entreprise effacée, avec la date de son export.
+2. Simulation : `npm run data02:company-erasure -- replay-registry` (avec les variables de la base restaurée). Chaque entrée répond `absent`, `already_erased` ou `to_erase`.
+3. Application : `COMPANY_ERASURE_ENABLED=pilot-company-erasure-v1 npm run data02:company-erasure -- replay-registry --apply`. Pour chaque entreprise revenue : accès recoupé, calendrier d'origine remis, puis effacement complet avec toutes ses gardes. Les fichiers du stockage déjà absents ne sont pas une erreur.
+4. Recommencer l'étape 2 : toutes les entrées doivent répondre `already_erased` ou `absent`.
+
+Vérifié : `tests/company-erasure.test.ts` (reprise d'une entreprise revenue active, déjà effacée, absente, démo, entrée invalide, autorisation absente, écriture concurrente). Non vérifié : une vraie restauration (aucune sauvegarde sur le plan gratuit) ; à essayer sur un projet isolé une fois en Pro.

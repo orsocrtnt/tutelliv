@@ -6,6 +6,9 @@ import {
   erasureBlockReason,
   invoiceArchivePath,
   readCompanyLifecycle,
+  replayRegisteredErasure,
+  type CompanyErasureManifest,
+  type ReplayDeps,
   type ErasureDeps,
   type ErasurePlan,
 } from "../src/domains/data-lifecycle/company-erasure.service";
@@ -27,7 +30,7 @@ function plan(overrides: Partial<ErasurePlan> = {}, company: Partial<ErasurePlan
     runningJobs: 0,
     crossTenant: false,
     invoices: [{ id: "inv1", pdfUrl: null }, { id: "inv2", pdfUrl: "co_a/inv2.pdf" }],
-    storage: { proofs: ["co_a/d1-1.jpg"], logos: ["co_a/logo-x.png"], subfolders: 0 },
+    storage: { proofs: ["co_a/d1-1.jpg"], logos: ["co_a/logo-x.png"], exports: ["co_a/x-1.zip"], subfolders: 0 },
     ...overrides,
   };
 }
@@ -59,7 +62,7 @@ test("garde : chaque condition manquante bloque, dans l'ordre attendu", () => {
   assert.equal(erasureBlockReason(plan({ users: [{ id: "s", authId: "s", systemRole: "SUPER_ADMIN" }] }), NOW), "PROTECTED_ACCOUNT");
   assert.equal(erasureBlockReason(plan({ runningJobs: 1 }), NOW), "UNFINISHED_JOBS");
   assert.equal(erasureBlockReason(plan({ crossTenant: true }), NOW), "CROSS_TENANT_REFERENCE");
-  assert.equal(erasureBlockReason(plan({ storage: { proofs: [], logos: [], subfolders: 1 } }), NOW), "UNEXPECTED_STORAGE_FOLDER");
+  assert.equal(erasureBlockReason(plan({ storage: { proofs: [], logos: [], exports: [], subfolders: 1 } }), NOW), "UNEXPECTED_STORAGE_FOLDER");
   assert.equal(erasureBlockReason(plan({ invoices: [{ id: "inv1", pdfUrl: "co_b/inv1.pdf" }] }), NOW), "UNKNOWN_INVOICE_FILE");
 });
 
@@ -77,7 +80,7 @@ test("simulation : aucune écriture, un résumé chiffré", async () => {
   assert.deepEqual(calls, []);
   assert.deepEqual(result, {
     status: "eligible",
-    summary: { users: 2, invoicesToArchive: 1, invoicesAlreadyArchived: 1, proofObjects: 1, logoObjects: 1 },
+    summary: { users: 2, invoicesToArchive: 1, invoicesAlreadyArchived: 1, proofObjects: 1, logoObjects: 1, exportObjects: 1 },
   });
 });
 
@@ -99,6 +102,7 @@ test("application : factures figées d'abord, puis stockage, Auth et base en der
     "verify:inv2",
     "storage:delivery-pods:1",
     "storage:company-logos:1",
+    "storage:company-exports:1",
     "auth:auth-1",
     "auth:auth-2",
     "db:u1,u2",
@@ -108,7 +112,7 @@ test("application : factures figées d'abord, puis stockage, Auth et base en der
   assert.equal(result.manifest.erasedAt, NOW.toISOString());
   assert.equal(result.manifest.exportConfirmedAt, lifecycle.exportConfirmedAt);
   assert.deepEqual(result.manifest.deleted, {
-    users: 2, orders: 3, authAccounts: 1, authAccountsAlreadyMissing: 1, proofObjects: 1, logoObjects: 1,
+    users: 2, orders: 3, authAccounts: 1, authAccountsAlreadyMissing: 1, proofObjects: 1, logoObjects: 1, exportObjects: 1,
   });
   assert.equal(result.manifest.kept.invoices, 2);
   // Le manifeste ne porte aucun identifiant de compte ni chemin de preuve.
@@ -135,4 +139,43 @@ test("entreprise absente, identifiant douteux ou délai non écoulé : rien n'es
     { status: "blocked", reason: "DELAY_NOT_ELAPSED" },
   );
   assert.deepEqual(calls, []);
+});
+
+// Reprise après restauration d'une sauvegarde (registre hors base).
+const registered: CompanyErasureManifest = {
+  schema: "tutelliv-company-erasure", version: 1, companyId: "co_a",
+  exportConfirmedAt: lifecycle.exportConfirmedAt, eraseNotBefore: lifecycle.eraseNotBefore, erasedAt: "2026-12-02T08:00:00.000Z",
+  deleted: { users: 2 }, kept: { invoices: 0, invoiceArchives: [], companyIdentity: true, saasRecords: true },
+};
+
+function replayDeps(company: Awaited<ReturnType<ReplayDeps["loadCompany"]>>, calls: string[], rescheduled = true): ReplayDeps {
+  return {
+    loadCompany: async () => company,
+    reschedule: async (id, _previous, next) => { calls.push(`reschedule:${id}:${next.eraseNotBefore}:${next.scheduledAt}`); return rescheduled; },
+    erase: async (id, options) => { calls.push(`erase:${id}:${options.apply}`); return { status: "erased", manifest: { ...registered, erasedAt: options.now.toISOString() } }; },
+  };
+}
+
+test("reprise : entreprise revenue avec une sauvegarde → accès recoupé, calendrier d'origine, effacement", async () => {
+  const calls: string[] = [];
+  // Sauvegarde antérieure à la coupure : entreprise active, sans calendrier.
+  const restored = { isDemo: false, settings: { billing: { x: 1 } } };
+  assert.deepEqual(await replayRegisteredErasure(registered, { now: NOW }, replayDeps(restored, calls)), { status: "to_erase" });
+  assert.deepEqual(calls, []);
+  const result = await replayRegisteredErasure(registered, { apply: true, authorization: COMPANY_ERASURE_AUTHORIZATION, now: NOW }, replayDeps(restored, calls));
+  assert.equal(result.status, "erased");
+  assert.deepEqual(calls, [`reschedule:co_a:${lifecycle.eraseNotBefore}:${NOW.toISOString()}`, "erase:co_a:true"]);
+});
+
+test("reprise : déjà effacée, absente, démo, entrée invalide ou autorisation absente → rien n'est fait", async () => {
+  const calls: string[] = [];
+  const erased = { isDemo: false, settings: { dataLifecycle: { ...lifecycle, erasedAt: registered.erasedAt } } };
+  const apply = { apply: true, authorization: COMPANY_ERASURE_AUTHORIZATION, now: NOW };
+  assert.deepEqual(await replayRegisteredErasure(registered, apply, replayDeps(erased, calls)), { status: "already_erased" });
+  assert.deepEqual(await replayRegisteredErasure(registered, apply, replayDeps(null, calls)), { status: "absent" });
+  assert.deepEqual(await replayRegisteredErasure(registered, apply, replayDeps({ isDemo: true, settings: null }, calls)), { status: "blocked", reason: "DEMO_COMPANY" });
+  assert.deepEqual(await replayRegisteredErasure({ ...registered, companyId: "../x" }, apply, replayDeps(erased, calls)), { status: "blocked", reason: "INVALID_REGISTRY_ENTRY" });
+  assert.deepEqual(await replayRegisteredErasure(registered, { apply: true, now: NOW }, replayDeps({ isDemo: false, settings: null }, calls)), { status: "blocked", reason: "EXPLICIT_ACTIVATION_REQUIRED" });
+  assert.deepEqual(await replayRegisteredErasure(registered, apply, replayDeps({ isDemo: false, settings: null }, calls, false)), { status: "blocked", reason: "CONCURRENT_CHANGE" });
+  assert.equal(calls.some((call) => call.startsWith("erase:")), false);
 });

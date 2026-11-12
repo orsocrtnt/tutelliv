@@ -28,6 +28,8 @@ export const COMPANY_ERASURE_DELAY_MS = 30 * 24 * 60 * 60 * 1000;
 export const INVOICE_ARCHIVE_BUCKET = "invoice-archives";
 const POD_BUCKET = "delivery-pods";
 const LOGO_BUCKET = "company-logos";
+// Remise de l'export (company-export-delivery.service) : ses fichiers partent avec l'entreprise.
+const EXPORT_BUCKET = "company-exports";
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;
 const PAGE_SIZE = 100;
 
@@ -64,7 +66,7 @@ export interface ErasurePlan {
   runningJobs: number;
   crossTenant: boolean;
   invoices: { id: string; pdfUrl: string | null }[];
-  storage: { proofs: string[]; logos: string[]; subfolders: number };
+  storage: { proofs: string[]; logos: string[]; exports: string[]; subfolders: number };
 }
 
 export type ErasureResult =
@@ -79,6 +81,7 @@ export interface ErasureSummary {
   invoicesAlreadyArchived: number;
   proofObjects: number;
   logoObjects: number;
+  exportObjects: number;
 }
 
 export interface ErasureDeps {
@@ -196,6 +199,7 @@ export async function eraseCompany(
         invoicesAlreadyArchived: plan.invoices.length - pending.length,
         proofObjects: plan.storage.proofs.length,
         logoObjects: plan.storage.logos.length,
+        exportObjects: plan.storage.exports.length,
       },
     };
   }
@@ -211,6 +215,7 @@ export async function eraseCompany(
     // 2. Preuves et logo. 3. Comptes Supabase Auth. 4. Base, en dernier et sous transaction.
     await deps.removeStorageObjects(POD_BUCKET, plan.storage.proofs);
     await deps.removeStorageObjects(LOGO_BUCKET, plan.storage.logos);
+    await deps.removeStorageObjects(EXPORT_BUCKET, plan.storage.exports);
     let authDeleted = 0;
     let authMissing = 0;
     for (const user of plan.users) {
@@ -237,6 +242,7 @@ export async function eraseCompany(
           authAccountsAlreadyMissing: authMissing,
           proofObjects: plan.storage.proofs.length,
           logoObjects: plan.storage.logos.length,
+          exportObjects: plan.storage.exports.length,
         },
         kept: { invoices: archives.length, invoiceArchives: archives, companyIdentity: true, saasRecords: true },
       }),
@@ -247,6 +253,72 @@ export async function eraseCompany(
     throw error;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Reprise après restauration d'une sauvegarde (registre tenu hors de la base)
+// ---------------------------------------------------------------------------
+
+export type ReplayResult = { status: "absent" } | { status: "already_erased" } | { status: "to_erase" } | ErasureResult;
+
+export interface ReplayDeps {
+  loadCompany(companyId: string): Promise<{ isDemo: boolean; settings: Prisma.JsonValue | null } | null>;
+  /** Recoupe l'accès et remet le calendrier du registre, si les réglages n'ont pas changé depuis la lecture. */
+  reschedule(companyId: string, previous: Prisma.JsonValue | null, lifecycle: CompanyLifecycle): Promise<boolean>;
+  erase(companyId: string, options: { apply: true; authorization?: string; now: Date }): Promise<ErasureResult>;
+}
+
+export function isErasureManifest(value: unknown): value is CompanyErasureManifest {
+  if (!value || typeof value !== "object") return false;
+  const manifest = value as Record<string, unknown>;
+  return manifest.schema === "tutelliv-company-erasure" && manifest.version === 1 &&
+    typeof manifest.companyId === "string" && SAFE_ID.test(manifest.companyId) &&
+    [manifest.exportConfirmedAt, manifest.eraseNotBefore, manifest.erasedAt].every((date) => typeof date === "string" && Number.isFinite(Date.parse(date)));
+}
+
+/**
+ * Une sauvegarde de la base antérieure à un effacement fait revenir l'entreprise (comptes Auth compris :
+ * ils sont dans la base). Le registre (`docs/operations/data02/registre/`) dit lesquelles ré-effacer :
+ * l'accès est recoupé, le calendrier d'origine remis (délai déjà écoulé), puis `eraseCompany` repasse
+ * toutes ses gardes. Simulation par défaut.
+ */
+export async function replayRegisteredErasure(
+  manifest: CompanyErasureManifest,
+  options: { apply?: boolean; authorization?: string; now?: Date } = {},
+  deps: ReplayDeps = defaultReplayDeps,
+): Promise<ReplayResult> {
+  if (!isErasureManifest(manifest)) return { status: "blocked", reason: "INVALID_REGISTRY_ENTRY" };
+  if (options.apply && options.authorization !== COMPANY_ERASURE_AUTHORIZATION) {
+    return { status: "blocked", reason: "EXPLICIT_ACTIVATION_REQUIRED" };
+  }
+  const now = options.now ?? new Date();
+  const company = await deps.loadCompany(manifest.companyId);
+  if (!company) return { status: "absent" };
+  if (readCompanyLifecycle(company.settings)?.erasedAt) return { status: "already_erased" };
+  if (company.isDemo) return { status: "blocked", reason: "DEMO_COMPANY" };
+  if (!options.apply) return { status: "to_erase" };
+  const lifecycle: CompanyLifecycle = {
+    exportConfirmedAt: manifest.exportConfirmedAt,
+    eraseNotBefore: manifest.eraseNotBefore,
+    scheduledAt: now.toISOString(),
+  };
+  if (!(await deps.reschedule(manifest.companyId, company.settings, lifecycle))) return { status: "blocked", reason: "CONCURRENT_CHANGE" };
+  return deps.erase(manifest.companyId, { apply: true, authorization: options.authorization, now });
+}
+
+export const defaultReplayDeps: ReplayDeps = {
+  loadCompany: (companyId) => prisma.company.findUnique({ where: { id: companyId }, select: { isDemo: true, settings: true } }),
+  async reschedule(companyId, previous, lifecycle) {
+    const settings = settingsObject(previous);
+    settings[COMPANY_LIFECYCLE_SETTINGS_KEY] = lifecycle as unknown as Prisma.JsonValue;
+    const expected = previous === null ? Prisma.DbNull : (previous as Prisma.InputJsonValue);
+    const written = await prisma.company.updateMany({
+      where: { id: companyId, isDemo: false, settings: { equals: expected } },
+      data: { status: "SUSPENDED", settings: settings as Prisma.InputJsonValue },
+    });
+    return written.count === 1;
+  },
+  erase: (companyId, options) => eraseCompany(companyId, options),
+};
 
 // ---------------------------------------------------------------------------
 // Dépendances réelles (Prisma, Supabase Storage et Auth)
@@ -314,14 +386,19 @@ export const defaultErasureDeps: ErasureDeps = {
       prisma.invoice.findMany({ where: { companyId }, select: { id: true, pdfUrl: true }, orderBy: { createdAt: "asc" } }),
     ]);
     const crossTenant = await hasCrossTenantDemoReference(prisma as unknown as Prisma.TransactionClient, companyId, users.map((user) => user.id));
-    const [proofs, logos] = await Promise.all([listFolder(POD_BUCKET, companyId), listFolder(LOGO_BUCKET, companyId)]);
+    const [proofs, logos, exports] = await Promise.all([
+      listFolder(POD_BUCKET, companyId), listFolder(LOGO_BUCKET, companyId), listFolder(EXPORT_BUCKET, companyId),
+    ]);
     return {
       company,
       users: users.map((user) => ({ id: user.id, authId: user.authId, systemRole: user.role.systemRole })),
       runningJobs,
       crossTenant,
       invoices,
-      storage: { proofs: proofs.files, logos: logos.files, subfolders: proofs.subfolders + logos.subfolders },
+      storage: {
+        proofs: proofs.files, logos: logos.files, exports: exports.files,
+        subfolders: proofs.subfolders + logos.subfolders + exports.subfolders,
+      },
     };
   },
 

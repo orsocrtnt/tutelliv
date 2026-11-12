@@ -52,6 +52,10 @@ export async function GET(request: Request) {
   await import("@/domains/growth/prospect/prospect-campaign.service")
     .then(({ purgeExpiredProspectRecipients }) => purgeExpiredProspectRecipients())
     .catch((error) => console.warn("[cron.prospect-retention]", error instanceof Error ? error.message : "FAILED"));
+  // DATA-02 : fichiers d'export effacés dès que leur lien est expiré, bloqué ou retiré ; même règle d'échec.
+  await import("@/domains/data-lifecycle/company-export-delivery.service")
+    .then(({ purgeClosedExportDeliveries }) => purgeClosedExportDeliveries())
+    .catch((error) => console.warn("[cron.export-delivery-retention]", error instanceof Error ? error.message : "FAILED"));
   try {
     const { details, ...counts } = await processDueOperationJobs();
     // Compteurs seuls pour les alertes ; le détail par tâche (identifiant interne, type, nature, code

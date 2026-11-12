@@ -4,13 +4,12 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**113 tâches terminées sur 144 — 78 %**
+**114 tâches terminées sur 144 — 79 %**
 
-`████████████████░░░░` · 31 tâches restantes
+`████████████████░░░░` · 30 tâches restantes
 
 **À faire par Claude**
 
-- DATA-02 — Prévoir sortie, export et conservation des données
 - V1-GO — Valider la V1 prête à être essayée (après les essais téléphone et la vérification de conformité)
 - PROD-04 — Définir les mesures de valeur (après les pilotes)
 - SAAS-03 — Permettre la gestion autonome de l'abonnement (après la vérification de conformité)
@@ -48,11 +47,12 @@
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
 <!-- TODO_PROGRESS_END -->
 
-## Ce qu'il reste vraiment à faire (vue simple, à jour au 11 novembre 2026)
+## Ce qu'il reste vraiment à faire (vue simple, à jour au 12 novembre 2026)
 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
+- Fin d'un pilote (DATA-02, close le 12 novembre) : l'export se remet par un lien tutelliv.fr/export/… envoyé par e-mail et un code donné par SMS ou au téléphone ; Claude prépare les deux d'une commande. Rien à faire avant le premier pilote qui s'arrête. Le jour où tu passes Supabase en Pro, demande à Claude d'essayer une restauration de sauvegarde sur un projet à part.
 - **À lancer toi-même (refusé à Claude le 9 novembre par la sécurité de Claude Code) :** 1) sur Vercel, projet `tutelliv-v2`, Settings → Environment Variables, `NEXT_PUBLIC_APP_URL` (Preview, branche `preproduction`) = `https://tutelliv.fr`, puis Redeploy du dernier déploiement `preproduction` ; 2) brancher le fichier Google : créer la clé du compte de service dans Google Cloud (`docs/operations/prospection/SHEET.md`, étape 1 ; Claude peut la faire dans ton Chrome si l'extension est connectée), puis `sh outputs/prospection-sheet/brancher-vercel.sh` (pose les 3 variables sans afficher la clé et relance le déploiement), puis partager la Sheet en Lecteur avec l'adresse `client_email`. Dis ensuite à Claude « vérifie » : il teste les liens des e-mails et `/admin/prospection`. Pour ne plus avoir ce refus, tu peux ajouter une règle de permission dans Claude Code.
 - Campagnes (9 novembre, ADMIN-ESPACE) : sur tutelliv.fr/admin/campaigns, chaque campagne montre maintenant l'aperçu du mail (De, Objet, Aperçu, puis le mail tel qu'il partira) et un bouton « Retirer » sur chaque adresse pas encore envoyée. À regarder une fois en ligne ; Claude vérifiera aussi en cliquant dès que Chrome est connecté.
 - Démo, liste « À essayer » (DEMO-ESSAYER-2, close le 6 novembre, vérifiée en ligne) : chaque étape dit quoi faire, une bande sous la barre de démo guide l'étape en cours, chaque étape se coche toute seule dans n'importe quelle vue, puis l'annonce propose « Y aller » vers la suivante. Au passage : /dispatch ne plante plus à l'affectation d'un livreur (environ 1 fois sur 3 avant). Rien à faire.
@@ -96,13 +96,12 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 
 **2. Claude — peut le faire seul, dans cet ordre**
 - CONTRAT-AMI : après la relecture du juriste, adapter le calcul des commissions (15 % après la 1re année, arrêt 12 mois après la fin du contrat).
-- DATA-02 : effacement de fin de pilote prêt et essayé le 11 novembre (outil manuel, 30 jours après l'export, factures gardées en PDF). Restent le canal chiffré pour remettre l'export et la procédure des sauvegardes.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
 - AUTH-GOOGLE (demandé le 11 novembre) : connexion par compte Google sur /login ; tu créeras l'identifiant dans Google Cloud au moment du branchement.
 
 **3. En attente de quelqu'un d'autre** (rien à faire tant que ça n'arrive pas)
-- Propriétaire et fournisseurs : fournir les justificatifs, contrats et décisions manquants pour la vérification LEGAL-1, DATA-02 et la fiche F10 d’INTAKE-1 avant les données réelles. LEGAL-LIENS suit la vérification des documents.
+- Propriétaire et fournisseurs : fournir les justificatifs, contrats et décisions manquants pour la vérification LEGAL-1 (dont les durées de conservation DATA-02) et la fiche F10 d’INTAKE-1 avant les données réelles. LEGAL-LIENS suit la vérification des documents.
 - Pilotes (ils attendent les entretiens du point 1, qui ne dépendent que de toi pour démarrer) : PILOT-1 et 2, PROD-04, OFFER-1, V1-GO, ONBOARD-1, DISPATCH-5 (mesure).
 - Mesures et mise en vente : SAAS-02, SAAS-03, COST-1, RELEASE-1, SMS, GROWTH-1.
 
@@ -154,6 +153,8 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   **Qui : Toi.**
 
   Terminé quand : la CSP passe de Report-Only à bloquante après une recette sans violation sur les cartes, Stripe, Supabase et les polices ; la migration de limitation est appliquée en préproduction ; `CONTACT_HMAC_SECRET` est défini ; la protection Supabase contre les mots de passe compromis est active ; le rattachement par e-mail est arbitré ; aucune donnée de livreur au-delà de la règle décidée n'est lisible côté client.
+
+  12 novembre 2026 (DATA-02) : une fois Supabase Pro actif, Claude essaie une restauration de sauvegarde sur un projet isolé puis `npm run data02:company-erasure -- replay-registry` (procédure dans `docs/operations/data02/README.md`).
 
   Constat du 2 novembre 2026 : CSP bloquante en ligne (en-tête relu), migration `auth_login_failures` appliquée en préproduction, `CONTACT_HMAC_SECRET` présent sur Vercel. Reste : la protection contre les mots de passe compromis, qui demande Supabase Pro. Non revérifié : la règle sur les données de livreur.
 
@@ -220,20 +221,6 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   9 novembre 2026, décisions du propriétaire (questionnaire) : durées de conservation de DATA-02 validées telles que proposées, sans avis d'un juriste ; CGV articles 16 et 17 : plafond de responsabilité égal aux sommes payées par le client sur les 12 derniers mois, préavis de 30 jours pour changer les conditions. SIREN demandé, numéro pas encore reçu. Inscrit dans `docs/legal/VERIFICATION_2026-11-02.md` (section 4) et `docs/operations/data02/RETENTION_POLICY_DRAFT.md`. Les textes J5 restent sur Drive, non modifiés : la mise à jour des CGV attend leur reprise dans le dépôt.
 
   Détail et historique : `docs/TODO-ARCHIVE.md`, section LEGAL-1.
-
-- [ ] **DATA-02 — Prévoir sortie, export et conservation des données.**
-
-  **Qui : Claude.**
-
-  9 novembre 2026 : durées de `docs/operations/data02/RETENTION_POLICY_DRAFT.md` validées par le propriétaire (GPS détaillé 60 jours, commandes archivées 5 ans, factures 10 ans, prospects 3 ans après le dernier contact, pilote effacé 30 jours après l'export), sans avis d'un juriste. Suite : purge automatique et export, testés sur données fictives.
-
-  9 novembre 2026, première purge ajoutée : les adresses de prospection sont effacées trois ans après le dernier échange (ajout ou envoi), comme le promet déjà la page Confidentialité ; adresses STOP gardées, envoi en cours non touché (`purgeExpiredProspectRecipients` dans `prospect-campaign.service.ts`, lancée par `/api/cron/operations`). La purge Contact existait déjà (3 ans après réception, texte publié). Test ajouté dans `tests/admin-espace-campaigns.test.ts` (17/17) ; `npm run check` 1 740/1 740. Non vérifié en ligne : aucune donnée de plus de trois ans, la purge n'efface rien aujourd'hui. Reste : fin de pilote (effacement 30 jours après l'export, qui attend un canal de remise chiffré de l'export), effacement des comptes Supabase Auth et des photos Storage, sauvegardes.
-
-  11 novembre 2026, **effacement de fin de pilote** (décision du propriétaire en questionnaire : garder les factures, effacer le reste) : `company-erasure.service.ts` + outil `npm run data02:company-erasure` (schedule / erase, simulation par défaut, `--apply` avec `COMPANY_ERASURE_ENABLED=pilot-company-erasure-v1`). Accès coupé obligatoire, effacement 30 jours après l'export confirmé, « Rétablir » annule le calendrier. Ordre rejouable : factures figées en PDF (bucket privé `invoice-archives`), preuves et logo, comptes Supabase Auth, puis base en transaction sérialisable ; fiche entreprise réduite à l'identité de facturation (`INACTIVE`), manifeste sans donnée personnelle. Jamais lancé par le cron (la politique l'interdit avant validation juridique). Vérifié : `tests/company-erasure.test.ts` 7/7 ; exercice A/B `scripts/data02/erasure-connected.ts` sur la base de préproduction (accord du propriétaire, `tutelliv-dev` en pause) : A effacée (3 comptes Auth supprimés, photo et logo supprimés, facture gardée et empreinte du PDF vérifiée), B identique, rejouer refusé, fixtures nettoyées ; ajoute le bucket privé vide `invoice-archives` en préproduction. `npm run check` 1 753/1 753. Doc : `docs/operations/data02/README.md`, section « Fin de pilote ». Reste : canal chiffré de remise de l'export ; sauvegardes (rétention du plan Supabase, registre des manifestes hors base, procédure après restauration) ; validation juridique avant tout usage réel.
-
-  Terminé quand : Export exploitable et test de suppression sur fixtures ; aucun effet sur une autre entreprise ; politique appliquée au stockage et sauvegardes.
-
-  Détail et historique : `docs/TODO-ARCHIVE.md`, section DATA-02.
 
 - [ ] **PROD-02 — Documenter le travail actuel et sa difficulté principale.**
 
