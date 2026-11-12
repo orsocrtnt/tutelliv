@@ -29,5 +29,6 @@ test("chaque modèle Prisma est classé et l'inventaire ne décide aucune conser
   assert.match(inventory, /Auth et Storage ne sont pas lus/);
   assert.match(inventory, /Aucune durée de conservation n'est choisie/);
   assert.match(inventory, /exportCompanyData/);
-  assert.match(read("TODO.md"), /^- \[ \] \*\*DATA-02/m);
+  // DATA-02 close le 12 novembre 2026 : la tâche et ses preuves sont dans l'archive.
+  assert.match(read("docs/TODO-ARCHIVE.md"), /^- \[x\] \*\*DATA-02/m);
 });
