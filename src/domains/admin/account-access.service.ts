@@ -1,5 +1,6 @@
 import { Prisma, type CompanyStatus } from "@prisma/client";
 import { prisma } from "@/services/prisma/client";
+import { COMPANY_LIFECYCLE_SETTINGS_KEY } from "@/domains/data-lifecycle/company-lifecycle-key";
 
 /**
  * Couper ou rétablir l'accès d'un compte ou d'une entreprise depuis l'espace super admin (5 novembre 2026,
@@ -55,6 +56,8 @@ export async function setPlatformCompanyAccess(id: string, action: AccessAction)
   const previous = settings[SUSPENDED_FROM_KEY];
   const restored: CompanyStatus = previous === "TRIAL" ? "TRIAL" : "ACTIVE";
   delete settings[SUSPENDED_FROM_KEY];
+  // DATA-02 : rétablir l'accès annule l'effacement programmé ; une nouvelle coupure exigera un nouvel export.
+  delete settings[COMPANY_LIFECYCLE_SETTINGS_KEY];
   const result = await prisma.company.updateMany({
     where: { id, status: "SUSPENDED", settings: { equals: expected } },
     data: { status: restored, settings: settings as Prisma.InputJsonValue },

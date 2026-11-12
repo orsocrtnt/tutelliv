@@ -78,6 +78,8 @@
     "test:data02:export-contract": "node --import tsx --test tests/data02-export-contract.test.ts",
     "test:data02:demo-retention": "dotenv -e .env.local -- tsx scripts/data02/demo-retention-connected.ts",
     "data02:demo-cleanup": "dotenv -e .env.local -- tsx scripts/data02/cleanup-demo.ts",
+    "data02:company-erasure": "dotenv -e .env.local -- tsx scripts/data02/erase-company.ts",
+    "test:data02:erasure": "dotenv -e .env.local -- tsx scripts/data02/erasure-connected.ts outputs/data02/erasure-connected.json",
     "e2e:test-data": "dotenv -e .env.local -- tsx scripts/e2e/dev-test-data.ts",
     "push:setup-keys": "node scripts/driver-push/setup-vapid-keys.mjs",
     "e2e:role-accounts": "dotenv -e .env.local -- tsx scripts/e2e/dev-role-accounts.ts",

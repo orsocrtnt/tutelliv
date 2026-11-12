@@ -97,3 +97,22 @@ L'outil opérateur `npm run data02:demo-cleanup` fonctionne en dry-run. L'applic
 Preuve nettoyée : `outputs/data02/connected.json`.
 
 Validation locale : huit tests dédiés dans `tests/company-archive.test.ts`, intégrés à `npm run check`. Rapport : `docs/rapports/2026-10-18/data02-proof-archive.md`. Le jalon DATA-02 reste ouvert.
+
+## Fin de pilote : effacement 30 jours après l'export (11 novembre 2026)
+
+Outil opérateur, jamais appelé par une route ni par le cron (la politique interdit une suppression automatique définitive de données réelles avant validation juridique). Code : `src/domains/data-lifecycle/company-erasure.service.ts`.
+
+1. Couper l'accès de l'entreprise dans `/admin` (« Couper l'accès », statut `SUSPENDED`).
+2. Remettre l'export, puis, une fois sa réception confirmée : `npm run data02:company-erasure -- schedule <companyId> --export-confirmed-at <date ISO>`. L'effacement devient possible 30 jours après cette date (`Company.settings.dataLifecycle`). « Rétablir » l'accès annule ce calendrier : une nouvelle coupure exige un nouvel export.
+3. Simulation : `npm run data02:company-erasure -- erase <companyId>` (résumé chiffré, rien n'est touché).
+4. Effacement : `COMPANY_ERASURE_ENABLED=pilot-company-erasure-v1 npm run data02:company-erasure -- erase <companyId> --apply`. Le manifeste (comptes, sans donnée personnelle) est écrit dans `outputs/data02/erasure-<companyId>.json` et gardé dans la fiche de l'entreprise.
+
+Ordre, rejouable après une panne : chaque facture est figée en PDF (Factur-X si ses données le permettent, sinon relevé classique) dans le bucket privé `invoice-archives` ; puis preuves (`delivery-pods`) et logo (`company-logos`) ; puis comptes Supabase Auth (un compte déjà absent n'est pas une erreur) ; enfin la base, en une transaction sérialisable qui revérifie tout.
+
+Gardé (décision du propriétaire du 11 novembre 2026, conforme à la politique : factures dix ans) : la fiche entreprise réduite à son nom et à son identité de facturation (statut `INACTIVE`), ses factures et leurs PDF figés, les traces du contrat SaaS (abonnement, usage, attribution commerciale). Effacé : comptes, commandes, livraisons, suivis, GPS, adresses, messages, tickets, tâches, canaux de commande, contacts et logo de l'entreprise.
+
+Refus : entreprise de démo, déjà effacée, accès non coupé, aucun calendrier, délai non écoulé, compte super admin rattaché, tâche en cours, lien avec une autre entreprise, sous-dossier inattendu dans le stockage, fichier de facture inconnu, autorisation absente.
+
+Vérifié : `tests/company-erasure.test.ts` (7 tests, sans base) et l'exercice A/B `scripts/data02/erasure-connected.ts`, lancé le 12 novembre 2026 (UTC) sur la base de préproduction avec l'accord du propriétaire (`tutelliv-dev` en pause) : `npx dotenv -e .env.preproduction.local -- tsx scripts/data02/erasure-connected.ts`. Résultat : A effacée (3 comptes Auth supprimés et absents, photo et logo supprimés, facture gardée en PDF dont l'empreinte est vérifiée), B identique, rejouer refusé (`ALREADY_ERASED`), fixtures nettoyées. Preuve locale : `outputs/data02/erasure-connected.json`.
+
+Restent : canal chiffré de remise de l'export ; sauvegardes (durée de rétention du plan Supabase et procédure après restauration : relancer l'effacement des entreprises effacées depuis la sauvegarde, à partir d'un registre des manifestes tenu hors de la base) ; validation juridique avant un premier usage réel.
