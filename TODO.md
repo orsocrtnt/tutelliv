@@ -4,9 +4,9 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**113 tâches terminées sur 143 — 79 %**
+**113 tâches terminées sur 144 — 78 %**
 
-`████████████████░░░░` · 30 tâches restantes
+`████████████████░░░░` · 31 tâches restantes
 
 **À faire par Claude**
 
@@ -21,6 +21,7 @@
 - MOTS-UNIFIES — Employer les mêmes mots partout à l'écran (après la vérification de conformité)
 - RELEASE-1 — Réaliser la recette de mise en vente (en dernier, avant la mise en vente)
 - SMS — Ajouter seulement les extensions justifiées (seulement si les pilotes le demandent)
+- AUTH-GOOGLE — Se connecter avec son compte Google (à planifier ; tu créeras l'identifiant Google (Google Cloud) au moment du branchement)
 
 **À faire par toi**
 
@@ -98,6 +99,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - DATA-02 : purge des prospects faite le 9 novembre ; reste la fin de pilote (export remis puis effacement à 30 jours), à cadrer avec toi au premier pilote.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
+- AUTH-GOOGLE (demandé le 11 novembre) : connexion par compte Google sur /login ; tu créeras l'identifiant dans Google Cloud au moment du branchement.
 
 **3. En attente de quelqu'un d'autre** (rien à faire tant que ça n'arrive pas)
 - Propriétaire et fournisseurs : fournir les justificatifs, contrats et décisions manquants pour la vérification LEGAL-1, DATA-02 et la fiche F10 d’INTAKE-1 avant les données réelles. LEGAL-LIENS suit la vérification des documents.
@@ -518,3 +520,15 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Terminé quand : les retouches demandées sont faites et le propriétaire valide la vidéo.
 
   **Modèle conseillé : Claude Opus · effort moyen.**
+
+- [ ] **AUTH-GOOGLE — Se connecter avec son compte Google.**
+
+  **Qui : Claude — à planifier ; tu créeras l'identifiant Google (Google Cloud) au moment du branchement.**
+
+  11 novembre 2026 : demandé par le propriétaire. Aujourd'hui, la connexion se fait seulement par e-mail et mot de passe : aucun appel `signInWithOAuth` dans `src/`. À faire : un bouton « Continuer avec Google » sur `/login` (Supabase Auth, fournisseur Google). Il faut aussi trancher ce qui se passe si l'adresse Google correspond à un compte existant, ou à personne. Un compte Google seul ne doit jamais créer d'accès à une entreprise sans invitation. La page de connexion doit rester la même pour les comptes de démo et le super admin.
+
+  Il faudra : un identifiant OAuth dans Google Cloud (écran de consentement, adresse de retour Supabase), le fournisseur Google activé dans Supabase (préproduction), les adresses de retour autorisées (`https://tutelliv.fr`), puis des tests pour un compte existant, un compte inconnu, un compte coupé et une invitation en attente, et un clic réel sur tutelliv.fr.
+
+  Terminé quand : un compte invité se connecte avec Google sur tutelliv.fr et arrive dans son espace, et une adresse Google inconnue est refusée proprement.
+
+  **Modèle conseillé : Claude Opus · effort élevé (authentification, sécurité).**
