@@ -41,17 +41,21 @@ test("LEGAL-LIENS : les formulaires qui collectent des données renvoient à la 
   assert.ok(identity.includes('href="/confidentialite"'), "étape identité de l'inscription");
 });
 
-test("LEGAL-LIENS : contenu provisoire signalé, aucune identité inventée", () => {
+test("LEGAL-LIENS : contenu provisoire signalé, identité du Kbis du 13 novembre 2026", () => {
   const shell = read("src/features/legal/legal-document.tsx");
   assert.match(shell, /Version provisoire, en cours de vérification/);
   const mentions = read("src/app/mentions-legales/page.tsx");
   const privacy = read("src/app/confidentialite/page.tsx");
   for (const source of [mentions, privacy]) {
     assert.ok(source.includes("<LegalDocument"), "bandeau provisoire via LegalDocument");
-    // Aucun SIREN/SIRET (9 ou 14 chiffres) ni numéro de téléphone publié tant que LEGAL-1 est ouverte.
-    assert.doesNotMatch(source, /\b\d{9}\b|\b\d{14}\b|\b0\d(?:[ .]?\d{2}){4}\b/);
+    assert.ok(source.includes("952 788 123"), "SIREN du Kbis");
+    assert.ok(source.includes("orso@tutelliv.fr"), "e-mail publié, donné par le propriétaire");
   }
-  assert.match(mentions, /\["Immatriculation \(SIREN\)", pending\]/);
+  // Valeurs du Kbis et de l'avis INSEE fournies par le propriétaire le 13 novembre 2026.
+  assert.match(mentions, /\["Immatriculation \(SIREN\)", "952 788 123 R\.C\.S\. Marseille"\]/);
+  assert.match(mentions, /\["SIRET", "952 788 123 00026"\]/);
+  assert.match(mentions, /\["Code APE", "62\.01Z"\]/);
+  assert.match(mentions, /\["Téléphone", "06 24 94 43 18"\]/);
   assert.match(mentions, /\["Directeur de la publication", "Carotenuto - Marchetti Orso"\]/);
   assert.match(privacy, /En cours de définition/);
 });

@@ -7,8 +7,6 @@ export const metadata: Metadata = {
   description: "Éditeur et hébergeurs du site TutelLiv (version provisoire, en cours de validation).",
 };
 
-const pending = <em>en cours</em>;
-
 export default function MentionsLegalesPage() {
   return (
     <LegalDocument
@@ -20,10 +18,14 @@ export default function MentionsLegalesPage() {
         <LegalFacts
           rows={[
             ["Éditeur", "Carotenuto - Marchetti Orso, entrepreneur individuel (EI)"],
+            ["Nom commercial", APP_NAME],
             ["Adresse", "10 traverse de la Gaye, 13009 Marseille, France"],
-            ["Immatriculation (SIREN)", pending],
+            ["Immatriculation (SIREN)", "952 788 123 R.C.S. Marseille"],
+            ["SIRET", "952 788 123 00026"],
+            ["Code APE", "62.01Z"],
             ["Directeur de la publication", "Carotenuto - Marchetti Orso"],
-            ["Contact", "Formulaire de la page Contact"],
+            ["E-mail", "orso@tutelliv.fr"],
+            ["Téléphone", "06 24 94 43 18"],
           ]}
         />
       </LegalSection>

@@ -17,7 +17,8 @@ export default function ConfidentialitePage() {
     >
       <LegalSection title="Responsable du traitement">
         <p>
-          L&apos;éditeur du site, présenté dans les{" "}
+          Orso Carotenuto - Marchetti, entrepreneur individuel (SIREN 952 788 123), 10 traverse de la Gaye, 13009
+          Marseille. Contact : orso@tutelliv.fr. Détails dans les{" "}
           <Link href="/mentions-legales" className="font-semibold text-brand underline underline-offset-4">
             mentions légales
           </Link>
@@ -119,8 +120,8 @@ export default function ConfidentialitePage() {
           la limitation de leur traitement ou vous y opposer, depuis la{" "}
           <Link href="/contact" className="font-semibold text-brand underline underline-offset-4">
             page Contact
-          </Link>
-          . Vous pouvez aussi adresser une réclamation à la CNIL (cnil.fr).
+          </Link>{" "}
+          ou par e-mail à orso@tutelliv.fr. Vous pouvez aussi adresser une réclamation à la CNIL (cnil.fr).
         </p>
       </LegalSection>
     </LegalDocument>

@@ -9,11 +9,12 @@ import { PROSPECT_LOGO_CID, PROSPECT_LOGO_PNG_BASE64 } from "@/domains/growth/pr
 
 export const PROSPECT_SENDER_ADDRESS = "orso@tutelliv.fr";
 export const PROSPECT_SENDER_NAME = "Orso — TutelLiv";
+export const PROSPECT_SENDER_PHONE = "06 24 94 43 18";
 export const PROSPECT_SUBJECT = "Il en est où ?";
 export const PROSPECT_PREHEADER = "Bonjour, mon colis, il en est où ? Ça vous dit quelque chose ?";
-/** Identité de l'émetteur exigée par la CNIL ; à compléter par le SIREN dès qu'il est attribué. */
+/** Identité de l'émetteur exigée par la CNIL (Kbis du 13 novembre 2026). */
 export const PROSPECT_SENDER_IDENTITY =
-  "Orso Carotenuto-Marchetti, entrepreneur individuel (immatriculation en cours), 10 traverse de la Gaye, 13009 Marseille.";
+  "Orso Carotenuto-Marchetti, entrepreneur individuel, SIREN 952 788 123 R.C.S. Marseille, 10 traverse de la Gaye, 13009 Marseille.";
 
 export type ProspectEmailInput = {
   city: string;
@@ -106,7 +107,7 @@ ${STEPS.map(stepRow).join("\n")}
 <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#4f5953">Envie d'être parmi les premiers informés ?</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px"><tr><td style="border-radius:999px;background:#0e1310"><a href="${escapeHtml(links.join)}" style="display:inline-block;padding:15px 26px;font-family:${FONT};font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px">Je veux en être</a></td></tr></table>
 <p style="margin:0 0 26px;font-size:13px;line-height:1.5;color:#68726b">Ou découvrez TutelLiv sur <a href="${escapeHtml(links.site)}" style="color:#08783f;text-decoration:underline">tutelliv.fr</a></p>
-<p style="margin:0;font-size:15px;line-height:1.6;color:#0e1310"><strong>Orso Carotenuto-Marchetti</strong><br><span style="color:#68726b;font-size:13px">Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS}</span></p>
+<p style="margin:0;font-size:15px;line-height:1.6;color:#0e1310"><strong>Orso Carotenuto-Marchetti</strong><br><span style="color:#68726b;font-size:13px">Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS} · ${PROSPECT_SENDER_PHONE}</span></p>
 </td></tr>
 </table>
 </td></tr>
@@ -134,7 +135,7 @@ ${STEPS.map(stepRow).join("\n")}
     `Découvrir TutelLiv : ${links.site}`,
     "",
     "Orso Carotenuto-Marchetti",
-    `Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS}`,
+    `Fondateur, TutelLiv · ${PROSPECT_SENDER_ADDRESS} · ${PROSPECT_SENDER_PHONE}`,
     "",
     "--",
     PROSPECT_SENDER_IDENTITY,

@@ -72,7 +72,7 @@ Verdicts : **Cohérent** (constat conforme au texte lu), **Écart** (à corriger
 | # | Blocage | État au 2 novembre |
 |---|---|---|
 | 1 | Hébergement commercial et DPA | **Ouvert**, conditions relues et confirmées |
-| 2 | Identité et textes | **Ouvert** : nom et adresse publiés, SIREN à venir, textes hors dépôt |
+| 2 | Identité et textes | **Ouvert** : nom, adresse, SIREN, SIRET, APE, e-mail et téléphone publiés le 13 novembre 2026, textes hors dépôt |
 | 3 | GPS sur téléphone | **Ouvert** : MOB-01C |
 | 4 | Cartographie publique | **Ouvert** |
 | 5 | Photos et hors ligne | **Traité côté code** : métadonnées retirées ; file hors ligne effacée au plus tard après sept jours (3 novembre). Reste la durée de conservation des photos (section 4) |
@@ -83,9 +83,9 @@ Verdicts : **Cohérent** (constat conforme au texte lu), **Écart** (à corriger
 
 ## 4. Ce qu'il faut au propriétaire
 
-**À fournir**
-- SIREN, e-mail et téléphone publiables. Directeur de publication : le propriétaire, confirmé le 2 novembre 2026.
-- **Droit d'exercer depuis les États-Unis :** la checklist J5 demande de confirmer la capacité à exercer sous visa J-1, et la cohérence de la résidence fiscale avec l'activité française. Elle demande aussi de vérifier la reprise de ton **ancien SIREN**. Rien de cela n'est tranché dans le dossier : à confirmer avant toute vente, idéalement avant le dépôt au Guichet unique. L'agent ne conclut pas sur ces points.
+**Fourni le 13 novembre 2026**
+- Kbis : entrepreneur individuel, SIREN 952 788 123 R.C.S. Marseille (ancien SIREN repris), SIRET 952 788 123 00026, APE 62.01Z, nom commercial TutelLiv. E-mail publié : orso@tutelliv.fr ; téléphone : 06 24 94 43 18. Publiés dans les mentions légales, la page Confidentialité et le pied du mail de prospection. Directeur de publication : le propriétaire, confirmé le 2 novembre 2026.
+- Droit d'exercer depuis les États-Unis (visa J-1) : écarté par le propriétaire le 13 novembre, il rentre bientôt en France.
 
 **Décidé le 2 novembre**
 - Page Confidentialité : bases légales publiées (intérêt légitime pour le contact et la prospection, contrat pour le compte) ; messages Contact conservés trois ans après le dernier échange. La purge reste à écrire (DATA-02).
@@ -96,7 +96,7 @@ Verdicts : **Cohérent** (constat conforme au texte lu), **Écart** (à corriger
 **Décidé le 9 novembre**
 - Durées de conservation du [projet DATA-02](../operations/data02/RETENTION_POLICY_DRAFT.md) validées telles que proposées, sans avis d'un juriste.
 - CGV, articles 16 et 17 : plafond de responsabilité égal aux sommes payées par le client sur les 12 derniers mois ; préavis de 30 jours pour changer les conditions.
-- SIREN : demande déposée au Guichet unique, numéro pas encore reçu.
+- SIREN : demande déposée au Guichet unique (numéro reçu le 13 novembre, voir plus haut).
 
 **À décider**
 - Faire confirmer ou non les points incertains par un professionnel.

@@ -4,7 +4,7 @@ Version du 1er novembre 2026. Plan de travail, pas un avis juridique : aucun jur
 
 ## 1. L'essentiel
 
-**Le démarchage peut démarrer lundi, mais pas pour vendre.** Tu n'as pas encore de SIREN (confirmé le 1er novembre) : jusqu'à ce qu'il arrive, on fait seulement des **entretiens de recherche**. Aucun prix, aucune offre de pilote. Quand le numéro arrive, le plan complet s'ouvre (repère « Après le SIREN » dans ce document).
+**SIREN reçu le 13 novembre 2026** (952 788 123 R.C.S. Marseille, SIRET 952 788 123 00026) : le plan complet est ouvert (repère « Après le SIREN » dans ce document). Avant le premier pilote, la vraie production reste à créer (Vercel Pro, AUDIT-0111).
 
 | Possible dès lundi | Pas encore possible |
 |---|---|
@@ -27,7 +27,7 @@ Dans l'ordre. Les points 1 à 3 bloquent l'envoi.
 
 | # | Problème constaté le 1er novembre | Ce qu'il faut faire | Qui |
 |---|---|---|---|
-| 1 | **Pas encore de SIREN** (confirmé le 1er novembre). | Faire la demande sur le Guichet unique lundi, avant le premier message. Voir ci-dessous. | Toi |
+| 1 | **Pas encore de SIREN** (confirmé le 1er novembre). | Fait : Kbis du 13 novembre 2026, SIREN 952 788 123. | Fait |
 | 2 | **Les mails partent de `no-reply@tutelliv.fr`.** Une réponse de prospect serait perdue et Resend porte aussi les mails de connexion. | Créer une vraie boîte, par exemple `orso@tutelliv.fr` chez OVH, et envoyer à la main depuis elle. | Toi |
 | 3 | **Les modèles de mail n'indiquent ni qui écrit, ni l'origine de l'adresse.** La CNIL demande l'identité de l'émetteur et un refus simple. | Utiliser les textes de la partie 7, qui contiennent ces mentions. | Fait dans ce plan |
 | 4 | **`tutelliv.fr` tourne avec un paiement fictif** (audit AUDIT-0111). | Boutons de `/tarifs` remplacés par « Demander un pilote » vers Contact. **Reste à faire :** l'accueil, le pied de page, Fonctionnalités et Démonstration mènent encore à l'inscription. Ne jamais envoyer ces liens à un prospect. | Fait pour `/tarifs` ; le reste avec S2 d'AUDIT-0111 |
@@ -44,7 +44,7 @@ Le code du travail présume lucrative une activité qui recherche des clients pa
 
 1. Lundi, avant tout message : faire la demande sur le Guichet unique.
 2. En attendant le numéro : entretiens de recherche seulement. Pas de prix, pas de pilote, pas de lien vers le site dans les mails.
-3. Quand le numéro arrive : l'ajouter au pied des mails et aux mentions légales, puis ouvrir les textes marqués « Après le SIREN ».
+3. Fait le 13 novembre 2026 : SIREN au pied des mails (`prospect-email.ts`) et dans les mentions légales ; textes « Après le SIREN » ouverts.
 
 **Risque qui reste :** le site public affiche déjà les prix ; l'inscription en ligne est fermée depuis le 2 novembre. Le mode entretiens réduit le risque sans le supprimer. Pose la question à ton comptable dès que possible.
 
@@ -142,11 +142,11 @@ Orso Carotenuto-Marchetti
 TutelLiv
 
 --
-Orso Carotenuto-Marchetti, entrepreneur individuel (immatriculation en cours), 10 traverse de la Gaye, 13009 Marseille.
+Orso Carotenuto-Marchetti, entrepreneur individuel, SIREN 952 788 123 R.C.S. Marseille, 10 traverse de la Gaye, 13009 Marseille.
 Adresse trouvée sur [votre site / l'annuaire X]. Pour ne plus recevoir de message, répondez « stop » : je retire votre adresse aussitôt.
 ```
 
-**Après le SIREN :** remplacer « immatriculation en cours » par le numéro, ajouter `https://tutelliv.fr`, et finir par : « Si le sujet vous parle, je vous montre le logiciel. »
+**Après le SIREN (SIREN déjà mis ci-dessus le 13 novembre) :** ajouter `https://tutelliv.fr`, et finir par : « Si le sujet vous parle, je vous montre le logiciel. »
 
 ### Mail 2 (J+5)
 

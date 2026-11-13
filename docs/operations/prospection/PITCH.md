@@ -2,7 +2,7 @@
 
 Version du 1er novembre 2026. À garder sous les yeux pendant les appels et les rendez-vous. Le plan complet est dans [le plan de démarchage](README.md).
 
-Tant que le SIREN n'est pas arrivé : ni prix, ni offre de pilote. Les textes « Après le SIREN » attendent le numéro.
+SIREN reçu le 13 novembre 2026 (952 788 123 R.C.S. Marseille) : les textes « Après le SIREN » sont ouverts. Avant le premier pilote, la vraie production reste à créer (Vercel Pro, AUDIT-0111).
 
 ## Le pitch
 
