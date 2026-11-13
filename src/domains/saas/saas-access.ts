@@ -1,3 +1,4 @@
+import { priceTaxSuffix } from "@/domains/billing/vat-display";
 import type { SaasPlanCode } from "@prisma/client";
 
 export const SESSION_SAAS_FEATURES = [
@@ -16,6 +17,8 @@ export type SessionSaasSeatMeter = {
   limit: number | null;
   remaining: number | null;
   extraMonthlyPriceCents: number | null;
+  /** Taux de TVA du catalogue (0 = franchise en base : prix sans « HT »). */
+  vatRateBps?: number | null;
   canAddExtra: boolean;
 };
 
@@ -43,14 +46,17 @@ export function buildSessionSeatMeter(input: {
   limit: number | null;
   hardMax?: number | null;
   extraMonthlyPriceCents?: number | null;
+  vatRateBps?: number | null;
 }): SessionSaasSeatMeter {
   const extraMonthlyPriceCents = input.extraMonthlyPriceCents ?? null;
+  const vatRateBps = input.vatRateBps ?? null;
   if (input.limit == null) {
     return {
       used: input.used,
       limit: null,
       remaining: null,
       extraMonthlyPriceCents,
+      vatRateBps,
       canAddExtra: false,
     };
   }
@@ -65,6 +71,7 @@ export function buildSessionSeatMeter(input: {
     limit: input.limit,
     remaining,
     extraMonthlyPriceCents,
+    vatRateBps,
     canAddExtra,
   };
 }
@@ -79,7 +86,7 @@ export function seatRemainingLabel(meter: SessionSaasSeatMeter) {
     return meter.remaining === 1 ? "1 poste restant" : `${meter.remaining} postes restants`;
   }
   if (meter.canAddExtra && meter.extraMonthlyPriceCents != null) {
-    return `Aucun poste restant · ${formatSeatEuros(meter.extraMonthlyPriceCents)} HT / mois pour en ajouter un`;
+    return `Aucun poste restant · ${formatSeatEuros(meter.extraMonthlyPriceCents)}${priceTaxSuffix(meter.vatRateBps)} / mois pour en ajouter un`;
   }
   return "Plafond atteint";
 }

@@ -44,7 +44,7 @@ export async function GET() {
   const options = catalog?.options.map((option) => ({ code: option.code, name: option.name, kind: option.kind, featureKey: option.featureKey, applicablePlans: option.applicablePlans, monthlyPriceCents: option.monthlyPriceCents, annualPriceCents: option.annualPriceCents })) ?? [];
   const active = (auth.account.state as unknown as BillingState | null)?.activeContract;
   const current = active ? { planCode: active.quote.planCode, billingInterval: active.quote.billingInterval, selections: active.quote.selections } : null;
-  return NextResponse.json({ state: auth.account.state, operations, plans, options, current }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ state: auth.account.state, operations, plans, options, current, vatRateBps: catalog?.vatRateBps ?? null }, { headers: { "Cache-Control": "no-store" } });
 }
 export async function POST(request: Request) {
   const auth = await context();

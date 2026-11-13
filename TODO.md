@@ -4,9 +4,9 @@
 <!-- TODO_PROGRESS_START -->
 ## Progression globale
 
-**115 tâches terminées sur 144 — 80 %**
+**115 tâches terminées sur 145 — 79 %**
 
-`████████████████░░░░` · 29 tâches restantes
+`████████████████░░░░` · 30 tâches restantes
 
 **À faire par Claude**
 
@@ -39,6 +39,7 @@
 - PILOT-1 — Recruter et conduire trois pilotes accompagnés (après les entretiens)
 - PILOT-2 — Décider avec les preuves des pilotes (après les pilotes)
 - CONTRAT-AMI — Contrat du commercial de Paris (ton ami) (faire relire la V4 par un juriste ; puis Claude (calcul des commissions et des paliers))
+- TVA-FRANCHISE — Abonnements TutelLiv sans TVA (micro-entreprise, art. 293 B du CGI) (lancer la migration en préproduction ; puis Claude vérifie en ligne)
 - MAIL-PONT — Relier la boîte de commandes de l'entreprise à TutelLiv (régler `NEXT_PUBLIC_APP_URL` sur `https://tutelliv.fr` (Vercel, Preview `preproduction`) et retirer le filtre Gmail d'essai ; Outlook plus tard (décidé le 4 novembre) ; ensuite Claude)
 - WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (SIREN reçu le 13 novembre : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
 - VIDEO-EXPLICATION — Retoucher la vidéo d'explication de TutelLiv (2 min 15) (dire les retouches à faire, puis Claude)
@@ -78,6 +79,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Entretiens (9 novembre) : ton ami à Paris appelle et fait l'entretien seul ; tu ne fais que les démos, en visio du lundi au vendredi entre 18 h et 18 h 30 heure française (ta pause de midi). Envoie-lui la nouvelle antisèche (4 pages) : `outputs/commercial/kit/TutelLiv-antiseche-commercial.pdf`, et remplace l'ancienne dans le Drive (Commercial > « Supports pour les commerciaux »).
 - Contrat de ton ami à Paris (CONTRAT-AMI) : il a accepté le 12 novembre la contre-proposition (parts en chiffre d'affaires mensuel apporté, 20 % au maximum). **V4 prête** : `outputs/contrat-ami/TutelLiv-contrat-apporteur-affaires-V4.pdf` (17 pages) et la note pour le juriste `TutelLiv-contrat-V4-note-de-revision.pdf` (4 pages : tableau V3 → V4 et 13 points à valider). Ajouté : 7 paliers (3 % à 1 500, 4 000, 7 500, 11 000 et 15 000 € par mois, puis 2,5 % à 25 000 et 35 000 €), actions sans droit de vote, calcul du chiffre compté (on compte ce que le client paie, sans dépasser ce que l'ami a vendu ; une montée faite par le client seul ne compte pas ; une montée par le lien personnel de l'ami compte après 3 mois payés ; un palier atteint reste acquis), alerte après 6 mois sans nouveau client (ton choix). À faire : faire relire la V4 par un juriste, puis remplir les blancs de ton ami (nom, adresse, SIRET, e-mail) et signer ; ton côté (nom, adresse, SIREN, SIRET) est rempli depuis le 13 novembre.
 - Petits changements plus rapides (9 novembre, à ta demande) : pour un texte, une couleur, un espacement ou de la doc, Claude ne relance plus les 1 744 tests du logiciel, seulement ceux du fichier touché (règle dans `AGENTS.md`). Rien à faire.
+- **TVA (13 novembre, TVA-FRANCHISE)** : les abonnements TutelLiv s'affichent sans TVA (« TVA non applicable, art. 293 B du CGI ») dès que le catalogue est à 0 %. À lancer toi-même dans ton Terminal (refusé à Claude) : `cd ~/Developer/TutelLiv-GPT && npx dotenv -e .env.preproduction.local -- prisma migrate deploy`, puis dis « vérifie ». Kit commercial et plaquette refaits sans « HT » (`outputs/commercial/kit/`). Fais confirmer par un comptable la franchise et la TVA sur tes achats à l'étranger.
 - **SIREN reçu et publié (13 novembre 2026)** : SIREN 952 788 123 R.C.S. Marseille (ancien numéro repris), SIRET 952 788 123 00026, APE 62.01Z, nom commercial TutelLiv. Claude les a mis, avec orso@tutelliv.fr et 06 24 94 43 18, dans les mentions légales, la page Confidentialité (responsable du traitement, exercice des droits), le pied et la signature du mail de prospection, les docs de prospection et de LEGAL-1, et en tête du contrat V4 de ton ami (côté TutelLiv ; PDF refait, 17 pages). Le n° de TVA n'est pas mis (aucun fourni). À regarder sur tutelliv.fr/mentions-legales après le déploiement. Reste à toi : compte Meta Business (WHATSAPP-1) et compte Super PDP (Factur-X) au nom de l'entreprise.
 - Étude de marché (`outputs/reports/Marché TutelLiv livraison B2B France.md`, environ 840 entreprises visées, hypothèse à mesurer) : trier la liste de prospects (107 lignes sur 282 ont le bon profil), obtenir 50 réponses tirées au hasard sur la part de clients directs, demander un devis à GTLYS et à Toncarton.
 - Avant le premier pilote ou la première vente (décidé le 2 novembre) : passer Vercel en Pro et créer la vraie production (AUDIT-0111, point E2).
@@ -336,6 +338,12 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
   12 novembre, V4 (l'ami a accepté la contre-proposition ; choix du propriétaire en questionnaire : alerte d'abandon après 6 mois sans nouveau client au lieu de 3, blancs laissés pour la signature) : `outputs/contrat-ami/TutelLiv-contrat-apporteur-affaires-V4.pdf` (17 pages) et `TutelLiv-contrat-V4-note-de-revision.pdf` (4 pages), sources `contrat-apporteur-affaires-v4.html` et `note-revision-v4.html` (local, non versionné). Changements : article 9 réécrit (actions de préférence sans droit de vote ou équivalent, mêmes droits financiers ; 7 paliers en Chiffre d'Affaires Mensuel Compté, 20 % au maximum ; paliers 6 et 7 : 1 % puis 1,5 % sur 6 mois ; palier atteint gagné même si le chiffre baisse) ; définition du chiffre compté (Clients Qualifiés, montant réglé plafonné aux éléments vendus, annuel ÷ 12, montée du client seul exclue, Évolution Apportée comptée après 3 mensualités réglées pour empêcher une montée temporaire d'acheter un palier — choix de Claude, signalé au juriste) ; Évolution Apportée par lien personnel sous 90 jours (7.3), ancienne règle du fichier de suivi gardée jusqu'à la mise en service du lien (7.3 bis), corrections manuelles journalisées (7.3 ter) ; relevé avec le chiffre compté par client (8.1) ; fraude étendue aux montées simulées et abonnements payés par l'ami (10.4) ; annexe 2 refaite (ordre de grandeur en clients Pro, exemple de calcul 851,83 €, abandon à 6 mois). Vérifié : PDF générés par Playwright, 0 image cassée, textes clés retrouvés dans le PDF, pages 7 et 14 et note relues en aperçu, renvois internes à l'article 9 contrôlés. Non vérifié : validité juridique (juriste). Code non modifié.
   Terminé quand : contrat relu et signé ; calcul des commissions conforme (35 % puis 15 %, arrêt 12 mois après la fin du contrat) avec tests.
+
+- [ ] **TVA-FRANCHISE — Abonnements TutelLiv sans TVA (micro-entreprise, art. 293 B du CGI).**
+
+  **Qui : Toi — lancer la migration en préproduction ; puis Claude vérifie en ligne.**
+
+  13 novembre 2026, décision du propriétaire (questionnaire) : tout passer sans TVA, l'affichage suit le taux du catalogue. Fait : `src/domains/billing/vat-display.ts` (taux 0 = « TVA non applicable, art. 293 B du CGI », prix sans « HT » ni « TTC » ; taux inconnu ou 20 % = « HT »/« TTC » comme avant) branché sur le tableau des formules et le récapitulatif de paiement de l'inscription, la fenêtre des options, le changement de formule (taux renvoyé par `GET /api/billing`) et le libellé « poste supplémentaire » ; migration de données `20261113120000_catalog_vat_franchise` (catalogue actif C11 à 0 %, aucun changement de schéma ; les catalogues suivants recopient le taux) ; kit commercial et plaquette (SIREN ajouté) régénérés sans « HT », doc de prospection corrigée. Vérifications : `tests/vat-franchise.test.ts` (4 tests), `npm run check` 1 784/1 784. Migration en préproduction refusée à l'agent par le garde-fou. Non vérifié : affichage en ligne (après la migration), PDF du kit relus seulement en texte (page 13 signalée « trop pleine » par le script de mise en page). Reste à faire confirmer par un comptable : franchise en base et TVA due sur les achats aux fournisseurs étrangers (Vercel, Supabase, Anthropic).
 
 - [ ] **LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public.**
 

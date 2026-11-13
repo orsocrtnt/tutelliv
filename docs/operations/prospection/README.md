@@ -117,7 +117,7 @@ Ton agenda porte un bloc « MARIE » du 13 au 27 novembre. Je ne sais pas s'il t
 | Données | « Base hébergée à Paris. Aucune vraie donnée tant que le cadre juridique n'est pas signé. » | « 100 % conforme RGPD » |
 | Support | « Réponse visée sous un jour ouvré. » | Un délai garanti |
 | Pilote (après le SIREN) | « 4 semaines, accompagné, sans obligation de s'abonner, données exportées à la fin. Gratuit, à confirmer dans l'accord. » | Une date de démarrage |
-| Prix (après le SIREN) | Starter 79 €, Pro 179 €, Business 349 € HT par mois, si la personne demande. Avant : « Je ne vends rien pour l'instant, je veux d'abord comprendre votre travail. » | Une remise inventée |
+| Prix (après le SIREN) | Starter 79 €, Pro 179 €, Business 349 € par mois (TVA non applicable, micro-entreprise), si la personne demande. Avant : « Je ne vends rien pour l'instant, je veux d'abord comprendre votre travail. » | Une remise inventée |
 
 ## 7. Les textes
 

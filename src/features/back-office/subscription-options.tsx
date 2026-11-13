@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Minus, Plus } from "lucide-react";
+import { isVatFranchise, priceTaxSuffix, VAT_FRANCHISE_MENTION } from "@/domains/billing/vat-display";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,7 +89,7 @@ export function SubscriptionOptions({ subscription, endsAtLabel }: { subscriptio
         <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Modifier les options</DialogTitle>
-            <DialogDescription>Formule {subscription.formula.name}, prix HT par {per(interval)}.</DialogDescription>
+            <DialogDescription>Formule {subscription.formula.name}, prix{priceTaxSuffix(catalog.data?.vatRateBps)} par {per(interval)}{isVatFranchise(catalog.data?.vatRateBps) ? ` (${VAT_FRANCHISE_MENTION})` : ""}.</DialogDescription>
           </DialogHeader>
           {catalog.isError && <p role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{catalog.error.message}</p>}
           {catalog.data && offered.length === 0 && <p className="text-sm text-muted-foreground">Aucune option supplémentaire n’est proposée pour cette formule.</p>}
@@ -100,7 +101,7 @@ export function SubscriptionOptions({ subscription, endsAtLabel }: { subscriptio
                 return <li key={option.code} className="flex items-center justify-between gap-3 p-3 text-sm">
                   <span className="min-w-0">
                     <span className="block font-medium">{option.name}</span>
-                    <span className="text-muted-foreground">{price} HT{option.kind === "OPTION" ? "" : " par compte"}</span>
+                    <span className="text-muted-foreground">{price}{priceTaxSuffix(catalog.data?.vatRateBps)}{option.kind === "OPTION" ? "" : " par compte"}</span>
                   </span>
                   {option.kind === "OPTION"
                     ? <input type="checkbox" className="size-5 shrink-0 accent-primary" checked={quantity > 0} disabled={max === 0 && quantity === 0} aria-label={option.name} onChange={(event) => update(option.code, event.target.checked ? 1 : 0)} />

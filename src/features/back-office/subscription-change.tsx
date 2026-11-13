@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isVatFranchise, priceTaxSuffix, totalTaxSuffix, VAT_FRANCHISE_MENTION } from "@/domains/billing/vat-display";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,9 +26,9 @@ export function Recap({ preview, endsAtLabel }: { preview: ChangePreview; endsAt
       </ul>
     </div>}
     <p>{preview.timing === "immediate"
-      ? <>À payer aujourd’hui : <strong>{formatMoney(preview.totalCents)} TTC</strong>, au prorata jusqu’au {endsAtLabel}. Le changement s’applique dès le paiement.</>
+      ? <>À payer aujourd’hui : <strong>{formatMoney(preview.totalCents)}{totalTaxSuffix(preview.quote.vatRateBps)}</strong>, au prorata jusqu’au {endsAtLabel}. Le changement s’applique dès le paiement.</>
       : <>Rien à payer aujourd’hui. Le changement s’applique au renouvellement, le {endsAtLabel}.</>}</p>
-    <p className="text-muted-foreground">Ensuite : {formatMoney(preview.quote.totalTtcCents)} TTC par {per(preview.quote.billingInterval)}.</p>
+    <p className="text-muted-foreground">Ensuite : {formatMoney(preview.quote.totalTtcCents)}{totalTaxSuffix(preview.quote.vatRateBps)} par {per(preview.quote.billingInterval)}{isVatFranchise(preview.quote.vatRateBps) ? ` (${VAT_FRANCHISE_MENTION})` : ""}.</p>
     {lostFeatures.length > 0 && <p className="text-muted-foreground">Fonctions retirées : {lostFeatures.map((feature) => SAAS_FEATURE_LABELS[feature as keyof typeof SAAS_FEATURE_LABELS] ?? feature).join(", ")}.</p>}
     {orderOverage && <p className="text-muted-foreground">Ce mois-ci, {orderOverage.current} commandes pour {orderOverage.included} incluses : les commandes au-delà seront facturées.</p>}
   </div>;
@@ -104,7 +105,7 @@ export function SubscriptionChange({ subscription, endsAtLabel }: { subscription
                   className={cn("flex items-center justify-between rounded-lg border p-3 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60", planCode === plan.code ? "border-primary bg-primary/5" : "hover:bg-muted/50")}
                   onClick={() => choose({ planCode: plan.code })}>
                   <span className="font-medium">{plan.name}{currentPlan && <span className="ml-2 text-xs font-normal text-muted-foreground">Formule actuelle</span>}</span>
-                  <span className="text-muted-foreground">{formatMoney(interval === "ANNUAL" ? plan.annualPriceCents : plan.monthlyPriceCents)} HT / {per(interval)}</span>
+                  <span className="text-muted-foreground">{formatMoney(interval === "ANNUAL" ? plan.annualPriceCents : plan.monthlyPriceCents)}{priceTaxSuffix(catalog.data.vatRateBps)} / {per(interval)}</span>
                 </button>;
               })}
             </div>

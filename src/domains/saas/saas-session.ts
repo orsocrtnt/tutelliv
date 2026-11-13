@@ -42,6 +42,7 @@ async function companySeatMeters(
       select: {
         catalogVersion: {
           select: {
+            vatRateBps: true,
             options: {
               where: { kind: { in: ["DRIVER_SEAT", "ADMIN_SEAT", "DISPATCHER_SEAT"] } },
               select: { kind: true, monthlyPriceCents: true, applicablePlans: true },
@@ -66,6 +67,7 @@ async function companySeatMeters(
       limit: access.limits[key],
       hardMax: access.maxSeats[key],
       extraMonthlyPriceCents: extraPrice(options, kind, access.planCode),
+      vatRateBps: subscription?.catalogVersion?.vatRateBps ?? null,
     });
 
   return {

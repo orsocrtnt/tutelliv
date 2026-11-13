@@ -31,7 +31,7 @@ export type ChangePreview = {
   currency: string;
   timing: "immediate" | "renewal";
   prorationDate: number;
-  quote: { totalTtcCents: number; billingInterval: BillingInterval };
+  quote: { totalTtcCents: number; billingInterval: BillingInterval; vatRateBps?: number };
   assessment: {
     blockers: Array<{ resource: "drivers" | "admins" | "dispatchers"; current: number; limit: number; excess: number }>;
     lostFeatures: string[];
@@ -59,7 +59,7 @@ export const subscriptionApi = {
     const response = await fetch("/api/billing", { cache: "no-store" });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error ?? "Formules indisponibles");
-    return body as { plans: BillingPlan[]; options: BillingOption[]; current: BillingSelection | null };
+    return body as { plans: BillingPlan[]; options: BillingOption[]; current: BillingSelection | null; vatRateBps: number | null };
   },
   preview: (selection: BillingSelection) => postBilling<ChangePreview>({ action: "preview", selection }),
   /** La clé reste la même pour toutes les tentatives d'une même confirmation : jamais deux changements. */

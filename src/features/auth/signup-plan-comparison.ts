@@ -1,3 +1,5 @@
+import { priceTaxSuffix } from "@/domains/billing/vat-display";
+
 export type PlanCode = "STARTER" | "PRO" | "BUSINESS";
 export type BillingInterval = "MONTHLY" | "ANNUAL";
 
@@ -77,12 +79,13 @@ function featureCell(
   featureKey: string,
   options: SignupCatalogOption[],
   billingInterval: BillingInterval,
+  vatRateBps: number,
 ): ComparisonCell {
   if (plan.includedFeatures.includes(featureKey)) return { kind: "included", text: "Inclus" };
   const option = options.find((candidate) => candidate.kind === "OPTION" && candidate.featureKey === featureKey && candidate.applicablePlans.includes(plan.code));
   if (option) {
     const price = billingInterval === "ANNUAL" ? option.annualPriceCents : option.monthlyPriceCents;
-    return { kind: "option", text: `En option · ${formatSignupMoney(price)} HT / ${billingInterval === "ANNUAL" ? "an" : "mois"}` };
+    return { kind: "option", text: `En option · ${formatSignupMoney(price)}${priceTaxSuffix(vatRateBps)} / ${billingInterval === "ANNUAL" ? "an" : "mois"}` };
   }
   return { kind: "missing", text: "Non inclus" };
 }
@@ -91,9 +94,10 @@ function autoDispatchCell(
   plan: SignupCatalogPlan,
   options: SignupCatalogOption[],
   billingInterval: BillingInterval,
+  vatRateBps: number,
 ): ComparisonCell {
   if (!plan.includedFeatures.includes("auto_dispatch")) {
-    return featureCell(plan, "auto_dispatch", options, billingInterval);
+    return featureCell(plan, "auto_dispatch", options, billingInterval, vatRateBps);
   }
   return {
     kind: "included",
@@ -107,7 +111,7 @@ export function buildSignupPlanComparison(catalog: SignupCatalog, billingInterva
   return [
     {
       id: "price",
-      label: `Prix HT / ${period}`,
+      label: `Prix${priceTaxSuffix(catalog.vatRateBps)} / ${period}`,
       cells: cellsFor(plans, (plan) => {
         if (billingInterval !== "ANNUAL") {
           return { kind: "value", text: formatSignupMoney(plan.monthlyPriceCents, catalog.currency) };
@@ -150,7 +154,7 @@ export function buildSignupPlanComparison(catalog: SignupCatalog, billingInterva
       label: "Commande supplémentaire",
       cells: cellsFor(plans, (plan) => ({
         kind: "value",
-        text: `${formatSignupMoney(plan.orderOverageUnitPriceCents, catalog.currency)} HT, sans blocage`,
+        text: `${formatSignupMoney(plan.orderOverageUnitPriceCents, catalog.currency)}${priceTaxSuffix(catalog.vatRateBps)}, sans blocage`,
       })),
     },
     {
@@ -163,8 +167,8 @@ export function buildSignupPlanComparison(catalog: SignupCatalog, billingInterva
       label: feature.label,
       cells: cellsFor(plans, (plan) =>
         feature.key === "auto_dispatch"
-          ? autoDispatchCell(plan, options, billingInterval)
-          : featureCell(plan, feature.key, options, billingInterval)
+          ? autoDispatchCell(plan, options, billingInterval, catalog.vatRateBps)
+          : featureCell(plan, feature.key, options, billingInterval, catalog.vatRateBps)
       ),
     })),
   ];
