@@ -38,9 +38,9 @@
 - PILOT-1 — Recruter et conduire trois pilotes accompagnés (après les entretiens)
 - PILOT-2 — Décider avec les preuves des pilotes (après les pilotes)
 - CONTRAT-AMI — Contrat du commercial de Paris (ton ami) (faire relire la V4 par un juriste ; puis Claude (calcul des commissions et des paliers))
-- LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public (SIREN, e-mail, téléphone ; puis Claude)
+- LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public (e-mail et téléphone à publier (SIREN reçu le 13 novembre) ; puis Claude)
 - MAIL-PONT — Relier la boîte de commandes de l'entreprise à TutelLiv (régler `NEXT_PUBLIC_APP_URL` sur `https://tutelliv.fr` (Vercel, Preview `preproduction`) et retirer le filtre Gmail d'essai ; Outlook plus tard (décidé le 4 novembre) ; ensuite Claude)
-- WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (après le SIREN : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
+- WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (SIREN reçu le 13 novembre : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
 - VIDEO-EXPLICATION — Retoucher la vidéo d'explication de TutelLiv (2 min 15) (dire les retouches à faire, puis Claude)
 
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
@@ -78,11 +78,11 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - Entretiens (9 novembre) : ton ami à Paris appelle et fait l'entretien seul ; tu ne fais que les démos, en visio du lundi au vendredi entre 18 h et 18 h 30 heure française (ta pause de midi). Envoie-lui la nouvelle antisèche (4 pages) : `outputs/commercial/kit/TutelLiv-antiseche-commercial.pdf`, et remplace l'ancienne dans le Drive (Commercial > « Supports pour les commerciaux »).
 - Contrat de ton ami à Paris (CONTRAT-AMI) : il a accepté le 12 novembre la contre-proposition (parts en chiffre d'affaires mensuel apporté, 20 % au maximum). **V4 prête** : `outputs/contrat-ami/TutelLiv-contrat-apporteur-affaires-V4.pdf` (17 pages) et la note pour le juriste `TutelLiv-contrat-V4-note-de-revision.pdf` (4 pages : tableau V3 → V4 et 13 points à valider). Ajouté : 7 paliers (3 % à 1 500, 4 000, 7 500, 11 000 et 15 000 € par mois, puis 2,5 % à 25 000 et 35 000 €), actions sans droit de vote, calcul du chiffre compté (on compte ce que le client paie, sans dépasser ce que l'ami a vendu ; une montée faite par le client seul ne compte pas ; une montée par le lien personnel de l'ami compte après 3 mois payés ; un palier atteint reste acquis), alerte après 6 mois sans nouveau client (ton choix). À faire : faire relire la V4 par un juriste, puis remplir les blancs (noms, adresses, SIREN, SIRET) et signer. Visa J-1 : à voir à part avec un avocat en immigration et un fiscaliste.
 - Petits changements plus rapides (9 novembre, à ta demande) : pour un texte, une couleur, un espacement ou de la doc, Claude ne relance plus les 1 744 tests du logiciel, seulement ceux du fichier touché (règle dans `AGENTS.md`). Rien à faire.
-- SIREN : demande déposée au Guichet unique, numéro pas encore reçu (confirmé le 9 novembre). Dès qu'il arrive, le donner à Claude : mentions légales, textes LEGAL-1, WhatsApp et Factur-X en dépendent. D'ici là, le démarchage se limite aux entretiens de recherche : aucun prix ni offre de pilote.
+- **SIREN reçu (Kbis du 13 novembre 2026)** : entreprise individuelle immatriculée au RCS de Marseille le 13 novembre, SIREN 952 788 123 (l'ancien numéro, repris), nom commercial TutelLiv, domaine tutelliv.fr, début d'activité le 9 novembre, activité « édition et commercialisation d'un logiciel en ligne (SaaS) par abonnement » pour les entreprises de livraison. À toi : relever le nouveau SIRET et le code APE sur l'avis de situation INSEE (annuaire-entreprises.data.gouv.fr ; l'ancien code 82.99Z doit avoir changé), et donner à Claude l'e-mail et le téléphone à publier. Débloqués : mentions légales (LEGAL-LIENS), textes LEGAL-1, compte Meta Business (WHATSAPP-1), compte Super PDP (Factur-X), blancs du contrat de ton ami.
 - Étude de marché (`outputs/reports/Marché TutelLiv livraison B2B France.md`, environ 840 entreprises visées, hypothèse à mesurer) : trier la liste de prospects (107 lignes sur 282 ont le bon profil), obtenir 50 réponses tirées au hasard sur la part de clients directs, demander un devis à GTLYS et à Toncarton.
 - Avant le premier pilote ou la première vente (décidé le 2 novembre) : passer Vercel en Pro et créer la vraie production (AUDIT-0111, point E2).
 - Plateforme Factur-X : ouvrir le compte Super PDP au nom de la société quand elle existe (choix fait par Claude le 30 octobre, carte blanche : compte gratuit jusqu'à 1 000 factures par mois, API publique, pas de devis nécessaire).
-- Avant le dépôt au Guichet unique : vérifier la reprise de ton ancien SIREN, et ta capacité à exercer depuis les États-Unis sous visa J-1 avec ta résidence fiscale (checklist J5, non tranché).
+- Ancien SIREN repris (Kbis du 13 novembre). Reste non tranché : ta capacité à exercer depuis les États-Unis sous visa J-1 avec ta résidence fiscale (checklist J5) ; à voir avec un avocat en immigration et un fiscaliste.
 - LEGAL-1 (sections 4 et 6 de `docs/legal/VERIFICATION_2026-11-02.md`) : fournir SIREN, e-mail et téléphone. Décidé le 9 novembre : durées de conservation de DATA-02 validées telles que proposées ; CGV, plafond de responsabilité = sommes payées sur les 12 derniers mois, préavis de 30 jours. Confirmer aussi la durée provisoire de sept jours pour la file hors ligne du livreur, et, si un pilote emploie des livreurs indépendants payés à la livraison, faire qualifier l'affectation automatique (`docs/legal/AIPD_TYPE.md`, section 3).
 - Plus tard : trouver un téléphone Android (essais MOB-01C).
 - Vidéo d'explication de 2 min 15 (10 novembre, VIDEO-EXPLICATION) : prête dans `outputs/brag/tutelliv-explication.mp4`, on garde cette base. Dis à Claude les retouches que tu veux (scène, texte, musique, voix) ; à écouter : la prononciation de « TutelLiv ».
@@ -339,7 +339,7 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
 - [ ] **LEGAL-LIENS — Rendre accessibles les mentions légales et la politique de confidentialité depuis le site public.**
 
-  **Qui : Toi — SIREN, e-mail, téléphone ; puis Claude.**
+  **Qui : Toi — e-mail et téléphone à publier (SIREN reçu le 13 novembre) ; puis Claude.**
 
   Constat du 2 novembre 2026 : liens, renvois aux formulaires et recette faits le 29 octobre. Reste : compléter le contenu des mentions.
 
@@ -468,7 +468,7 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
 - [ ] **WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller.** Demande du propriétaire du 4 novembre 2026. Spécification : `docs/operations/order-intake/WHATSAPP.md` (règles de Meta vérifiées en ligne le 4 novembre : pas de renvoi automatique, API officielle seulement, vérification de l'entreprise, messages reçus gratuits, message transféré sans auteur d'origine, règle de Meta sur l'IA). Conseil : option A, un numéro TutelLiv vers lequel le dispatcher transfère le message ; l'entreprise est reconnue par le numéro du dispatcher.
 
-  **Qui : Toi — après le SIREN : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude.**
+  **Qui : Toi — SIREN reçu le 13 novembre : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude.**
 
   4 novembre 2026, décision du propriétaire : **option A maintenant, B préparée** (« part du principe que j'ai le SIREN »). Fait :
   - Base : enum `InboundChannel` et colonne `inbound_order_emails.channel`, `company_intake_channels.whatsapp_enabled` (migration `20261104020000_whatsapp_inbound`, appliquée sur tutelliv-dev et en préproduction avec ton accord).
