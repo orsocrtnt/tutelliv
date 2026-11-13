@@ -1,6 +1,17 @@
 /** Retour de Google : refus affiché sur `/login?google=<raison>` (aucune donnée personnelle dans l'adresse). */
 export const GOOGLE_LOGIN_PARAM = "google";
 export const GOOGLE_CALLBACK_PATH = "/auth/callback";
+/** Jeton Google (bouton officiel) échangé côté serveur : la fenêtre Google affiche « tutelliv.fr ». */
+export const GOOGLE_ID_TOKEN_PATH = "/api/auth/google";
+
+/**
+ * Identifiant public du client OAuth « Application Web » (projet Google Cloud « TutelLiv »), déclaré aussi
+ * dans Supabase (fournisseur Google, « Client IDs »). Public par nature : il figure dans chaque page Google.
+ * Une autre base (future production) peut en fournir un autre par `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
+ */
+export const GOOGLE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  "478277728600-8dkgje98373234lrc3ksfi3mdpbmjhb4.apps.googleusercontent.com";
 
 export type GoogleLoginRefusal = "unknown" | "unavailable" | "error" | "service";
 

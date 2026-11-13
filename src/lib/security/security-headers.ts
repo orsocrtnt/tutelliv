@@ -12,6 +12,8 @@ const DEFAULT_TILE_ORIGIN = "https://tile.openstreetmap.org";
 const DEFAULT_STYLE_ORIGIN = "https://tiles.openfreemap.org";
 // Plan et géocodage IGN (Géoplateforme), utilisables comme tuiles via NEXT_PUBLIC_MAP_TILE_URL.
 const IGN_ORIGIN = "https://data.geopf.fr";
+// Bouton « Continuer avec Google » (AUTH-GOOGLE) : bibliothèque Google Identity Services, limitée au chemin /gsi/.
+const GOOGLE_SIGN_IN = "https://accounts.google.com/gsi/";
 
 /** Origine https d'une URL de configuration ; `{s}` des tuiles devient un joker de sous-domaine. */
 function httpsOrigin(value: string | undefined): string | null {
@@ -35,15 +37,15 @@ export function buildContentSecurityPolicy(env: HeaderEnv = process.env as Heade
   const directives: Record<string, Array<string | null>> = {
     "default-src": ["'self'"],
     // Scripts inline de Next (hydratation) sans nonce ; eval seulement en développement.
-    "script-src": ["'self'", "'unsafe-inline'", dev ? "'unsafe-eval'" : null],
-    "style-src": ["'self'", "'unsafe-inline'"],
+    "script-src": ["'self'", "'unsafe-inline'", GOOGLE_SIGN_IN, dev ? "'unsafe-eval'" : null],
+    "style-src": ["'self'", "'unsafe-inline'", GOOGLE_SIGN_IN],
     "img-src": ["'self'", "data:", "blob:", "https://*.supabase.co", ...maps],
     "font-src": ["'self'", "data:"],
-    "connect-src": ["'self'", supabase, supabase?.replace(/^https:/, "wss:") ?? null, ...maps, dev ? "ws:" : null],
+    "connect-src": ["'self'", supabase, supabase?.replace(/^https:/, "wss:") ?? null, ...maps, GOOGLE_SIGN_IN, dev ? "ws:" : null],
     // Worker MapLibre servi depuis /vendor ; MapLibre crée aussi des workers blob:.
     "worker-src": ["'self'", "blob:"],
     "frame-ancestors": ["'none'"],
-    "frame-src": ["'none'"],
+    "frame-src": [GOOGLE_SIGN_IN],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
     "form-action": ["'self'"],

@@ -45,6 +45,10 @@ test("CSP : domaines réellement utilisés autorisés, rien de plus large", () =
     assert.ok(img.includes(origin), `img-src ${origin}`);
   }
   assert.ok((csp.get("worker-src") ?? []).includes("blob:"));
+  // AUTH-GOOGLE : seul le chemin /gsi/ de Google, jamais tout accounts.google.com.
+  for (const name of ["script-src", "style-src", "connect-src"]) assert.ok((csp.get(name) ?? []).includes("https://accounts.google.com/gsi/"), name);
+  assert.deepEqual(csp.get("frame-src"), ["https://accounts.google.com/gsi/"]);
+  assert.doesNotMatch(buildContentSecurityPolicy(ENV), /accounts\.google\.com(?!\/gsi\/)/);
   for (const [name, values] of csp) assert.ok(!values.includes("*") && !values.includes("https:"), `${name} trop large`);
 });
 

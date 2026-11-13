@@ -4,6 +4,7 @@ import test from "node:test";
 import { runInNewContext } from "node:vm";
 import { NextResponse } from "next/server";
 import ts from "typescript";
+import * as zod from "zod";
 import {
   GOOGLE_LOGIN_MESSAGES,
   googleLoginReturnPath,
@@ -258,4 +259,83 @@ test("connexion : seuls les refus connus s'affichent, et l'adresse inconnue renv
   assert.match(GOOGLE_LOGIN_MESSAGES.unknown, /demandez-lui une invitation/);
   const form = readFileSync("src/features/auth/auth-form.tsx", "utf8");
   assert.match(form, /href="\/register"[^>]*>Créer un compte entreprise</);
+});
+
+function loadIdTokenRoute(options: {
+  signIn?: (args: unknown) => Promise<{ data: { user: unknown }; error: unknown }>;
+  outcome?: () => Promise<unknown>;
+}) {
+  const calls = { signOut: 0, demoCleared: 0, signInArgs: [] as unknown[] };
+  const route = loadModule<{ POST: (request: Request) => Promise<Response> }>("src/app/api/auth/google/route.ts", {
+    "next/server": { NextResponse },
+    zod,
+    "@/services/supabase/server": {
+      createClient: async () => ({
+        auth: {
+          signInWithIdToken: async (args: unknown) => {
+            calls.signInArgs.push(plain(args));
+            return options.signIn ? options.signIn(args) : { data: { user: googleUser() }, error: null };
+          },
+          signOut: async () => { calls.signOut += 1; return { error: null }; },
+        },
+      }),
+    },
+    "@/domains/auth/google-login.service": {
+      completeGoogleLogin: options.outcome ?? (async () => ({ kind: "signed-in", redirectTo: "/dashboard" })),
+    },
+    "@/lib/demo/persona-cookie": {
+      clearDemoPersonaCookie: async () => { calls.demoCleared += 1; },
+      clearDemoSessionCookie: async () => { calls.demoCleared += 1; },
+    },
+    "@/lib/auth/google-login": { GOOGLE_LOGIN_MESSAGES },
+  });
+  return { ...route, calls };
+}
+
+const idTokenRequest = (body: unknown) =>
+  new Request("https://tutelliv.fixture/api/auth/google", { method: "POST", body: JSON.stringify(body) });
+const validBody = { credential: "header.payload.signature-fixture", nonce: "0123456789abcdef0123456789abcdef" };
+
+test("bouton Google : jeton et nonce bruts transmis à Supabase, succès vers l'espace du rôle", async () => {
+  const { POST, calls } = loadIdTokenRoute({ outcome: async () => ({ kind: "signed-in", redirectTo: "/driver" }) });
+  const response = await POST(idTokenRequest(validBody));
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { redirectTo: "/driver" });
+  assert.deepEqual(calls.signInArgs, [{ provider: "google", token: validBody.credential, nonce: validBody.nonce }]);
+  assert.equal(calls.demoCleared, 2);
+  assert.equal(calls.signOut, 0);
+});
+
+test("bouton Google : corps invalide refusé sans appel à Supabase", async () => {
+  const { POST, calls } = loadIdTokenRoute({});
+  for (const body of [null, {}, { credential: "court", nonce: validBody.nonce }, { credential: validBody.credential }]) {
+    const response = await POST(idTokenRequest(body));
+    assert.equal(response.status, 400);
+  }
+  assert.equal(calls.signInArgs.length, 0);
+});
+
+test("bouton Google : jeton refusé par Supabase (signature, audience, nonce) = erreur, panne = indisponible", async () => {
+  const rejected = loadIdTokenRoute({ signIn: async () => ({ data: { user: null }, error: { status: 400 } }) });
+  const response = await rejected.POST(idTokenRequest(validBody));
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).reason, "error");
+  const down = loadIdTokenRoute({ signIn: async () => ({ data: { user: null }, error: { status: 502 } }) });
+  assert.equal((await down.POST(idTokenRequest(validBody))).status, 503);
+});
+
+test("bouton Google : refus d'accès = session fermée, raison et message renvoyés", async () => {
+  for (const [reason, status] of [["unknown", 403], ["unavailable", 403]] as const) {
+    const { POST, calls } = loadIdTokenRoute({ outcome: async () => ({ kind: "refused", reason }) });
+    const response = await POST(idTokenRequest(validBody));
+    assert.equal(response.status, status);
+    const body = await response.json();
+    assert.equal(body.reason, reason);
+    assert.equal(body.error, GOOGLE_LOGIN_MESSAGES[reason]);
+    assert.equal(calls.signOut, 1);
+    assert.equal(calls.demoCleared, 0);
+  }
+  const db = loadIdTokenRoute({ outcome: async () => { throw Object.assign(new Error("pool"), { code: "P2024" }); } });
+  assert.equal((await db.POST(idTokenRequest(validBody))).status, 503);
+  assert.equal(db.calls.signOut, 1);
 });

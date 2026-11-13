@@ -70,7 +70,12 @@ const loginInputClass =
 
 export function AuthForm({ mode, loginContext = "company", prefillDemo = false, googleEnabled = false, googleRefusal = null }: AuthFormProps) {
   const [error, setError] = useState<string | null>(googleRefusal ? GOOGLE_LOGIN_MESSAGES[googleRefusal] : null);
-  const showSignupAfterRefusal = googleRefusal === "unknown" && error === GOOGLE_LOGIN_MESSAGES.unknown;
+  // Le lien d'inscription ne suit que le refus « adresse Google inconnue », tant que ce message est affiché.
+  const showSignupAfterRefusal = error === GOOGLE_LOGIN_MESSAGES.unknown;
+  const showGoogleRefusal = (reason: GoogleLoginRefusal) => {
+    setSuccess(null);
+    setError(GOOGLE_LOGIN_MESSAGES[reason]);
+  };
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
   const applyLoginSession = useApplyLoginSession();
@@ -384,7 +389,7 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false, 
                     ou
                     <span className="h-px flex-1 bg-border" />
                   </div>
-                  <GoogleLoginButton onError={setError} />
+                  <GoogleLoginButton onError={showGoogleRefusal} />
                 </>
               )}
               {loginLinks[loginContext].register && (
