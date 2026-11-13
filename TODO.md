@@ -20,7 +20,6 @@
 - MOTS-UNIFIES — Employer les mêmes mots partout à l'écran (après la vérification de conformité)
 - RELEASE-1 — Réaliser la recette de mise en vente (en dernier, avant la mise en vente)
 - SMS — Ajouter seulement les extensions justifiées (seulement si les pilotes le demandent)
-- AUTH-GOOGLE — Se connecter avec son compte Google (à planifier ; tu créeras l'identifiant Google (Google Cloud) au moment du branchement)
 
 **À faire par toi**
 
@@ -43,6 +42,7 @@
 - MAIL-PONT — Relier la boîte de commandes de l'entreprise à TutelLiv (régler `NEXT_PUBLIC_APP_URL` sur `https://tutelliv.fr` (Vercel, Preview `preproduction`) et retirer le filtre Gmail d'essai ; Outlook plus tard (décidé le 4 novembre) ; ensuite Claude)
 - WHATSAPP-1 — Recevoir les commandes WhatsApp sans copier-coller (après le SIREN : compte Meta Business, numéro dédié, variables Vercel ; ensuite Claude)
 - VIDEO-EXPLICATION — Retoucher la vidéo d'explication de TutelLiv (2 min 15) (dire les retouches à faire, puis Claude)
+- AUTH-GOOGLE — Se connecter avec son compte Google (activer la validation en deux étapes sur ton compte Google ; puis Claude (identifiant Google, activation dans Supabase, essais))
 
 _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les tâches closes, sans pondération de leur taille. Recalcul et synchronisation des copies : `npm run todo:progress`, automatiquement avant `npm run docs:verify`._
 <!-- TODO_PROGRESS_END -->
@@ -52,6 +52,7 @@ _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
+- **Connexion Google (AUTH-GOOGLE, 12 novembre) :** Google Cloud refuse l'accès tant que ton compte Google n'a pas la validation en deux étapes (obligatoire depuis mai 2026). Active-la sur https://myaccount.google.com/signinoptions/two-step-verification, puis dis à Claude « Google c'est fait » : il crée l'identifiant, active Google dans Supabase et fait les essais. Le code est déjà en ligne, le bouton reste caché jusque-là.
 - Fin d'un pilote (DATA-02, close le 12 novembre) : l'export se remet par un lien tutelliv.fr/export/… envoyé par e-mail et un code donné par SMS ou au téléphone ; Claude prépare les deux d'une commande. Rien à faire avant le premier pilote qui s'arrête. Le jour où tu passes Supabase en Pro, demande à Claude d'essayer une restauration de sauvegarde sur un projet à part.
 - **À lancer toi-même (refusé à Claude le 9 novembre par la sécurité de Claude Code) :** 1) sur Vercel, projet `tutelliv-v2`, Settings → Environment Variables, `NEXT_PUBLIC_APP_URL` (Preview, branche `preproduction`) = `https://tutelliv.fr`, puis Redeploy du dernier déploiement `preproduction` ; 2) brancher le fichier Google : créer la clé du compte de service dans Google Cloud (`docs/operations/prospection/SHEET.md`, étape 1 ; Claude peut la faire dans ton Chrome si l'extension est connectée), puis `sh outputs/prospection-sheet/brancher-vercel.sh` (pose les 3 variables sans afficher la clé et relance le déploiement), puis partager la Sheet en Lecteur avec l'adresse `client_email`. Dis ensuite à Claude « vérifie » : il teste les liens des e-mails et `/admin/prospection`. Pour ne plus avoir ce refus, tu peux ajouter une règle de permission dans Claude Code.
 - Campagnes (9 novembre, ADMIN-ESPACE) : sur tutelliv.fr/admin/campaigns, chaque campagne montre maintenant l'aperçu du mail (De, Objet, Aperçu, puis le mail tel qu'il partira) et un bouton « Retirer » sur chaque adresse pas encore envoyée. À regarder une fois en ligne ; Claude vérifiera aussi en cliquant dès que Chrome est connecté.
@@ -98,7 +99,7 @@ _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le m
 - CONTRAT-AMI : après la relecture du juriste, adapter le calcul SALES-1 : 15 % après la 1re année, arrêt 12 mois après la fin du contrat, lien personnel de changement de formule, origine de chaque changement, chiffre d'affaires mensuel compté et page de suivi des paliers.
 - LEGAL-1, écarts qui ne dépendent pas de toi : mise à jour des textes J5 une fois tes décisions prises (sur Drive : à reprendre dans le dépôt, Drive non modifié). Première vérification faite le 2 novembre (`docs/legal/VERIFICATION_2026-11-02.md`), aucune conformité déclarée.
 - MAIL-PONT : essai Outlook plus tard, quand tu le décides ; puis, si tu le veux, les fiches dans la page « Clients ».
-- AUTH-GOOGLE (demandé le 11 novembre) : connexion par compte Google sur /login ; tu créeras l'identifiant dans Google Cloud au moment du branchement.
+- AUTH-GOOGLE : code prêt et poussé (bouton caché tant que Google n'est pas activé). Dès que tu as activé la validation en deux étapes : identifiant Google Cloud, activation dans Supabase, essais réels et clic sur tutelliv.fr.
 
 **3. En attente de quelqu'un d'autre** (rien à faire tant que ça n'arrive pas)
 - Propriétaire et fournisseurs : fournir les justificatifs, contrats et décisions manquants pour la vérification LEGAL-1 (dont les durées de conservation DATA-02) et la fiche F10 d’INTAKE-1 avant les données réelles. LEGAL-LIENS suit la vérification des documents.
@@ -515,12 +516,19 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
 - [ ] **AUTH-GOOGLE — Se connecter avec son compte Google.**
 
-  **Qui : Claude — à planifier ; tu créeras l'identifiant Google (Google Cloud) au moment du branchement.**
+  **Qui : Toi — activer la validation en deux étapes sur ton compte Google ; puis Claude (identifiant Google, activation dans Supabase, essais).**
 
   11 novembre 2026 : demandé par le propriétaire. Aujourd'hui, la connexion se fait seulement par e-mail et mot de passe : aucun appel `signInWithOAuth` dans `src/`. À faire : un bouton « Continuer avec Google » sur `/login` (Supabase Auth, fournisseur Google). Il faut aussi trancher ce qui se passe si l'adresse Google correspond à un compte existant, ou à personne. Un compte Google seul ne doit jamais créer d'accès à une entreprise sans invitation. La page de connexion doit rester la même pour les comptes de démo et le super admin.
 
   Il faudra : un identifiant OAuth dans Google Cloud (écran de consentement, adresse de retour Supabase), le fournisseur Google activé dans Supabase (préproduction), les adresses de retour autorisées (`https://tutelliv.fr`), puis des tests pour un compte existant, un compte inconnu, un compte coupé et une invitation en attente, et un clic réel sur tutelliv.fr.
 
   Terminé quand : un compte invité se connecte avec Google sur tutelliv.fr et arrive dans son espace, et une adresse Google inconnue est refusée proprement.
+
+  12 novembre 2026 (Claude) : code fait. Décisions du propriétaire (questionnaire) : une invitation en attente vaut acceptation avec Google ; une adresse Google inconnue est refusée avec un lien « Créer un compte entreprise » (`/register`) ; le bouton marche pour tous les comptes sauf la démo ; Claude fait le branchement dans Chrome.
+  - Fait : bouton « Continuer avec Google » sous « Se connecter » sur `/login`, `/login/client` et `/login/driver` (`google-login-button.tsx`), affiché seulement si Google est activé dans Supabase (réglage public relu toutes les 5 minutes, `auth-providers.ts`) : avant le branchement, rien ne change en ligne. Retour de Google sur `/auth/callback` (`src/app/auth/callback/route.ts`) : code échangé côté serveur, destination choisie par le serveur d'après le rôle, aucun paramètre de redirection suivi. Décision dans `google-login.service.ts` : compte TutelLiv relié au même compte Supabase (liaison automatique par adresse) et actif → son espace ; invitation en attente → activée avec les mêmes garde-fous que le lien d'invitation (entreprise active ou en essai, hors démo) ; inconnu, coupé, entreprise suspendue ou démo → session fermée et message sur la page de départ (`?google=`, retiré de l'adresse après lecture). Le compte Supabase vide créé par un clic Google inconnu est supprimé (sinon il bloquerait l'invitation ou l'inscription de cette adresse), seulement s'il n'a que Google, moins de 10 minutes, aucune inscription en cours et aucun profil TutelLiv.
+  - Supabase préproduction (Chrome, fait par Claude) : adresses de retour ajoutées `https://tutelliv.fr/auth/callback**`, `https://tutelliv-v2-git-preproduction-tutelliv.vercel.app/auth/callback**`, `http://localhost:3100/auth/callback**` (« Successfully added 3 URLs »). Fournisseur Google pas encore activé (`/auth/v1/settings` : `google: false`).
+  - Vérifié : `tests/auth-google.test.ts` 15/15 (compte existant, invitation en attente, inconnu avec suppression, comptes jamais supprimés, compte coupé, entreprise suspendue, démo, adresse non vérifiée, retour annulé, page d'origine étrangère ignorée, panne) ; `npm run check` 1 776/1 776 ; clic réel sur un serveur isolé (worktree, port 3100, base de préproduction) : `/auth/callback` sans code ramène sur `/login/client` avec « La connexion avec Google n'a pas abouti… », `/login?google=unknown` affiche le refus et le lien d'inscription, le paramètre est retiré de l'adresse, pas de bouton Google tant que le fournisseur est coupé.
+  - Bloqué : Google Cloud refuse l'accès (« Accès à Google Cloud bloqué ») tant que la validation en deux étapes n'est pas activée sur le compte Google du propriétaire (obligatoire depuis le 29 mai 2026). C'est un réglage de sécurité de son compte : à faire par lui (https://myaccount.google.com/signinoptions/two-step-verification).
+  - Reste (Claude, ensuite) : créer le projet et l'identifiant OAuth « Application Web » dans Google Cloud (écran de consentement TutelLiv, adresse de retour `https://zwwyalsslyydubtetagj.supabase.co/auth/v1/callback`), activer Google dans Supabase avec cet identifiant, puis essais réels : adresse inconnue refusée, invitation en attente acceptée (compte E2E invité sur une adresse Google du propriétaire), compte coupé refusé ; vérifier en vrai que Supabase garde le même compte pour une invitation pas encore acceptée (la documentation ne le dit pas) ; clic réel sur tutelliv.fr.
 
   **Modèle conseillé : Claude Opus · effort élevé (authentification, sécurité).**

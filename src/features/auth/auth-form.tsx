@@ -34,6 +34,8 @@ import { AUTH_TIMEOUT_MESSAGE, RequestTimeoutError, requestJsonWithTimeout } fro
 import { createSubmitGuard } from "@/features/auth/submit-guard";
 import { DEMO_DEFAULT_PASSWORD, DEMO_LOGIN_EMAIL } from "@/lib/demo/constants";
 import { navigateToAuthPage } from "@/lib/navigation/auth-page-navigation";
+import { GOOGLE_LOGIN_MESSAGES, GOOGLE_LOGIN_PARAM, type GoogleLoginRefusal } from "@/lib/auth/google-login";
+import { GoogleLoginButton } from "@/features/auth/google-login-button";
 
 type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
 type PasswordLink =
@@ -56,14 +58,19 @@ interface AuthFormProps {
   loginContext?: LoginContext;
   /** Lien « Essayer la démo » : remplit le compte de démonstration public (affiché en clair sur la page). */
   prefillDemo?: boolean;
+  /** Fournisseur Google activé dans Supabase : affiche « Continuer avec Google » (AUTH-GOOGLE). */
+  googleEnabled?: boolean;
+  /** Refus au retour de Google (`?google=`), affiché dès l'ouverture de la page. */
+  googleRefusal?: GoogleLoginRefusal | null;
 }
 
 /** Champs de la connexion : 52 px de haut, bordure contrastée (3:1) en Light comme en Dark. */
 const loginInputClass =
   "h-[52px] rounded-[14px] border-[#858f88] bg-card px-4 text-base dark:border-[#6b746f]";
 
-export function AuthForm({ mode, loginContext = "company", prefillDemo = false }: AuthFormProps) {
-  const [error, setError] = useState<string | null>(null);
+export function AuthForm({ mode, loginContext = "company", prefillDemo = false, googleEnabled = false, googleRefusal = null }: AuthFormProps) {
+  const [error, setError] = useState<string | null>(googleRefusal ? GOOGLE_LOGIN_MESSAGES[googleRefusal] : null);
+  const showSignupAfterRefusal = googleRefusal === "unknown" && error === GOOGLE_LOGIN_MESSAGES.unknown;
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
   const applyLoginSession = useApplyLoginSession();
@@ -80,6 +87,14 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
     return () => window.removeEventListener("pageshow", release);
   }, [loginGuard]);
   const [completingLink, setCompletingLink] = useState(false);
+
+  // Refus Google affiché une fois : l'adresse est nettoyée pour qu'un rechargement ne le remontre pas.
+  useEffect(() => {
+    if (!googleRefusal) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete(GOOGLE_LOGIN_PARAM);
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}`);
+  }, [googleRefusal]);
 
   useEffect(() => {
     if (mode !== "reset-password") return;
@@ -299,14 +314,22 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
           {isInvitedUser && mode === "login" && (
             <Alert variant="info" className="mt-5">
               <AlertDescription>
-                Votre compte est créé par l’entreprise de livraison qui vous invite. Utilisez votre e-mail et le mot de passe choisi lors de votre invitation.
+                Votre compte est créé par l’entreprise de livraison qui vous invite. Utilisez votre e-mail et le mot de passe choisi lors de votre invitation{googleEnabled ? ", ou « Continuer avec Google » si l’invitation a été envoyée à votre adresse Google" : ""}.
               </AlertDescription>
             </Alert>
           )}
 
           {error && (
             <Alert variant="destructive" className="mt-6">
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>
+                {error}
+                {showSignupAfterRefusal && (
+                  <>
+                    {" "}Vous dirigez une entreprise de livraison ?{" "}
+                    <Link href="/register" className="font-semibold underline underline-offset-2">Créer un compte entreprise</Link>
+                  </>
+                )}
+              </AlertDescription>
             </Alert>
           )}
           {success && (
@@ -354,6 +377,16 @@ export function AuthForm({ mode, loginContext = "company", prefillDemo = false }
               <Button type="submit" variant="brand" size="lg" className="h-[52px] w-full rounded-full text-base font-semibold" loading={loginForm.formState.isSubmitting}>
                 Se connecter
               </Button>
+              {googleEnabled && (
+                <>
+                  <div className="flex items-center gap-3 text-sm text-text-secondary" aria-hidden>
+                    <span className="h-px flex-1 bg-border" />
+                    ou
+                    <span className="h-px flex-1 bg-border" />
+                  </div>
+                  <GoogleLoginButton onError={setError} />
+                </>
+              )}
               {loginLinks[loginContext].register && (
                 <p className="text-center text-sm text-text-secondary">
                   Pas encore de compte entreprise ?{" "}
