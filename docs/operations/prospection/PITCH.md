@@ -39,7 +39,7 @@ SIREN reçu le 13 novembre 2026 (952 788 123 R.C.S. Marseille) : les textes « A
 
 **Avant le rendez-vous (2 minutes)**
 
-1. Aller sur `https://tutelliv.fr/demonstration`, cliquer sur « Ouvrir la démonstration », puis sur « Remplir avec le compte démo ».
+1. Aller sur `https://tutelliv.fr` et cliquer sur « Voir la démo », en haut à droite : la démo s'ouvre toute seule (`/demonstration` renvoie maintenant vers la visite animée de l'accueil ; vérifié le 13 novembre 2026).
 2. Cliquer sur **« Réinitialiser la démo »** dans le bandeau du haut, puis confirmer. Sans ce geste, les données sont souvent périmées (par exemple 14 retards, aucune mission du jour). Testé le 1er novembre : la réinitialisation remet les données à la date du jour.
 3. Choisir « Administrateur » dans le bandeau.
 
@@ -49,11 +49,13 @@ SIREN reçu le 13 novembre 2026 (952 788 123 R.C.S. Marseille) : les textes « A
 |---|---|---|---|
 | 0 à 2 | Client : « Nouvelle commande » | Une commande saisie une seule fois | « Votre client commande ici, une seule fois. » |
 | 2 à 5 | Administrateur : Dispatch | La file d'attente, l'affectation, les imprévus | « Votre dispatcher voit ce qui est à traiter. Une affectation n'est pas une acceptation : vous voyez quand le livreur a vraiment pris la mission. » |
-| 5 à 7 | Chauffeur : mission | Confirmer et démarrer | « Le livreur a tout sur son téléphone. Sa position n'est partagée que pendant une mission démarrée. » |
+| 5 à 7 | Livreur : onglet « Missions » | Prendre en charge, Commencer la mission, Passer en livraison, Confirmer la livraison (photo, nom, signature) | « Le livreur a tout sur son téléphone. Sa position n'est partagée que pendant une mission démarrée. » |
 | 7 à 9 | Client : Livraisons | Les étapes et la carte | « Votre client voit où ça en est. Est-ce que ça vous éviterait des appels ? » |
 | 9 à 10 | Aucun | Rien : ajouter une preuve prend du temps, mais ne bloque plus la place de démo | « La preuve reste dans le dossier de la livraison. » La visite animée de l'accueil la montre, mais il faut la jouer depuis le début : à garder pour une personne qui a le temps. |
 
-Pour changer de rôle : le menu « Administrateur / Client / Chauffeur » du bandeau.
+Pour changer de rôle : le menu « Administrateur / Client / Livreur » du bandeau.
+
+**Pièges relevés en jouant la démo le 13 novembre 2026 :** dater la commande du jour (sinon la mission n'apparaît pas chez le livreur) ; la démo est en dispatch automatique, la commande est donc déjà affectée en arrivant dans Dispatch ; à la validation de la livraison, la position est vérifiée (jusqu'à 14 secondes) puis « Localisation éloignée » s'affiche puisqu'on n'est pas sur place : « Confirmer quand même ». Pas-à-pas filmé : vidéos V6.1 à V6.5 (tâche FORMATION-COM).
 
 **Après le rendez-vous**
 

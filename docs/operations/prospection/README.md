@@ -261,7 +261,7 @@ Chiffres par campagne : envoyés, clics « Je veux en être », clics vers le si
 
 ## 8. Le rendez-vous de 20 à 30 minutes
 
-Depuis le 9 novembre 2026 : la partie « écouter » est faite par l'ami à Paris, au téléphone ; la démonstration par Orso, en visio entre 18 h et 18 h 30, heure française (partie 5).
+Depuis le 9 novembre 2026 : la partie « écouter » est faite par l'ami à Paris, au téléphone. Depuis le 13 novembre (décision du propriétaire, contrat C16) : il fait aussi la démonstration lui-même ; ses vidéos de formation (12 vidéos, dont la démo en 5 parties) sont dans `outputs/videos-formation/commercial/` et sur le Drive du propriétaire (tâche FORMATION-COM).
 
 Pitch en 10 secondes, 30 secondes et 2 minutes, supports et démonstration minute par minute : [`PITCH.md`](PITCH.md).
 
@@ -281,7 +281,7 @@ Ne pas demander « Vous aimeriez une carte en direct ? » ni « Vous paieriez 17
 3. le livreur confirme et démarre ;
 4. le client voit l'état de la livraison.
 
-**Ne jamais ajouter de photo ni de signature dans la démo :** c'est ce qui a bloqué une place le 28 octobre, et le blocage est définitif tant que personne n'intervient. La preuve se raconte, ou se montre dans la visite animée de la page d'accueil, à jouer depuis le début.
+**Photo et signature dans la démo : permises depuis la correction du recyclage** (vérifié dans le code le 13 novembre 2026 : les preuves fictives sont effacées quand la place est recyclée ; la liste « À essayer » propose d'ailleurs « Livrer avec preuve »). Le blocage du 28 octobre ne se reproduit plus. La preuve se raconte, ou se montre dans la visite animée de la page d'accueil, à jouer depuis le début.
 
 **Se déconnecter à la fin de la démo** : cela libère une place pour le suivant. Vérifier avant chaque rendez-vous que la démo s'ouvre. Ne pas montrer les invitations, ni taper une vraie adresse dans la démo : ce blocage reste à corriger (AUDIT-0111).
 
