@@ -32,7 +32,7 @@
 - INTAKE-1 — Commande par message IA (coller un message)
 - AUDIT-0111 — Corrections de l'audit complet du 1er novembre 2026 avant le premier pilote
 - PROPRIO-2810 — Actions du propriétaire avant mise en ligne
-- FORMATION-COM — Vidéos de formation du commercial de Paris (regarder les 12 vidéos et dire les retouches ; puis Claude (retouches, voix des phrases modifiées))
+- FORMATION-COM — Vidéos de formation du commercial de Paris (partager le dossier Drive avec ton ami ; puis Claude (V7, dès que l'autre session annonce Tarifs et inscription prêts))
 - ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire (brancher le fichier Google (`docs/operations/prospection/SHEET.md`), puis Claude vérifie la lecture réelle ; campagnes : l'autre session les fusionne)
 - ONBOARD-1 — Guider jusqu’à la première livraison (pendant les pilotes)
 - LEGAL-1 — Vérifier le respect des exigences applicables et préparer les documents (fournir les pièces et décider, puis Claude)
@@ -53,7 +53,7 @@ _Chaque tâche est classée selon qui doit agir ensuite. Cette jauge compte les 
 _Lire ce bloc en premier. Tout le reste du fichier est le détail. Un agent le met à jour à chaque fin de tâche (simples tirets ici : seules les cases des tâches comptent dans la jauge)._
 
 **1. Toi (le 30 octobre, Claude a fait le reste de ta liste : voir PROPRIO-2810)**
-- **Vidéos de formation de ton ami (FORMATION-COM, 13 et 14 novembre)** : 12 vidéos (environ 15 min, voix ElevenLabs « Victor Doré ») sur ton Drive, dossier TutelLiv → [Vidéos de formation – commercial](https://drive.google.com/drive/folders/1jUKM-BDMsZNeXUQDhR8H5eSXu4nRpEt6), non partagé. À toi : les regarder (surtout la prononciation de « TutelLiv »), dire les retouches, puis partager le dossier avec ton ami. V7 (prix et inscription) garde des cartons « à tourner » jusqu'à l'ouverture des ventes. Sur ton Mac, Node ne démarre plus depuis une mise à jour Homebrew du 13 novembre : lancer `brew reinstall node@22`.
+- **Vidéos de formation de ton ami (FORMATION-COM, 13 et 14 novembre)** : 12 vidéos (environ 15 min, voix ElevenLabs « Victor Doré ») sur ton Drive, dossier TutelLiv → [Vidéos de formation – commercial](https://drive.google.com/drive/folders/1jUKM-BDMsZNeXUQDhR8H5eSXu4nRpEt6), non partagé. Validées par toi le 14 novembre, sans retouche. À toi : partager le dossier avec ton ami (clic droit → Partager → son adresse, en Lecteur). V7 (prix et inscription) garde des cartons « à tourner » jusqu'à l'ouverture des ventes. Sur ton Mac, Node ne démarre plus depuis une mise à jour Homebrew du 13 novembre : lancer `brew reinstall node@22`.
 - Connexion Google (AUTH-GOOGLE, close le 13 novembre, vérifiée sur tutelliv.fr) : « Continuer avec Google » marche ; une invitation en attente est acceptée, une adresse inconnue est refusée, un compte coupé aussi. L'écran Google affiche encore « zwwyalsslyydubtetagj.supabase.co » au lieu de « TutelLiv » (domaine personnalisé Supabase payant, à décider plus tard). Rien à faire.
 - Fin d'un pilote (DATA-02, close le 12 novembre) : l'export se remet par un lien tutelliv.fr/export/… envoyé par e-mail et un code donné par SMS ou au téléphone ; Claude prépare les deux d'une commande. Rien à faire avant le premier pilote qui s'arrête. Le jour où tu passes Supabase en Pro, demande à Claude d'essayer une restauration de sauvegarde sur un projet à part.
 - **À lancer toi-même (refusé à Claude le 9 novembre par la sécurité de Claude Code) :** 1) sur Vercel, projet `tutelliv-v2`, Settings → Environment Variables, `NEXT_PUBLIC_APP_URL` (Preview, branche `preproduction`) = `https://tutelliv.fr`, puis Redeploy du dernier déploiement `preproduction` ; 2) brancher le fichier Google : créer la clé du compte de service dans Google Cloud (`docs/operations/prospection/SHEET.md`, étape 1 ; Claude peut la faire dans ton Chrome si l'extension est connectée), puis `sh outputs/prospection-sheet/brancher-vercel.sh` (pose les 3 variables sans afficher la clé et relance le déploiement), puis partager la Sheet en Lecteur avec l'adresse `client_email`. Dis ensuite à Claude « vérifie » : il teste les liens des e-mails et `/admin/prospection`. Pour ne plus avoir ce refus, tu peux ajouter une règle de permission dans Claude Code.
@@ -118,7 +118,7 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
 - [ ] **FORMATION-COM — Vidéos de formation du commercial de Paris.**
 
-  **Qui : Toi — regarder les 12 vidéos et dire les retouches ; puis Claude (retouches, voix des phrases modifiées).**
+  **Qui : Toi — partager le dossier Drive avec ton ami ; puis Claude (V7, dès que l'autre session annonce Tarifs et inscription prêts).**
 
   Demande du propriétaire du 13 novembre 2026 : former l'ami qui démarche, sur le modèle des vidéos AJ School (`outputs/videos formation exemple /`). Décisions en questionnaire le 13 novembre : la série enseigne la vente de A à Z comme le contrat C16, l'ami fait la démo lui-même, à « On peut l'essayer ? » il propose le pilote de quatre semaines (sans dire « gratuit »), même voix ElevenLabs pour toutes les formations. Le 13 novembre, le propriétaire a demandé que la démo soit la vidéo la plus détaillée : V6 refaite en 5 parties.
 
@@ -127,6 +127,8 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
   Vérifié : une image de fin pour chaque plan, voix présente et au même volume dans les 12 vidéos, découpage de la voix contrôlé (rythme régulier sur tous les plans). Non vérifié : écoute réelle (l'agent n'entend pas), lecture sur le Drive. Limites : V7 garde des cartons « à tourner » (`/tarifs` est une liste d'attente, inscription fermée) ; le tableur de V2 et V8 est une maquette fictive faite d'après l'antisèche ; une place de démo est restée ouverte jusqu'à expiration après un essai raté.
 
   Autorisation du propriétaire (14 novembre 2026) : dès qu'une autre session annonce que la page Tarifs et l'inscription sont prêtes, Claude tourne V7 (captures, voix ElevenLabs, rendu, Drive) sans attendre l'ouverture officielle des ventes.
+
+  Validation du propriétaire (14 novembre 2026) : les 12 vidéos sont validées telles quelles, sans retouche (« tu peux valider »).
 
   Terminé quand : le propriétaire a validé les vidéos et les a partagées avec son ami ; V7 tournée avec les vrais écrans de prix et d'inscription.
 
