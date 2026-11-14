@@ -126,7 +126,9 @@ _Tâches closes, anciens tableaux et journal : `docs/TODO-ARCHIVE.md`._
 
   Vérifié : une image de fin pour chaque plan, voix présente et au même volume dans les 12 vidéos, découpage de la voix contrôlé (rythme régulier sur tous les plans). Non vérifié : écoute réelle (l'agent n'entend pas), lecture sur le Drive. Limites : V7 garde des cartons « à tourner » (`/tarifs` est une liste d'attente, inscription fermée) ; le tableur de V2 et V8 est une maquette fictive faite d'après l'antisèche ; une place de démo est restée ouverte jusqu'à expiration après un essai raté.
 
-  Terminé quand : le propriétaire a validé les vidéos et les a partagées avec son ami ; V7 tournée à l'ouverture des ventes.
+  Autorisation du propriétaire (14 novembre 2026) : dès qu'une autre session annonce que la page Tarifs et l'inscription sont prêtes, Claude tourne V7 (captures, voix ElevenLabs, rendu, Drive) sans attendre l'ouverture officielle des ventes.
+
+  Terminé quand : le propriétaire a validé les vidéos et les a partagées avec son ami ; V7 tournée avec les vrais écrans de prix et d'inscription.
 
 - [ ] **ADMIN-ESPACE — Refaire l'espace super admin (/admin) du propriétaire.**
 
